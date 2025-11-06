@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HotelManagementIt008.Data.Migrations
 {
-    [DbContext(typeof(HotelManagementContext))]
+    [DbContext(typeof(HotelManagementDbContext))]
     [Migration("20251105165730_AddTables")]
     partial class AddTables
     {

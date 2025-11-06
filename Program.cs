@@ -1,6 +1,3 @@
-using HotelManagementIt008.Data.Seeders;
-using HotelManagementIt008.Extensions;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 

@@ -1,6 +1,4 @@
-﻿using HotelManagementIt008.Enums;
-
-namespace HotelManagementIt008.Models
+﻿namespace HotelManagementIt008.Models
 {
     internal class Profile
     {

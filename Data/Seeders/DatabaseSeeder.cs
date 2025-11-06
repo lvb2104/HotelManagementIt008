@@ -3,19 +3,16 @@ using System.Text;
 
 using Bogus;
 
-using HotelManagementIt008.Enums;
-using HotelManagementIt008.Models;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelManagementIt008.Data.Seeders
 {
     internal class DatabaseSeeder
     {
-        private readonly HotelManagementContext _context;
+        private readonly HotelManagementDbContext _context;
         private readonly Random _rng = new();
 
-        public DatabaseSeeder(HotelManagementContext context)
+        public DatabaseSeeder(HotelManagementDbContext context)
         {
             _context = context;
         }
@@ -51,9 +48,9 @@ namespace HotelManagementIt008.Data.Seeders
 
         private string HashPassword(string password)
         {
-            using var sha256 = SHA256.Create();
-            var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(bytes);
+            using var sha256 = SHA256.Create(); // Use SHA256 for hashing
+            var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password)); // Convert password to byte array
+            return Convert.ToBase64String(bytes); // Convert byte array to Base64 string
         }
 
         private async Task<List<Role>> SeedRoles()
