@@ -1,14 +1,13 @@
-﻿
-using HotelManagementIt008.Models;
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace HotelManagementIt008.Data
 {
-    internal class HotelManagementContext : DbContext
+    internal class HotelManagementDbContext : DbContext
     {
-        public HotelManagementContext(DbContextOptions<HotelManagementContext> dbContextOptions) : base(dbContextOptions)
-        { }
+        public HotelManagementDbContext(DbContextOptions<HotelManagementDbContext> dbContextOptions) : base(dbContextOptions)
+        {
+
+        }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Profile> Profiles { get; set; }
@@ -22,6 +21,7 @@ namespace HotelManagementIt008.Data
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Params> Params { get; set; }
 
+        // Configure entity relationships and properties
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -98,6 +98,7 @@ namespace HotelManagementIt008.Data
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
+        // Configure CreatedAt, UpdatedAt, DeletedAt properties
         private void ConfigureTimeStamps(ModelBuilder modelBuilder)
         {
             var entities = new Type[]
@@ -150,6 +151,7 @@ namespace HotelManagementIt008.Data
             }
         }
 
+        // Override SaveChangesAsync to set timestamps
         public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
             var entries = ChangeTracker.Entries();

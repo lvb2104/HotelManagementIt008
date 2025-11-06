@@ -1,4 +1,4 @@
-﻿namespace HotelManagementIt008.Configuration
+﻿namespace HotelManagementIt008.Configurations
 {
     internal class EFCoreSettings
     {

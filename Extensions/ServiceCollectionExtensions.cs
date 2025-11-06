@@ -1,7 +1,4 @@
-﻿using HotelManagementIt008.Configuration;
-using HotelManagementIt008.Data;
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -14,7 +11,7 @@ namespace HotelManagementIt008.Extensions
         {
             public IServiceCollection AddDatabaseService() // which method
             {
-                services.AddDbContext<HotelManagementContext>((serviceProvider, options) =>
+                services.AddDbContext<HotelManagementDbContext>((serviceProvider, options) =>
                 {
                     var settings = serviceProvider.GetRequiredService<IOptions<EFCoreSettings>>().Value;
                     options.UseSqlServer(settings.DefaultConnection);
