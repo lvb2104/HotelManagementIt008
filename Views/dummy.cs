@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HotelManagementIt008.Views
+﻿namespace HotelManagementIt008.Views
 {
-    internal class dummy
+    public class dummy
     {
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Enums
 {
-    internal enum RoleType
+    public enum RoleType
     {
         Admin,
         Staff,

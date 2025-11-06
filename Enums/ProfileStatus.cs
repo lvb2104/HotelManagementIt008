@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Enums
 {
-    internal enum ProfileStatus
+    public enum ProfileStatus
     {
         Inactive,
         Active,

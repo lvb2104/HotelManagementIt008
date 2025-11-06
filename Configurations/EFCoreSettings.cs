@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Configurations
 {
-    internal class EFCoreSettings
+    public class EFCoreSettings
     {
         public const string SettingsSection = "ConnectionStrings";
 

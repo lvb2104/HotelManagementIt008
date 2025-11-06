@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Models
 {
-    internal class Profile
+    public class Profile
     {
         public Guid Id { get; set; }
 
