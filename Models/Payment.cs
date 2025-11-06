@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Models
 {
-    internal class Payment
+    public class Payment
     {
         public Guid Id { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Models
 {
-    internal class Params
+    public class Params
     {
         public Guid Id { get; set; }
 

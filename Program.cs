@@ -1,9 +1,12 @@
+using HotelManagementIt008.Interfaces;
+using HotelManagementIt008.Repositories;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace HotelManagementIt008
 {
-    internal static class Program
+    public static class Program
     {
         /// <summary>
         ///  The main entry point for the application.
@@ -17,10 +20,16 @@ namespace HotelManagementIt008
             {
                 // Register application services
                 services.AddConfigurationService(context.Configuration)
-                    .AddDatabaseService();
+                    .AddDatabaseService()
+                    .AddAutoMapperService();
 
                 // Register other services here
-                services.AddTransient<DatabaseSeeder>();
+                services.AddScoped<DatabaseSeeder>()
+                    .AddScoped<IUserService, UserService>()
+                    .AddScoped<IUnitOfWork, UnitOfWork>();
+
+                // Register Forms
+                services.AddTransient<LoginForm>();
             }).Build();
 
             using (var scope = host.Services.CreateScope())
@@ -31,7 +40,8 @@ namespace HotelManagementIt008
             }
 
             ApplicationConfiguration.Initialize();
-            Application.Run(new MainForm());
+            var loginForm = host.Services.GetRequiredService<LoginForm>();
+            Application.Run(loginForm);
         }
     }
 }

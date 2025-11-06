@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelManagementIt008.Data.Migrations
 {
     [DbContext(typeof(HotelManagementDbContext))]
-    [Migration("20251105165730_AddTables")]
+    [Migration("20251106141603_AddTables")]
     partial class AddTables
     {
         /// <inheritdoc />
@@ -389,14 +389,12 @@ namespace HotelManagementIt008.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ProfileId")
+                    b.Property<Guid?>("ProfileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("RoleId")
@@ -407,8 +405,11 @@ namespace HotelManagementIt008.Data.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("SYSUTCDATETIME()");
 
-                    b.Property<Guid>("UserTypeId")
+                    b.Property<Guid?>("UserTypeId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -541,8 +542,7 @@ namespace HotelManagementIt008.Data.Migrations
                     b.HasOne("HotelManagementIt008.Models.UserType", "UserType")
                         .WithMany("Users")
                         .HasForeignKey("UserTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Role");
 
@@ -586,8 +586,7 @@ namespace HotelManagementIt008.Data.Migrations
 
                     b.Navigation("Bookings");
 
-                    b.Navigation("Profile")
-                        .IsRequired();
+                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("HotelManagementIt008.Models.UserType", b =>
