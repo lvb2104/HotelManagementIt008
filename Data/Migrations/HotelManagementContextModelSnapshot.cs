@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HotelManagementIt008.Data.Migrations
 {
-    [DbContext(typeof(HotelManagementContext))]
+    [DbContext(typeof(HotelManagementDbContext))]
     partial class HotelManagementContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
