@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Models
 {
-    internal class BookingDetails
+    public class BookingDetails
     {
         public Guid Id { get; set; }
 

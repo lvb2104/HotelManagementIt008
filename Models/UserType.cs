@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Models
 {
-    internal class UserType
+    public class UserType
     {
         public Guid Id { get; set; }
 

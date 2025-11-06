@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Enums
 {
-    internal enum InvoiceStatus
+    public enum InvoiceStatus
     {
         Pending,
         Paid,
