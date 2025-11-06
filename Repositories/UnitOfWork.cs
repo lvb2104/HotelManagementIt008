@@ -2,7 +2,7 @@
 
 namespace HotelManagementIt008.Repositories
 {
-    internal class UnitOfWork : IUnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly HotelManagementDbContext _context;
         private UserRepository? _userRepository;

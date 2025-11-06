@@ -1,9 +1,7 @@
-﻿using HotelManagementIt008.Interfaces.Repositories;
-
-namespace HotelManagementIt008.Interfaces
+﻿namespace HotelManagementIt008.Interfaces
 {
     // Define the Unit of Work interface to encapsulate all repositories
-    internal interface IUnitOfWork
+    public interface IUnitOfWork
     {
         IUserRepository UserRepository { get; }
         IUserTypeRepository UserTypeRepository { get; }

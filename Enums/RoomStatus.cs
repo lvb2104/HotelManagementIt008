@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Enums
 {
-    internal enum RoomStatus
+    public enum RoomStatus
     {
         Available,
         Occupied,

@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Enums
 {
-    internal enum UserTypeType
+    public enum UserTypeType
     {
         Local,
         Foreign

@@ -1,5 +1,17 @@
 ﻿# Hotel Management System
 
+## Update database
+
+```bash
+# Use Package Manager Console in Visual Studio
+# First, remove existing migrations if any
+Remove-Migration -Force
+# Then, add a new migration
+Add-Migration [name] -OutputDir Data/Migrations
+# Finally, update the database
+Update-Database
+```
+
 ## Người 1 – **Accounts** (USER_TYPE, USER, ROLE, PROFILE)
 
 **Form chính (5):**

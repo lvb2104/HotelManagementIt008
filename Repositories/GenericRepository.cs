@@ -3,15 +3,15 @@
 namespace HotelManagementIt008.Repositories
 {
     // Implement generic methods for all repositories
-    internal class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        private readonly HotelManagementDbContext _context;
+        protected readonly HotelManagementDbContext Context;
         private readonly DbSet<T> _dbSet;
 
         public GenericRepository(HotelManagementDbContext context)
         {
-            _context = context;
-            _dbSet = _context.Set<T>();
+            Context = context;
+            _dbSet = Context.Set<T>();
         }
 
         // Use "virtual" keyword to allow overriding in derived classes (UserRepository, RoomRepository, etc.)

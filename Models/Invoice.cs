@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Models
 {
-    internal class Invoice
+    public class Invoice
     {
         public Guid Id { get; set; }
 

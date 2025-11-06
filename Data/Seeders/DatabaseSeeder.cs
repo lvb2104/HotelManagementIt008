@@ -1,13 +1,10 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-
-using Bogus;
+﻿using Bogus;
 
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelManagementIt008.Data.Seeders
 {
-    internal class DatabaseSeeder
+    public class DatabaseSeeder
     {
         private readonly HotelManagementDbContext _context;
         private readonly Random _rng = new();
@@ -25,7 +22,8 @@ namespace HotelManagementIt008.Data.Seeders
                 return;
             }
 
-            var passwordHash = HashPassword("password123");
+            var salt = BCrypt.Net.BCrypt.GenerateSalt();
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword("password123", salt);
 
             // Phase 1: Seed lookup tables
             var roles = await SeedRoles();
@@ -37,20 +35,15 @@ namespace HotelManagementIt008.Data.Seeders
             var rooms = await SeedRooms(roomTypes);
 
             // Phase 3: Seed users and profiles
-            var users = await SeedUsersAndProfiles(roles, userTypes, passwordHash);
+            var admin = await SeedAdmin(roles, passwordHash);
+            var staffs = await SeedStaffs(roles, passwordHash);
+            var customers = await SeedCustomersAndProfiles(roles, userTypes);
 
             // Phase 4: Seed bookings, invoices, and booking details
-            await SeedBookingsInvoicesAndDetails(users, rooms, payments, roomTypes, userTypes);
+            await SeedBookingsInvoicesAndDetails(customers, rooms, payments, roomTypes, userTypes);
 
             // Phase 5: Seed system parameters
             await SeedParams();
-        }
-
-        private string HashPassword(string password)
-        {
-            using var sha256 = SHA256.Create(); // Use SHA256 for hashing
-            var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password)); // Convert password to byte array
-            return Convert.ToBase64String(bytes); // Convert byte array to Base64 string
         }
 
         private async Task<List<Role>> SeedRoles()
@@ -185,49 +178,53 @@ namespace HotelManagementIt008.Data.Seeders
             return rooms;
         }
 
-        private async Task<List<User>> SeedUsersAndProfiles(List<Role> roles, List<UserType> userTypes, string passwordHash)
+        private async Task<User> SeedAdmin(List<Role> roles, string passwordHash)
         {
             var adminRole = roles.First(r => r.Type == RoleType.Admin);
+            var admin = new User
+            {
+                Id = Guid.NewGuid(),
+                Username = "admin",
+                PasswordHash = passwordHash,
+                RoleId = adminRole.Id,
+            };
+            await _context.Users.AddAsync(admin);
+            await _context.SaveChangesAsync();
+            return admin;
+        }
+
+        private async Task<List<User>> SeedStaffs(List<Role> roles, string passwordHash)
+        {
             var staffRole = roles.First(r => r.Type == RoleType.Staff);
+            var staffFaker = new Faker<User>()
+                .RuleFor(u => u.Id, f => Guid.NewGuid())
+                .RuleFor(u => u.Username, f => f.Internet.UserName())
+                .RuleFor(u => u.PasswordHash, f => passwordHash)
+                .RuleFor(u => u.RoleId, f => staffRole.Id);
+            // 10% Staff (20 users)
+            var staffs = staffFaker.Generate(20);
+            await _context.Users.AddRangeAsync(staffs);
+            await _context.SaveChangesAsync();
+            return staffs;
+        }
+
+        private async Task<List<User>> SeedCustomersAndProfiles(List<Role> roles, List<UserType> userTypes)
+        {
             var customerRole = roles.First(r => r.Type == RoleType.Customer);
 
-            var userFaker = new Faker<User>()
+            var customerFaker = new Faker<User>()
                 .RuleFor(u => u.Id, f => Guid.NewGuid())
                 .RuleFor(u => u.Email, f => f.Internet.Email())
-                .RuleFor(u => u.PasswordHash, f => passwordHash)
-                .RuleFor(u => u.RoleId, f => f.PickRandom(roles).Id)
+                .RuleFor(u => u.RoleId, f => customerRole.Id)
                 .RuleFor(u => u.UserTypeId, f => f.PickRandom(userTypes).Id);
 
-            var users = new List<User>();
-
-            // 5% Admin (10 users)
-            for (int i = 0; i < 10; i++)
-            {
-                var user = userFaker.Generate();
-                user.RoleId = adminRole.Id;
-                users.Add(user);
-            }
-
-            // 15% Staff (30 users)
-            for (int i = 0; i < 30; i++)
-            {
-                var user = userFaker.Generate();
-                user.RoleId = staffRole.Id;
-                users.Add(user);
-            }
-
             // 80% Customer (160 users)
-            for (int i = 0; i < 160; i++)
-            {
-                var user = userFaker.Generate();
-                user.RoleId = customerRole.Id;
-                users.Add(user);
-            }
+            var customers = customerFaker.Generate(180);
 
-            await _context.Users.AddRangeAsync(users);
+            await _context.Users.AddRangeAsync(customers);
             await _context.SaveChangesAsync();
 
-            // Create profiles for all users
+            // Create profiles for all customers
             var profileFaker = new Faker<Profile>()
                 .RuleFor(p => p.Id, f => Guid.NewGuid())
                 .RuleFor(p => p.FullName, f => f.Name.FullName())
@@ -240,10 +237,10 @@ namespace HotelManagementIt008.Data.Seeders
                 .RuleFor(p => p.UserId, f => Guid.Empty);
 
             var profiles = new List<Profile>();
-            foreach (var user in users)
+            foreach (var customer in customers)
             {
                 var profile = profileFaker.Generate();
-                profile.UserId = user.Id;
+                profile.UserId = customer.Id;
                 profiles.Add(profile);
             }
 
@@ -251,13 +248,13 @@ namespace HotelManagementIt008.Data.Seeders
             await _context.SaveChangesAsync();
 
             // Update users with profile IDs
-            for (int i = 0; i < users.Count; i++)
+            for (int i = 0; i < customers.Count; i++)
             {
-                users[i].ProfileId = profiles[i].Id;
+                customers[i].ProfileId = profiles[i].Id;
             }
             await _context.SaveChangesAsync();
 
-            return users;
+            return customers;
         }
 
         private async Task SeedBookingsInvoicesAndDetails(List<User> users, List<Room> rooms, List<Payment> payments, List<RoomType> roomTypes, List<UserType> userTypes)
