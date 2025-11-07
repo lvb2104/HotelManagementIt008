@@ -20,9 +20,14 @@ namespace HotelManagementIt008.Repositories
             await _dbSet.AddAsync(entity);
         }
 
+        public virtual IQueryable<T> GetAllQueryable()
+        {
+            return _dbSet.AsNoTracking();
+        }
+
         public virtual async Task<ICollection<T>> GetAllAsync() // TODO: Paging
         {
-            return await _dbSet.ToListAsync();
+            return await _dbSet.AsNoTracking().ToListAsync();
         }
 
         public virtual async Task<T?> GetByIdAsync(string id)
@@ -30,7 +35,7 @@ namespace HotelManagementIt008.Repositories
             return await _dbSet.FindAsync(id);
         }
 
-        public virtual async Task<bool> TryDeleteAsync(string id)
+        public virtual async Task<bool> RemoveAsync(string id)
         {
             var entityToDelete = await _dbSet.FindAsync(id);
             if (entityToDelete is null)
@@ -38,11 +43,11 @@ namespace HotelManagementIt008.Repositories
                 return false;
             }
 
-            await TryDeleteAsync(entityToDelete);
+            await RemoveAsync(entityToDelete);
             return true;
         }
 
-        public virtual async Task TryDeleteAsync(T entity)
+        public virtual async Task RemoveAsync(T entity)
         {
             _dbSet.Remove(entity);
         }
