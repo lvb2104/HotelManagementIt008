@@ -4,10 +4,11 @@
     public interface IGenericRepository<T> where T : class
     {
         Task AddAsync(T entity);
+        IQueryable<T> GetAllQueryable();
         Task<ICollection<T>> GetAllAsync(); // TODO: Paging
         Task<T?> GetByIdAsync(string id);
-        Task<bool> TryDeleteAsync(string id);
-        Task TryDeleteAsync(T entity);
+        Task<bool> RemoveAsync(string id);
+        Task RemoveAsync(T entity);
         Task UpdateAsync(T entity);
     }
 }

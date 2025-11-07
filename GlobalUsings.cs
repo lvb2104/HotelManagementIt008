@@ -6,6 +6,8 @@ global using HotelManagementIt008.Dtos.Responses;
 global using HotelManagementIt008.Enums;
 global using HotelManagementIt008.Extensions;
 global using HotelManagementIt008.Forms;
+global using HotelManagementIt008.Helpers;
+global using HotelManagementIt008.Interfaces;
 global using HotelManagementIt008.Interfaces.Repositories;
 global using HotelManagementIt008.Interfaces.Services;
 global using HotelManagementIt008.Models;
