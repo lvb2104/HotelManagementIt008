@@ -6,13 +6,15 @@ namespace HotelManagementIt008.Forms
     public partial class LoginForm : Form
     {
         private readonly IUserService _userService;
+        private readonly RoomManagementForm _roomManagementForm;
 
-        public LoginForm(IUserService userService)
+        public LoginForm(IUserService userService, RoomManagementForm roomManagementForm)
         {
             _userService = userService;
             InitializeComponent();
             ApplyCustomFont();
             SetupCustomEvents();
+            _roomManagementForm = roomManagementForm;
         }
         private void SetupCustomEvents()
         {
@@ -69,9 +71,8 @@ namespace HotelManagementIt008.Forms
 
                     // Open MainForm
                     this.Hide();
-                    var mainForm = new MainForm();
-                    mainForm.ShowDialog();
-                    mainForm.Show();
+                    _roomManagementForm.FormClosed += (_, __) => this.Close(); // closes hidden LoginForm => app exits
+                    _roomManagementForm.Show();
                 }
                 else
                 {
@@ -108,11 +109,6 @@ namespace HotelManagementIt008.Forms
             Marshal.FreeCoTaskMem(fontPtr);
 
             title.Font = new Font(pfc.Families[0], 24f, FontStyle.Regular);
-        }
-
-        private void title_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }

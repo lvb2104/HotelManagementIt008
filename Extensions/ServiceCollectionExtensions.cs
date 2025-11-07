@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 
+using Gridify;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -72,6 +74,15 @@ namespace HotelManagementIt008.Extensions
                         sp.GetRequiredService<MapperConfiguration>(), // Get the registered MapperConfiguration from above
                         sp.GetService)); // Use the service provider to resolve dependencies
 
+                return services;
+            }
+        }
+
+        extension(IServiceCollection services)
+        {
+            public IServiceCollection AddGridifyService()
+            {
+                services.AddGridifyMappers(typeof(Program).Assembly);
                 return services;
             }
         }
