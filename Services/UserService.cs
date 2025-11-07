@@ -1,10 +1,5 @@
 ﻿using AutoMapper;
 
-using HotelManagementIt008.Dtos.Requests;
-using HotelManagementIt008.Dtos.Responses;
-using HotelManagementIt008.Helpers;
-using HotelManagementIt008.Interfaces;
-
 namespace HotelManagementIt008.Services
 {
     public class UserService : IUserService
@@ -19,22 +14,25 @@ namespace HotelManagementIt008.Services
         }
         public async Task<Result<LoginResponseDto>> LogInAsync(LoginRequestDto loginRequestDto)
         {
-            var user = await _unitOfWork.UserRepository.FindUserByUsernameAsync(loginRequestDto.Username);
-
-            if (user == null)
+            try
             {
-                return Result<LoginResponseDto>.Failure("User not found.");
+                var user = await _unitOfWork.UserRepository.FindUserByUsernameAsync(loginRequestDto.Username);
+                if (user == null)
+                {
+                    return Result<LoginResponseDto>.Failure("User not found.");
+                }
+                bool isPasswordValid = BCrypt.Net.BCrypt.Verify(loginRequestDto.Password, user.PasswordHash);
+                if (!isPasswordValid)
+                {
+                    return Result<LoginResponseDto>.Failure("Invalid password.");
+                }
+                var loginResponseDto = _mapper.Map<LoginResponseDto>(user);
+                return Result<LoginResponseDto>.Success(loginResponseDto);
             }
-
-            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(loginRequestDto.Password, user.PasswordHash);
-
-            if (!isPasswordValid)
+            catch (Exception ex)
             {
-                return Result<LoginResponseDto>.Failure("Invalid password.");
+                return Result<LoginResponseDto>.Failure($"An error occurred during login. Please try again later: {ex}");
             }
-
-            var loginResponseDto = _mapper.Map<LoginResponseDto>(user);
-            return Result<LoginResponseDto>.Success(loginResponseDto);
         }
     }
 }

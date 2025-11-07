@@ -1,6 +1,4 @@
-﻿using HotelManagementIt008.Dtos.Responses;
-
-namespace HotelManagementIt008.MappingProfiles
+﻿namespace HotelManagementIt008.MappingProfiles.AutoMapperProfiles
 {
     public class UserMappingProfile : AutoMapper.Profile
     {

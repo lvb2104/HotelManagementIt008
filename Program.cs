@@ -1,4 +1,3 @@
-using HotelManagementIt008.Interfaces;
 using HotelManagementIt008.Repositories;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -21,15 +20,19 @@ namespace HotelManagementIt008
                 // Register application services
                 services.AddConfigurationService(context.Configuration)
                     .AddDatabaseService()
-                    .AddAutoMapperService();
+                    .AddAutoMapperService()
+                    .AddGridifyService();
 
                 // Register other services here
                 services.AddScoped<DatabaseSeeder>()
                     .AddScoped<IUserService, UserService>()
+                    .AddScoped<IRoomService, RoomService>()
+                    .AddScoped<IRoomTypeService, RoomTypeService>()
                     .AddScoped<IUnitOfWork, UnitOfWork>();
 
                 // Register Forms
-                services.AddTransient<LoginForm>();
+                services.AddScoped<LoginForm>();
+                services.AddScoped<RoomManagementForm>();
             }).Build();
 
             using (var scope = host.Services.CreateScope())

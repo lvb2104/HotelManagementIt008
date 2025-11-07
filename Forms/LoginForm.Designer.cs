@@ -48,10 +48,11 @@
             txtUsername.BorderStyle = BorderStyle.None;
             txtUsername.Font = new Font("Microsoft Sans Serif", 10.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
             txtUsername.ForeColor = Color.FromArgb(0, 117, 214);
-            txtUsername.Location = new Point(50, 218);
+            txtUsername.Location = new Point(89, 227);
             txtUsername.Margin = new Padding(4, 2, 4, 2);
             txtUsername.Name = "txtUsername";
-            txtUsername.Size = new Size(264, 17);
+            txtUsername.PlaceholderText = "Username";
+            txtUsername.Size = new Size(196, 17);
             txtUsername.TabIndex = 1;
             // 
             // txtPassword
@@ -59,18 +60,20 @@
             txtPassword.BorderStyle = BorderStyle.None;
             txtPassword.Font = new Font("Microsoft Sans Serif", 10.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
             txtPassword.ForeColor = Color.FromArgb(0, 117, 214);
-            txtPassword.Location = new Point(50, 291);
+            txtPassword.Location = new Point(89, 291);
             txtPassword.Margin = new Padding(4, 2, 4, 2);
             txtPassword.Name = "txtPassword";
             txtPassword.PasswordChar = '●';
-            txtPassword.Size = new Size(264, 17);
+            txtPassword.PlaceholderText = "Password";
+            txtPassword.Size = new Size(196, 17);
             txtPassword.TabIndex = 3;
             // 
             // chkShowPassword
             // 
             chkShowPassword.AutoSize = true;
+            chkShowPassword.Cursor = Cursors.Hand;
             chkShowPassword.ForeColor = Color.FromArgb(70, 70, 70);
-            chkShowPassword.Location = new Point(11, 345);
+            chkShowPassword.Location = new Point(35, 339);
             chkShowPassword.Margin = new Padding(4, 2, 4, 2);
             chkShowPassword.Name = "chkShowPassword";
             chkShowPassword.Size = new Size(149, 22);
@@ -87,10 +90,10 @@
             btnLogin.FlatStyle = FlatStyle.Flat;
             btnLogin.Font = new Font("Bahnschrift", 13.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnLogin.ForeColor = Color.White;
-            btnLogin.Location = new Point(13, 433);
+            btnLogin.Location = new Point(35, 405);
             btnLogin.Margin = new Padding(4, 2, 4, 2);
             btnLogin.Name = "btnLogin";
-            btnLogin.Size = new Size(307, 37);
+            btnLogin.Size = new Size(250, 37);
             btnLogin.TabIndex = 5;
             btnLogin.Text = "LOG IN";
             btnLogin.UseVisualStyleBackColor = false;
@@ -99,10 +102,10 @@
             // logoPic
             // 
             logoPic.Image = Properties.Resources.logo;
-            logoPic.Location = new Point(102, 12);
+            logoPic.Location = new Point(89, 12);
             logoPic.Margin = new Padding(4, 3, 4, 3);
             logoPic.Name = "logoPic";
-            logoPic.Size = new Size(126, 111);
+            logoPic.Size = new Size(149, 111);
             logoPic.SizeMode = PictureBoxSizeMode.Zoom;
             logoPic.TabIndex = 7;
             logoPic.TabStop = false;
@@ -112,7 +115,7 @@
             title.AutoSize = true;
             title.Font = new Font("Segoe UI", 24F, FontStyle.Bold, GraphicsUnit.Point, 0);
             title.ForeColor = Color.FromArgb(0, 117, 214);
-            title.Location = new Point(102, 126);
+            title.Location = new Point(111, 126);
             title.Margin = new Padding(4, 0, 4, 0);
             title.Name = "title";
             title.Size = new Size(126, 45);
@@ -122,7 +125,7 @@
             // pictureBox2
             // 
             pictureBox2.Image = Properties.Resources.user;
-            pictureBox2.Location = new Point(11, 211);
+            pictureBox2.Location = new Point(35, 216);
             pictureBox2.Margin = new Padding(4, 3, 4, 3);
             pictureBox2.Name = "pictureBox2";
             pictureBox2.Size = new Size(32, 28);
@@ -133,25 +136,25 @@
             // panel1
             // 
             panel1.BackColor = Color.FromArgb(0, 117, 214);
-            panel1.Location = new Point(11, 245);
+            panel1.Location = new Point(35, 253);
             panel1.Margin = new Padding(4, 3, 4, 3);
             panel1.Name = "panel1";
-            panel1.Size = new Size(303, 1);
+            panel1.Size = new Size(250, 1);
             panel1.TabIndex = 10;
             // 
             // panel2
             // 
             panel2.BackColor = Color.FromArgb(0, 117, 214);
-            panel2.Location = new Point(11, 318);
+            panel2.Location = new Point(35, 314);
             panel2.Margin = new Padding(4, 3, 4, 3);
             panel2.Name = "panel2";
-            panel2.Size = new Size(303, 1);
+            panel2.Size = new Size(250, 1);
             panel2.TabIndex = 12;
             // 
             // pictureBox1
             // 
             pictureBox1.Image = Properties.Resources._lock;
-            pictureBox1.Location = new Point(11, 284);
+            pictureBox1.Location = new Point(35, 280);
             pictureBox1.Margin = new Padding(4, 3, 4, 3);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(32, 28);
@@ -177,7 +180,7 @@
             Controls.Add(txtPassword);
             Font = new Font("Microsoft Sans Serif", 10.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
             ForeColor = Color.FromArgb(0, 117, 214);
-            FormBorderStyle = FormBorderStyle.None;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
             Margin = new Padding(4, 2, 4, 2);
             MaximizeBox = false;
             MinimizeBox = false;
