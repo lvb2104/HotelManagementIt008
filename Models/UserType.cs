@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Models
 {
-    public class UserType
+    public class UserType : ISoftDeletable
     {
         public Guid Id { get; set; }
 

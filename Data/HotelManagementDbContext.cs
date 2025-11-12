@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelManagementIt008.Data
 {
@@ -26,6 +28,7 @@ namespace HotelManagementIt008.Data
         {
             base.OnModelCreating(modelBuilder);
             ConfigureTimeStamps(modelBuilder);
+            ConfigureSoftDelete(modelBuilder);
 
             // User - Profile (One-to-One)
             modelBuilder.Entity<User>()
@@ -98,6 +101,48 @@ namespace HotelManagementIt008.Data
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
+        // Configure global query filters for soft delete
+        private void ConfigureSoftDelete(ModelBuilder modelBuilder)
+        {
+            var softDeletableTypes = new Type[]
+            {
+                typeof(User),
+                typeof(Profile),
+                typeof(Role),
+                typeof(UserType),
+                typeof(RoomType),
+                typeof(Room),
+                typeof(Booking),
+                typeof(BookingDetails),
+                typeof(Invoice),
+                typeof(Payment)
+            };
+
+            foreach (var entityType in softDeletableTypes)
+            {
+                // Get the entity type builder for "entityType e"
+                var entity = modelBuilder.Entity(entityType);
+
+                // Create parameter expression for the entity "e"
+                var parameter = Expression.Parameter(entityType, "e");
+
+                // Access the DeletedAt property "e.DeletedAt"
+                var property = Expression.Property(parameter, nameof(ISoftDeletable.DeletedAt));
+
+                // Create the constant expression for null "null"
+                var nullConstant = Expression.Constant(null, typeof(DateTime?));
+
+                // Create the expression "e.DeletedAt == null"
+                var comparison = Expression.Equal(property, nullConstant);
+
+                // Create the lambda expression "e => e.DeletedAt == null"
+                var lambda = Expression.Lambda(comparison, parameter);
+
+                // Apply the query filter to the entity
+                entity.HasQueryFilter(lambda);
+            }
+        }
+
         // Configure CreatedAt, UpdatedAt, DeletedAt properties
         private void ConfigureTimeStamps(ModelBuilder modelBuilder)
         {
@@ -109,16 +154,16 @@ namespace HotelManagementIt008.Data
 
             var entities = new Type[]
             {
-        typeof(User),
-        typeof(Profile),
-        typeof(Role),
-        typeof(UserType),
-        typeof(RoomType),
-        typeof(Room),
-        typeof(Booking),
-        typeof(BookingDetails),
-        typeof(Invoice),
-        typeof(Payment)
+                typeof(User),
+                typeof(Profile),
+                typeof(Role),
+                typeof(UserType),
+                typeof(RoomType),
+                typeof(Room),
+                typeof(Booking),
+                typeof(BookingDetails),
+                typeof(Invoice),
+                typeof(Payment)
             };
 
             foreach (var entityType in entities)
@@ -165,7 +210,17 @@ namespace HotelManagementIt008.Data
                 var hasUpdatedAt = entry.Metadata.FindProperty("UpdatedAt") is not null;
                 var hasCreatedAt = entry.Metadata.FindProperty("CreatedAt") is not null;
 
-                if (entry.State == EntityState.Added)
+                // Handle soft delete
+                if (entry.Entity is ISoftDeletable sd)
+                {
+                    if (entry.State == EntityState.Deleted)
+                    {
+                        entry.State = EntityState.Modified;
+                        sd.DeletedAt ??= utcNow;
+                    }
+                }
+                // Handle CreatedAt and UpdatedAt
+                else if (entry.State == EntityState.Added)
                 {
                     if (hasCreatedAt && entry.Property("CreatedAt").CurrentValue is null)
                     {
@@ -176,6 +231,7 @@ namespace HotelManagementIt008.Data
                         entry.Property("UpdatedAt").CurrentValue = utcNow;
                     }
                 }
+                // Handle UpdatedAt
                 else if (entry.State == EntityState.Modified)
                 {
                     if (hasUpdatedAt)

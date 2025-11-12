@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Models
 {
-    public class Role
+    public class Role : ISoftDeletable
     {
         public Guid Id { get; set; }
 

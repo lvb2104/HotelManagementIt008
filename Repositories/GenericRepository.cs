@@ -25,7 +25,7 @@ namespace HotelManagementIt008.Repositories
             return _dbSet.AsNoTracking();
         }
 
-        public virtual async Task<ICollection<T>> GetAllAsync() // TODO: Paging
+        public virtual async Task<ICollection<T>> GetAllAsync()
         {
             return await _dbSet.AsNoTracking().ToListAsync();
         }
