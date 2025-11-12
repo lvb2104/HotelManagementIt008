@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Models
 {
-    public class Booking
+    public class Booking : ISoftDeletable
     {
         public Guid Id { get; set; }
 

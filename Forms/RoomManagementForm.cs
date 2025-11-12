@@ -8,7 +8,7 @@ namespace HotelManagementIt008.Forms
         private readonly IRoomService _roomService;
         private readonly IGridifyMapper<Room> _mapper;
         private int _currentPage = 1;
-        private int _pageSize = 10;
+        private int _pageSize = 20;
         private int _totalPages = 1;
 
         public RoomManagementForm(IRoomTypeService roomTypeService, IRoomService roomService, IGridifyMapper<Room> mapper)
@@ -43,21 +43,18 @@ namespace HotelManagementIt008.Forms
                 Name = "colRoomNumber",
                 DataPropertyName = nameof(RoomResponseDto.RoomNumber),
                 HeaderText = "Room Number",
-                Width = 100
             });
             dgvRooms.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "colRoomType",
                 DataPropertyName = nameof(RoomResponseDto.RoomTypeName),
                 HeaderText = "Room Type",
-                Width = 150
             });
             dgvRooms.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "colPrice",
                 DataPropertyName = nameof(RoomResponseDto.PricePerNight),
                 HeaderText = "Price Per Night",
-                Width = 120,
                 DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" }
             });
             dgvRooms.Columns.Add(new DataGridViewTextBoxColumn
@@ -65,14 +62,12 @@ namespace HotelManagementIt008.Forms
                 Name = "colStatus",
                 DataPropertyName = nameof(RoomResponseDto.Status),
                 HeaderText = "Status",
-                Width = 100
             });
             dgvRooms.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "colNote",
                 DataPropertyName = nameof(RoomResponseDto.Note),
                 HeaderText = "Note",
-                Width = 200
             });
 
         }

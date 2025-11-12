@@ -5,7 +5,7 @@
     {
         Task AddAsync(T entity);
         IQueryable<T> GetAllQueryable();
-        Task<ICollection<T>> GetAllAsync(); // TODO: Paging
+        Task<ICollection<T>> GetAllAsync();
         Task<T?> GetByIdAsync(string id);
         Task<bool> RemoveAsync(string id);
         Task RemoveAsync(T entity);

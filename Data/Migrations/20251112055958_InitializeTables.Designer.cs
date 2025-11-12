@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HotelManagementIt008.Data.Migrations
 {
     [DbContext(typeof(HotelManagementDbContext))]
-    [Migration("20251112015442_InitialPostgres")]
-    partial class InitialPostgres
+    [Migration("20251112055958_InitializeTables")]
+    partial class InitializeTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

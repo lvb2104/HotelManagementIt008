@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Models
 {
-    public class Invoice
+    public class Invoice : ISoftDeletable
     {
         public Guid Id { get; set; }
 
