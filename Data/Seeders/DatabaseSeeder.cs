@@ -1,6 +1,6 @@
 ﻿using Bogus;
-
 using Microsoft.EntityFrameworkCore;
+using System.Transactions;
 
 namespace HotelManagementIt008.Data.Seeders
 {
@@ -22,28 +22,54 @@ namespace HotelManagementIt008.Data.Seeders
                 return;
             }
 
-            var salt = BCrypt.Net.BCrypt.GenerateSalt();
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword("password123", salt);
+            // Increase command timeout for long seeding operations (in seconds)
+            _context.Database.SetCommandTimeout(180);
 
-            // Phase 1: Seed lookup tables
-            var roles = await SeedRoles();
-            var userTypes = await SeedUserTypes();
-            var roomTypes = await SeedRoomTypes();
-            var payments = await SeedPayments();
+            // Wrap the whole seeding in a DB transaction for atomicity and speed
+            await using var transaction = await _context.Database.BeginTransactionAsync();
 
-            // Phase 2: Seed rooms
-            var rooms = await SeedRooms(roomTypes);
+            // Improve performance for bulk inserts
+            var originalAutoDetect = _context.ChangeTracker.AutoDetectChangesEnabled;
+            try
+            {
+                _context.ChangeTracker.AutoDetectChangesEnabled = false;
 
-            // Phase 3: Seed users and profiles
-            var admin = await SeedAdmin(roles, passwordHash);
-            var staffs = await SeedStaffs(roles, passwordHash);
-            var customers = await SeedCustomersAndProfiles(roles, userTypes);
+                var salt = BCrypt.Net.BCrypt.GenerateSalt();
+                var passwordHash = BCrypt.Net.BCrypt.HashPassword("password123", salt);
 
-            // Phase 4: Seed bookings, invoices, and booking details
-            await SeedBookingsInvoicesAndDetails(customers, rooms, payments, roomTypes, userTypes);
+                // Phase 1: Seed lookup tables (Roles, UserTypes, RoomTypes, Payments)
+                var roles = await SeedRoles();
+                var userTypes = await SeedUserTypes();
+                var roomTypes = await SeedRoomTypes();
+                var payments = await SeedPayments();
 
-            // Phase 5: Seed system parameters
-            await SeedParams();
+                // Phase 2: Seed rooms
+                var rooms = await SeedRooms(roomTypes);
+
+                // Phase 3: Seed users and profiles
+                var admin = await SeedAdmin(roles, passwordHash);
+                var staffs = await SeedStaffs(roles, passwordHash);
+                var customers = await SeedCustomersAndProfiles(roles, userTypes);
+
+                // Phase 4: Seed bookings, invoices, and booking details
+                await SeedBookingsInvoicesAndDetails(customers, rooms, payments, roomTypes, userTypes);
+
+                // Phase 5: Seed system parameters
+                await SeedParams();
+
+                // Commit transaction
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            finally
+            {
+                // Restore AutoDetectChanges setting
+                _context.ChangeTracker.AutoDetectChangesEnabled = originalAutoDetect;
+            }
         }
 
         private async Task<List<Role>> SeedRoles()
@@ -141,7 +167,8 @@ namespace HotelManagementIt008.Data.Seeders
                 .RuleFor(p => p.Method, f => f.PickRandom<PaymentMethod>())
                 .RuleFor(p => p.Amount, f => Math.Round(f.Random.Double(50, 2000), 2))
                 .RuleFor(p => p.Status, f => f.PickRandom<PaymentStatus>())
-                .RuleFor(p => p.CreatedAt, f => f.Date.Between(DateTime.UtcNow.AddMonths(-6), DateTime.UtcNow));
+                // Ensure createdAt is UTC
+                .RuleFor(p => p.CreatedAt, f => DateTime.SpecifyKind(f.Date.Between(DateTime.UtcNow.AddMonths(-6), DateTime.UtcNow), DateTimeKind.Utc));
 
             var payments = paymentFaker.Generate(80);
 
@@ -230,10 +257,11 @@ namespace HotelManagementIt008.Data.Seeders
                 .RuleFor(p => p.FullName, f => f.Name.FullName())
                 .RuleFor(p => p.Nationality, f => f.Address.Country())
                 .RuleFor(p => p.Status, f => ProfileStatus.Active)
-                .RuleFor(p => p.Dob, f => f.Date.Between(DateTime.UtcNow.AddYears(-80), DateTime.UtcNow.AddYears(-18)))
+                .RuleFor(p => p.Dob, f => DateTime.SpecifyKind(f.Date.Between(DateTime.UtcNow.AddYears(-80), DateTime.UtcNow.AddYears(-18)), DateTimeKind.Utc))
                 .RuleFor(p => p.PhoneNumber, f => f.Phone.PhoneNumber())
                 .RuleFor(p => p.Address, f => f.Address.FullAddress())
                 .RuleFor(p => p.IdentityCardNumber, f => f.Random.Replace("##########"))
+                // set placeholder user - will overwrite below
                 .RuleFor(p => p.UserId, f => Guid.Empty);
 
             var profiles = new List<Profile>();
@@ -259,12 +287,18 @@ namespace HotelManagementIt008.Data.Seeders
 
         private async Task SeedBookingsInvoicesAndDetails(List<User> users, List<Room> rooms, List<Payment> payments, List<RoomType> roomTypes, List<UserType> userTypes)
         {
-            var customers = users.Where(u => u.RoleId == users.First(x => x.RoleId != Guid.Empty).RoleId).ToList();
+            // Safeguard: ensure we have at least one role to filter by
+            var firstRoleId = users.Select(u => u.RoleId).FirstOrDefault(x => x != Guid.Empty);
+            if (firstRoleId == Guid.Empty)
+            {
+                // fallback: treat all as customers
+            }
+            var customers = users.Where(u => u.RoleId == firstRoleId).ToList();
             var availablePayments = payments.ToList();
 
             var bookingFaker = new Faker<Booking>()
                 .RuleFor(b => b.Id, f => Guid.NewGuid())
-                .RuleFor(b => b.CheckInDate, f => f.Date.Between(DateTime.UtcNow.AddMonths(-6), DateTime.UtcNow.AddMonths(3)))
+                .RuleFor(b => b.CheckInDate, f => DateTime.SpecifyKind(f.Date.Between(DateTime.UtcNow.AddMonths(-6), DateTime.UtcNow.AddMonths(3)), DateTimeKind.Utc))
                 .RuleFor(b => b.CheckOutDate, (f, b) => b.CheckInDate.AddDays(f.Random.Int(1, 14)))
                 .RuleFor(b => b.BookerId, f => f.PickRandom(customers).Id)
                 .RuleFor(b => b.RoomId, f => f.PickRandom(rooms).Id)
