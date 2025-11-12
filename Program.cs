@@ -2,6 +2,7 @@ using HotelManagementIt008.Repositories;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using DotNetEnv;
 
 namespace HotelManagementIt008
 {
@@ -13,11 +14,12 @@ namespace HotelManagementIt008
         [STAThread]
         static async Task Main()
         {
+            Env.TraversePath().Load();
+
             var host = Host.CreateDefaultBuilder().ConfigureServices((context, services) =>
             {
                 // Register application services
-                services.AddConfigurationService(context.Configuration)
-                    .AddConfigurationService(context.Configuration)                
+                services.AddConfigurationService(context.Configuration)              
                     .AddDatabaseService()
                     .AddAutoMapperService()
                     .AddGridifyService();
