@@ -332,14 +332,14 @@
             dgvRooms.ReadOnly = true;
             dgvRooms.RowHeadersVisible = false;
             dgvRooms.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvRooms.Size = new Size(984, 481);
+            dgvRooms.Size = new Size(984, 456);
             dgvRooms.TabIndex = 3;
             // 
             // RoomManagementForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(984, 661);
+            ClientSize = new Size(984, 636);
             Controls.Add(dgvRooms);
             Controls.Add(pnlActions);
             Controls.Add(grpFilters);
