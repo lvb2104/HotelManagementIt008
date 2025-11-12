@@ -101,18 +101,24 @@ namespace HotelManagementIt008.Data
         // Configure CreatedAt, UpdatedAt, DeletedAt properties
         private void ConfigureTimeStamps(ModelBuilder modelBuilder)
         {
+            // detect provider (safer than Database.IsNpgsql() in some contexts)
+            var isPostgres = Database.ProviderName != null && Database.ProviderName.Contains("Npgsql");
+
+            string createdDefault = isPostgres ? "now()" : "SYSUTCDATETIME()";
+            string updatedDefault = isPostgres ? "now()" : "SYSUTCDATETIME()";
+
             var entities = new Type[]
             {
-                typeof(User),
-                typeof(Profile),
-                typeof(Role),
-                typeof(UserType),
-                typeof(RoomType),
-                typeof(Room),
-                typeof(Booking),
-                typeof(BookingDetails),
-                typeof(Invoice),
-                typeof(Payment)
+        typeof(User),
+        typeof(Profile),
+        typeof(Role),
+        typeof(UserType),
+        typeof(RoomType),
+        typeof(Room),
+        typeof(Booking),
+        typeof(BookingDetails),
+        typeof(Invoice),
+        typeof(Payment)
             };
 
             foreach (var entityType in entities)
@@ -128,8 +134,7 @@ namespace HotelManagementIt008.Data
                 {
                     modelBuilder.Entity(entityType)
                         .Property<DateTime>("CreatedAt")
-                        // SQL Server UTC (preferred). If you really want local server time, use GETDATE().
-                        .HasDefaultValueSql("SYSUTCDATETIME()")
+                        .HasDefaultValueSql(createdDefault)
                         .ValueGeneratedOnAdd();
                 }
 
@@ -137,8 +142,7 @@ namespace HotelManagementIt008.Data
                 {
                     modelBuilder.Entity(entityType)
                         .Property<DateTime>("UpdatedAt")
-                        // Just metadata; app code will set it on Add/Update.
-                        .HasDefaultValueSql("SYSUTCDATETIME()")
+                        .HasDefaultValueSql(updatedDefault)
                         .ValueGeneratedOnAddOrUpdate();
                 }
 
