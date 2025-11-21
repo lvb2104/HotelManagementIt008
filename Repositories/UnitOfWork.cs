@@ -1,6 +1,4 @@
-﻿using HotelManagementIt008.Interfaces;
-
-namespace HotelManagementIt008.Repositories
+﻿namespace HotelManagementIt008.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {

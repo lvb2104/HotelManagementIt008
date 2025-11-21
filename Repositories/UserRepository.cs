@@ -1,9 +1,8 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace HotelManagementIt008.Repositories
 {
-    public class UserRepository : GenericRepository<User>, IUserRepository
+    public class UserRepository : Repository<User>, IUserRepository
     {
         public UserRepository(HotelManagementDbContext context) : base(context)
         {
@@ -13,14 +12,14 @@ namespace HotelManagementIt008.Repositories
         {
             return await Context.Users
                 .AsNoTracking()
-                .AnyAsync(u => u.Username == username && u.DeletedAt == null);
+                .AnyAsync(u => u.Username == username);
         }
 
         public async Task<User?> FindUserByUsernameAsync(string username)
         {
             return await Context.Users
                 .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Username == username && u.DeletedAt == null);
+                .FirstOrDefaultAsync(u => u.Username == username);
         }
     }
 }

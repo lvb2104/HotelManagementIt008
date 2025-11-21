@@ -8,7 +8,7 @@
 
         public string? Description { get; set; }
 
-        public double PricePerNight { get; set; }
+        public decimal PricePerNight { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

@@ -22,6 +22,6 @@
 
         // Data for GridView
         public string RoomTypeName => RoomType?.Name ?? string.Empty;
-        public double PricePerNight => RoomType?.PricePerNight ?? 0;
+        public decimal PricePerNight => RoomType?.PricePerNight ?? 0;
     }
 }

@@ -4,7 +4,7 @@
     {
         public Guid Id { get; set; }
 
-        public double TotalPrice { get; set; }
+        public decimal TotalPrice { get; set; }
 
         public DateTime CheckInDate { get; set; }
 

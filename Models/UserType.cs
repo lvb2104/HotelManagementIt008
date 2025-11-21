@@ -8,7 +8,7 @@
 
         public string? Description { get; set; }
 
-        public double SurchargeRate { get; set; }
+        public decimal SurchargeRate { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 
+using HotelManagementIt008.Repositories;
+
 namespace HotelManagementIt008.Services
 {
     public class UserService : IUserService

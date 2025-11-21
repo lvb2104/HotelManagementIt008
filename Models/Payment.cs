@@ -6,7 +6,7 @@
 
         public PaymentMethod Method { get; set; } = PaymentMethod.Cash;
 
-        public double Amount { get; set; }
+        public decimal Amount { get; set; }
 
         public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
 

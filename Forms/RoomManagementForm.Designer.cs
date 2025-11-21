@@ -120,6 +120,8 @@
             // 
             // nudPriceTo
             // 
+            nudPriceTo.BorderStyle = BorderStyle.FixedSingle;
+            nudPriceTo.DecimalPlaces = 2;
             nudPriceTo.Increment = new decimal(new int[] { 50000, 0, 0, 0 });
             nudPriceTo.Location = new Point(600, 65);
             nudPriceTo.Maximum = new decimal(new int[] { 10000000, 0, 0, 0 });
@@ -152,6 +154,7 @@
             // 
             // nudPriceFrom
             // 
+            nudPriceFrom.BorderStyle = BorderStyle.FixedSingle;
             nudPriceFrom.Increment = new decimal(new int[] { 50000, 0, 0, 0 });
             nudPriceFrom.Location = new Point(600, 30);
             nudPriceFrom.Maximum = new decimal(new int[] { 10000000, 0, 0, 0 });
