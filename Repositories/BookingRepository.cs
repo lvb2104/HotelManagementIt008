@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Repositories
 {
-    public class BookingRepository : GenericRepository<Booking>, IBookingRepository
+    public class BookingRepository : Repository<Booking>, IBookingRepository
     {
         public BookingRepository(HotelManagementDbContext context) : base(context)
         {

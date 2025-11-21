@@ -4,6 +4,8 @@ using AutoMapper;
 using Gridify;
 using Gridify.EntityFramework;
 
+using HotelManagementIt008.Repositories;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelManagementIt008.Services

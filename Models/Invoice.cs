@@ -4,11 +4,11 @@
     {
         public Guid Id { get; set; }
 
-        public double BasePrice { get; set; }
+        public decimal BasePrice { get; set; }
 
-        public double TaxPrice { get; set; }
+        public decimal TaxPrice { get; set; }
 
-        public double TotalPrice { get; set; }
+        public decimal TotalPrice { get; set; }
 
         public int DaysStayed { get; set; }
 

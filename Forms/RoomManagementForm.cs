@@ -8,7 +8,7 @@ namespace HotelManagementIt008.Forms
         private readonly IRoomService _roomService;
         private readonly IGridifyMapper<Room> _mapper;
         private int _currentPage = 1;
-        private int _pageSize = 20;
+        private readonly int _pageSize = 20;
         private int _totalPages = 1;
 
         public RoomManagementForm(IRoomTypeService roomTypeService, IRoomService roomService, IGridifyMapper<Room> mapper)
@@ -91,7 +91,7 @@ namespace HotelManagementIt008.Forms
                 dgvRooms.DataSource = roomsResult.Value.Data;
 
                 // _totalPages calculation
-                _totalPages = (int)Math.Ceiling((double)roomsResult.Value.Count / _pageSize);
+                _totalPages = (int)Math.Ceiling((decimal)roomsResult.Value.Count / _pageSize);
                 UpdatePaginationControls();
             }
             else
@@ -113,6 +113,37 @@ namespace HotelManagementIt008.Forms
                 {
                     cboFilterRoomType.Items.Add(roomType.Name);
                 }
+
+                // Price Range - Set min and max based on room types
+                if (roomTypeResult.Value.Count != 0)
+                {
+                    var minPrice = (decimal)roomTypeResult.Value.Min(t => t.PricePerNight);
+                    var maxPrice = (decimal)roomTypeResult.Value.Max(t => t.PricePerNight);
+
+                    // Set NumericUpDown ranges
+                    nudPriceFrom.Minimum = 0;
+                    nudPriceFrom.Maximum = maxPrice;
+                    nudPriceFrom.Value = 0; // Start from 0
+
+                    nudPriceTo.Minimum = 0;
+                    nudPriceTo.Maximum = maxPrice * 2; // Allow higher for surcharges
+                    nudPriceTo.Value = maxPrice * 2; // Default to max
+                }
+                else
+                {
+                    // Default values if no room types exist
+                    nudPriceFrom.Minimum = 0;
+                    nudPriceFrom.Maximum = 10000000;
+                    nudPriceFrom.Value = 0;
+
+                    nudPriceTo.Minimum = 0;
+                    nudPriceTo.Maximum = 10000000;
+                    nudPriceTo.Value = 10000000;
+                }
+
+                // Add event handlers for validation
+                nudPriceFrom.ValueChanged += ValidatePriceRange;
+                nudPriceTo.ValueChanged += ValidatePriceRange;
             }
             cboFilterRoomType.SelectedIndex = 0;
 
@@ -124,6 +155,24 @@ namespace HotelManagementIt008.Forms
                 cboFilterStatus.Items.Add(status.ToString());
             }
             cboFilterStatus.SelectedIndex = 0;
+        }
+
+        private void ValidatePriceRange(object? sender, EventArgs e)
+        {
+            // Ensure "From" is not greater than "To"
+            if (nudPriceFrom.Value > nudPriceTo.Value)
+            {
+                if (sender == nudPriceFrom)
+                {
+                    // User changed "From", adjust "To"
+                    nudPriceTo.Value = nudPriceFrom.Value;
+                }
+                else
+                {
+                    // User changed "To", adjust "From"
+                    nudPriceFrom.Value = nudPriceTo.Value;
+                }
+            }
         }
 
         private string BuildFilterString()

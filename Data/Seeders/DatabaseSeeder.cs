@@ -125,14 +125,14 @@ namespace HotelManagementIt008.Data.Seeders
                     Id = Guid.NewGuid(),
                     Type = UserTypeType.Local,
                     Description = "Local customer",
-                    SurchargeRate = 1.0
+                    SurchargeRate = 1.0m
                 },
                 new UserType
                 {
                     Id = Guid.NewGuid(),
                     Type = UserTypeType.Foreign,
                     Description = "Foreign customer",
-                    SurchargeRate = 2.5
+                    SurchargeRate = 2.5m
                 }
             };
 
@@ -145,21 +145,21 @@ namespace HotelManagementIt008.Data.Seeders
         {
             var roomTypeNames = new[]
             {
-                ("Standard Single", "Basic single room with essential amenities", 50.0),
-                ("Standard Double", "Comfortable double room for two guests", 80.0),
-                ("Deluxe", "Spacious room with premium amenities", 120.0),
-                ("Suite", "Luxury suite with separate living area", 200.0),
-                ("Presidential Suite", "Ultimate luxury accommodation", 500.0),
-                ("Family Room", "Large room suitable for families", 150.0),
-                ("Twin Room", "Room with two single beds", 85.0),
-                ("Executive Room", "Business-class room with workspace", 130.0)
+                ("Standard Single", "Basic single room with essential amenities", 50.0m),
+                ("Standard Double", "Comfortable double room for two guests", 80.0m),
+                ("Deluxe", "Spacious room with premium amenities", 120.0m),
+                ("Suite", "Luxury suite with separate living area", 200.0m),
+                ("Presidential Suite", "Ultimate luxury accommodation", 500.0m),
+                ("Family Room", "Large room suitable for families", 150.0m),
+                ("Twin Room", "Room with two single beds", 85.0m),
+                ("Executive Room", "Business-class room with workspace", 130.0m)
             };
 
             var roomTypeFaker = new Faker<RoomType>()
                 .RuleFor(rt => rt.Id, f => Guid.NewGuid())
                 .RuleFor(rt => rt.Name, f => string.Empty)
                 .RuleFor(rt => rt.Description, f => string.Empty)
-                .RuleFor(rt => rt.PricePerNight, f => 0.0);
+                .RuleFor(rt => rt.PricePerNight, f => 0.0m);
 
             var roomTypes = roomTypeNames.Select((rt, index) =>
             {
@@ -180,7 +180,7 @@ namespace HotelManagementIt008.Data.Seeders
             var paymentFaker = new Faker<Payment>()
                 .RuleFor(p => p.Id, f => Guid.NewGuid())
                 .RuleFor(p => p.Method, f => f.PickRandom<PaymentMethod>())
-                .RuleFor(p => p.Amount, f => Math.Round(f.Random.Double(50, 2000), 2))
+                .RuleFor(p => p.Amount, f => Math.Round(f.Random.Decimal(50, 2000), 2))
                 .RuleFor(p => p.Status, f => f.PickRandom<PaymentStatus>())
                 .RuleFor(p => p.CreatedAt, f => f.Date.Between(DateTime.UtcNow.AddMonths(-6), DateTime.UtcNow));
 
@@ -308,7 +308,7 @@ namespace HotelManagementIt008.Data.Seeders
                 .RuleFor(b => b.CheckOutDate, (f, b) => b.CheckInDate.AddDays(f.Random.Int(1, 14)))
                 .RuleFor(b => b.BookerId, f => f.PickRandom(customers).Id)
                 .RuleFor(b => b.RoomId, f => f.PickRandom(rooms).Id)
-                .RuleFor(b => b.TotalPrice, f => 0.0);
+                .RuleFor(b => b.TotalPrice, f => 0.0m);
 
             var bookings = bookingFaker.Generate(300);
             await _context.Set<Booking>().AddRangeAsync(bookings);
@@ -326,7 +326,7 @@ namespace HotelManagementIt008.Data.Seeders
 
                 var daysStayed = (booking.CheckOutDate - booking.CheckInDate).Days;
                 var basePrice = Math.Round(roomType.PricePerNight * daysStayed * userType.SurchargeRate, 2);
-                var taxPrice = Math.Round(basePrice * 0.1, 2); // 10% tax
+                var taxPrice = Math.Round(basePrice * 0.1m, 2); // 10% tax
                 var totalPrice = basePrice + taxPrice;
 
                 var invoice = new Invoice
