@@ -12,14 +12,14 @@ namespace HotelManagementIt008.Repositories
         {
             return await Context.Users
                 .AsNoTracking()
-                .AnyAsync(u => u.Username == username && u.DeletedAt == null);
+                .AnyAsync(u => u.Username == username);
         }
 
         public async Task<User?> FindUserByUsernameAsync(string username)
         {
             return await Context.Users
                 .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Username == username && u.DeletedAt == null);
+                .FirstOrDefaultAsync(u => u.Username == username);
         }
     }
 }

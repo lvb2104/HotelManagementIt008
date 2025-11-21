@@ -28,7 +28,7 @@ namespace HotelManagementIt008.Services
             try
             {
                 // Get queryable with includes
-                var roomsQuery = _unitOfWork.RoomRepository.GetAllQueryable().Include(r => r.RoomType).Where(r => r.DeletedAt == null);
+                var roomsQuery = _unitOfWork.RoomRepository.GetAllQueryable().Include(r => r.RoomType);
 
                 // Apply Gridify filtering, sorting, and paging
                 var pagedRooms = await roomsQuery.GridifyAsync(query, _gridifyMapper);
