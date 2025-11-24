@@ -1,20 +1,23 @@
 ﻿using System.Drawing.Text;
 using System.Runtime.InteropServices;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace HotelManagementIt008.Forms
 {
     public partial class LoginForm : Form
     {
         private readonly IUserService _userService;
-        private readonly RoomManagementForm _roomManagementForm;
+        private readonly IServiceProvider _serviceProvider;
 
-        public LoginForm(IUserService userService, RoomManagementForm roomManagementForm)
+        public LoginForm(IUserService userService, IServiceProvider serviceProvider)
         {
             _userService = userService;
+            _serviceProvider = serviceProvider;
+
             InitializeComponent();
             ApplyCustomFont();
             SetupCustomEvents();
-            _roomManagementForm = roomManagementForm;
         }
         private void SetupCustomEvents()
         {
@@ -57,22 +60,23 @@ namespace HotelManagementIt008.Forms
 
             try
             {
-                var loginRequestDto = new LoginRequestDto
+                var dto = new LoginRequestDto
                 {
                     Username = txtUsername.Text,
                     Password = txtPassword.Text
                 };
-                var result = await _userService.LogInAsync(loginRequestDto);
+
+                var result = await _userService.LogInAsync(dto);
+
                 if (result.IsSuccess)
                 {
-                    // Successful login
-                    MessageBox.Show("Login successful!", "Success",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Hide();
 
-                    // Open MainForm
-                    this.Hide();
-                    _roomManagementForm.FormClosed += (_, __) => this.Close(); // closes hidden LoginForm => app exits
-                    _roomManagementForm.Show();
+                    var mainDashboardForm = ActivatorUtilities.CreateInstance<MainDashboardForm>(_serviceProvider, result.Value!);
+
+                    // When room form closes, close login form (so app exits)
+                    mainDashboardForm.FormClosed += (_, __) => Close();
+                    mainDashboardForm.Show();
                 }
                 else
                 {

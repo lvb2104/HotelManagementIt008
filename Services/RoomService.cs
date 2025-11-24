@@ -23,6 +23,11 @@ namespace HotelManagementIt008.Services
             _gridifyMapper = gridifyMapper;
         }
 
+        //public Task<Result<RoomResponseDto>> CreateRoomAsync(CreateRoomDto dto)
+        //{
+
+        //}
+
         public async Task<Result<Paging<RoomResponseDto>>> GetAllRoomsAsync(GridifyQuery query)
         {
             try

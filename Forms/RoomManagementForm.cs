@@ -238,5 +238,25 @@ namespace HotelManagementIt008.Forms
                 await LoadRooms();
             }
         }
+
+        private void btnAddRoom_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnEditRoom_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnDeleteRoom_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnExportPDF_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

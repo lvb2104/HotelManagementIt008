@@ -278,6 +278,7 @@
             btnExportPDF.TabIndex = 3;
             btnExportPDF.Text = "📄 Export PDF";
             btnExportPDF.UseVisualStyleBackColor = false;
+            btnExportPDF.Click += btnExportPDF_Click;
             // 
             // btnDeleteRoom
             // 
@@ -291,6 +292,7 @@
             btnDeleteRoom.TabIndex = 2;
             btnDeleteRoom.Text = "🗑️ Delete";
             btnDeleteRoom.UseVisualStyleBackColor = false;
+            btnDeleteRoom.Click += btnDeleteRoom_Click;
             // 
             // btnEditRoom
             // 
@@ -304,6 +306,7 @@
             btnEditRoom.TabIndex = 1;
             btnEditRoom.Text = "✏️ Edit Room";
             btnEditRoom.UseVisualStyleBackColor = false;
+            btnEditRoom.Click += btnEditRoom_Click;
             // 
             // btnAddRoom
             // 
@@ -316,6 +319,7 @@
             btnAddRoom.TabIndex = 0;
             btnAddRoom.Text = "➕ Add Room";
             btnAddRoom.UseVisualStyleBackColor = false;
+            btnAddRoom.Click += btnAddRoom_Click;
             // 
             // dgvRooms
             // 
@@ -347,6 +351,7 @@
             Controls.Add(pnlActions);
             Controls.Add(grpFilters);
             Controls.Add(pnlFilters);
+            FormBorderStyle = FormBorderStyle.None;
             Name = "RoomManagementForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Room Management";

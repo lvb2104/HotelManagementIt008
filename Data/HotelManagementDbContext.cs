@@ -6,7 +6,7 @@ namespace HotelManagementIt008.Data
 {
     public class HotelManagementDbContext : DbContext
     {
-        public HotelManagementDbContext(DbContextOptions<HotelManagementDbContext> dbContextOptions) : base(dbContextOptions)
+        public HotelManagementDbContext(DbContextOptions<HotelManagementDbContext> context) : base(context)
         {
 
         }

@@ -2,6 +2,6 @@
 {
     public interface IUserService
     {
-        Task<Result<LoginResponseDto>> LogInAsync(LoginRequestDto loginRequestDto);
+        Task<Result<LoginResponseDto>> LogInAsync(LoginRequestDto dto);
     }
 }
