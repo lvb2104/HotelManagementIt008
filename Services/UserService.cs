@@ -14,22 +14,22 @@ namespace HotelManagementIt008.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<Result<LoginResponseDto>> LogInAsync(LoginRequestDto loginRequestDto)
+        public async Task<Result<LoginResponseDto>> LogInAsync(LoginRequestDto dto)
         {
             try
             {
-                var user = await _unitOfWork.UserRepository.FindUserByUsernameAsync(loginRequestDto.Username);
+                var user = await _unitOfWork.UserRepository.FindUserByUsernameAsync(dto.Username);
                 if (user == null)
                 {
                     return Result<LoginResponseDto>.Failure("User not found.");
                 }
-                bool isPasswordValid = BCrypt.Net.BCrypt.Verify(loginRequestDto.Password, user.PasswordHash);
+                bool isPasswordValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
                 if (!isPasswordValid)
                 {
                     return Result<LoginResponseDto>.Failure("Invalid password.");
                 }
-                var loginResponseDto = _mapper.Map<LoginResponseDto>(user);
-                return Result<LoginResponseDto>.Success(loginResponseDto);
+                var response = _mapper.Map<LoginResponseDto>(user);
+                return Result<LoginResponseDto>.Success(response);
             }
             catch (Exception ex)
             {
