@@ -1,5 +1,3 @@
-using HotelManagementIt008.Repositories;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -23,12 +21,12 @@ namespace HotelManagementIt008
 
                 // Domain services
                 services.AddScoped<DatabaseSeeder>()
-                    .AddScoped<IUserService, UserService>()
-                    .AddScoped<IRoomService, RoomService>()
-                    .AddScoped<IRoomTypeService, RoomTypeService>()
-                    .AddScoped<IUnitOfWork, UnitOfWork>();
+                    .AddTransient<IUserService, UserService>()
+                    .AddTransient<IRoomService, RoomService>()
+                    .AddTransient<IRoomTypeService, RoomTypeService>()
+                    .AddTransient<IUnitOfWork, UnitOfWork>();
 
-                // Forms (transient = new instance each time)
+                // Forms
                 services.AddTransient<LoginForm>();
                 services.AddTransient<RoomManagementForm>();
             }).Build();

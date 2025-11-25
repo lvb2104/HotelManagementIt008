@@ -1,6 +1,8 @@
 ﻿using System.Drawing.Text;
 using System.Runtime.InteropServices;
 
+using HotelManagementIt008.Services.Interfaces;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HotelManagementIt008.Forms
