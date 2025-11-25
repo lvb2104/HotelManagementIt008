@@ -66,7 +66,7 @@
             pnlFilters.Location = new Point(0, 0);
             pnlFilters.Name = "pnlFilters";
             pnlFilters.Padding = new Padding(10);
-            pnlFilters.Size = new Size(984, 120);
+            pnlFilters.Size = new Size(1110, 120);
             pnlFilters.TabIndex = 0;
             // 
             // grpFilters
@@ -86,7 +86,7 @@
             grpFilters.Font = new Font("Segoe UI", 10F);
             grpFilters.Location = new Point(10, 10);
             grpFilters.Name = "grpFilters";
-            grpFilters.Size = new Size(950, 100);
+            grpFilters.Size = new Size(1070, 100);
             grpFilters.TabIndex = 1;
             grpFilters.TabStop = false;
             grpFilters.Text = "Search Filters";
@@ -123,7 +123,7 @@
             nudPriceTo.BorderStyle = BorderStyle.FixedSingle;
             nudPriceTo.DecimalPlaces = 2;
             nudPriceTo.Increment = new decimal(new int[] { 50000, 0, 0, 0 });
-            nudPriceTo.Location = new Point(600, 65);
+            nudPriceTo.Location = new Point(642, 65);
             nudPriceTo.Maximum = new decimal(new int[] { 10000000, 0, 0, 0 });
             nudPriceTo.Name = "nudPriceTo";
             nudPriceTo.Size = new Size(120, 25);
@@ -136,7 +136,7 @@
             // 
             lblPriceTo.AutoSize = true;
             lblPriceTo.ForeColor = Color.FromArgb(70, 70, 70);
-            lblPriceTo.Location = new Point(563, 71);
+            lblPriceTo.Location = new Point(605, 71);
             lblPriceTo.Name = "lblPriceTo";
             lblPriceTo.Size = new Size(22, 19);
             lblPriceTo.TabIndex = 7;
@@ -146,7 +146,7 @@
             // 
             lblPriceRange.AutoSize = true;
             lblPriceRange.ForeColor = Color.FromArgb(70, 70, 70);
-            lblPriceRange.Location = new Point(500, 35);
+            lblPriceRange.Location = new Point(542, 35);
             lblPriceRange.Name = "lblPriceRange";
             lblPriceRange.Size = new Size(83, 19);
             lblPriceRange.TabIndex = 6;
@@ -156,7 +156,7 @@
             // 
             nudPriceFrom.BorderStyle = BorderStyle.FixedSingle;
             nudPriceFrom.Increment = new decimal(new int[] { 50000, 0, 0, 0 });
-            nudPriceFrom.Location = new Point(600, 30);
+            nudPriceFrom.Location = new Point(642, 30);
             nudPriceFrom.Maximum = new decimal(new int[] { 10000000, 0, 0, 0 });
             nudPriceFrom.Name = "nudPriceFrom";
             nudPriceFrom.Size = new Size(120, 25);
@@ -170,7 +170,7 @@
             btnClearFilters.Cursor = Cursors.Hand;
             btnClearFilters.FlatStyle = FlatStyle.Flat;
             btnClearFilters.ForeColor = Color.White;
-            btnClearFilters.Location = new Point(844, 28);
+            btnClearFilters.Location = new Point(947, 35);
             btnClearFilters.Name = "btnClearFilters";
             btnClearFilters.Size = new Size(100, 35);
             btnClearFilters.TabIndex = 4;
@@ -184,7 +184,7 @@
             btnSearch.Cursor = Cursors.Hand;
             btnSearch.FlatStyle = FlatStyle.Flat;
             btnSearch.ForeColor = Color.White;
-            btnSearch.Location = new Point(738, 28);
+            btnSearch.Location = new Point(841, 35);
             btnSearch.Name = "btnSearch";
             btnSearch.Size = new Size(100, 35);
             btnSearch.TabIndex = 3;
@@ -233,12 +233,12 @@
             pnlActions.Location = new Point(0, 120);
             pnlActions.Name = "pnlActions";
             pnlActions.Padding = new Padding(10);
-            pnlActions.Size = new Size(984, 60);
+            pnlActions.Size = new Size(1110, 60);
             pnlActions.TabIndex = 2;
             // 
             // btnNext
             // 
-            btnNext.Location = new Point(872, 17);
+            btnNext.Location = new Point(957, 17);
             btnNext.Name = "btnNext";
             btnNext.Size = new Size(100, 30);
             btnNext.TabIndex = 6;
@@ -249,7 +249,7 @@
             // lblPageInfo
             // 
             lblPageInfo.AutoSize = true;
-            lblPageInfo.Location = new Point(739, 25);
+            lblPageInfo.Location = new Point(851, 25);
             lblPageInfo.Name = "lblPageInfo";
             lblPageInfo.Size = new Size(71, 15);
             lblPageInfo.TabIndex = 5;
@@ -259,7 +259,7 @@
             // btnPrevious
             // 
             btnPrevious.Enabled = false;
-            btnPrevious.Location = new Point(573, 17);
+            btnPrevious.Location = new Point(717, 17);
             btnPrevious.Name = "btnPrevious";
             btnPrevious.Size = new Size(100, 30);
             btnPrevious.TabIndex = 4;
@@ -339,14 +339,15 @@
             dgvRooms.ReadOnly = true;
             dgvRooms.RowHeadersVisible = false;
             dgvRooms.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvRooms.Size = new Size(984, 456);
+            dgvRooms.Size = new Size(1110, 480);
             dgvRooms.TabIndex = 3;
             // 
             // RoomManagementForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(984, 636);
+            BackColor = Color.FromArgb(249, 250, 251);
+            ClientSize = new Size(1110, 660);
             Controls.Add(dgvRooms);
             Controls.Add(pnlActions);
             Controls.Add(grpFilters);
