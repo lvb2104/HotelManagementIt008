@@ -4,7 +4,7 @@ using HotelManagementIt008.Models;
 
 namespace HotelManagementIt008.Mapping.AutoMapperProfiles
 {
-    public class InvoiceMappingProfile : Profile
+    public class InvoiceMappingProfile : AutoMapper.Profile
     {
         public InvoiceMappingProfile()
         {
