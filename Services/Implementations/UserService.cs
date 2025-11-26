@@ -47,5 +47,40 @@ namespace HotelManagementIt008.Services.Implementations
                 return Result<int>.Failure($"An error occurred while counting users: {ex.Message}");
             }
         }
+
+        public async Task<Result<User>> CreateDefaultUserAsync(CreateParticipantDto dto)
+        {
+            try
+            {
+                var userType = await _unitOfWork.UserTypeRepository.GetAllQueryable().FirstOrDefaultAsync(ut => ut.Type == dto.UserType);
+                if (userType == null) return Result<User>.Failure($"UserType {dto.UserType} not found");
+
+                var user = new User
+                {
+                    Email = dto.Email,
+                    Username = dto.FullName.Replace(" ", "").ToLower() + new Random().Next(1000, 9999),
+                    // PasswordHash? Default password?
+                    UserTypeId = userType.Id,
+                    Profile = new Models.Profile
+                    {
+                        FullName = dto.FullName,
+                        Address = dto.Address,
+                        IdentityCardNumber = dto.IdentityNumber
+                    }
+                };
+
+                var userRole = await _unitOfWork.RoleRepository.GetAllQueryable().FirstOrDefaultAsync(r => r.Type == RoleType.Customer);
+                if (userRole != null) user.RoleId = userRole.Id;
+
+                await _unitOfWork.UserRepository.AddAsync(user);
+                await _unitOfWork.SaveAsync();
+
+                return Result<User>.Success(user);
+            }
+            catch (Exception ex)
+            {
+                return Result<User>.Failure($"Error creating default user: {ex.Message}");
+            }
+        }
     }
 }

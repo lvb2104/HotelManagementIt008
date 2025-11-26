@@ -40,7 +40,7 @@ namespace HotelManagementIt008.Services.Implementations
 
                 // Check if admin
                 var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
-                bool isAdmin = role?.RoleName == "admin"; // Assuming "admin" is the role name
+                bool isAdmin = role?.Type == RoleType.Admin;
 
                 var query = _unitOfWork.BookingRepository.GetAllQueryable()
                     .Include(b => b.Booker)
@@ -96,7 +96,7 @@ namespace HotelManagementIt008.Services.Implementations
                 if (booking == null) return Result<BookingResponseDto>.Failure("Booking not found");
 
                 var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
-                bool isAdmin = role?.RoleName == "admin";
+                bool isAdmin = role?.Type == RoleType.Admin;
 
                 if (booking.BookerId.ToString() != userId && !isAdmin)
                 {
@@ -142,39 +142,10 @@ namespace HotelManagementIt008.Services.Implementations
 
                     if (participantUser == null)
                     {
-                        // Create default user logic (simplified here, ideally delegate to UserService)
-                        // Assuming UserService has a method for this or we do it here.
-                        // Since I can't easily call UserService.handleCreateDefaultUser as it's not in interface yet,
-                        // I'll implement basic creation here or assume I can add it to UserService later.
-                        // For now, let's assume we create a user with basic info.
-                        
-                        // Actually, I should probably add CreateDefaultUser to IUserService.
-                        // But to avoid too many context switches, I will implement the logic here.
-                        
-                        var userType = await _unitOfWork.UserTypeRepository.GetAllQueryable().FirstOrDefaultAsync(ut => ut.TypeName == pDto.UserType.ToString());
-                        if (userType == null) return Result<BookingResponseDto>.Failure($"UserType {pDto.UserType} not found");
-
-                        participantUser = new User
-                        {
-                            Email = pDto.Email,
-                            Username = pDto.FullName.Replace(" ", "").ToLower() + new Random().Next(1000, 9999),
-                            // PasswordHash? Default password?
-                            UserTypeId = userType.Id,
-                            Profile = new Models.Profile
-                            {
-                                FullName = pDto.FullName,
-                                Address = pDto.Address,
-                                IdentityNumber = pDto.IdentityNumber
-                            }
-                            // Role? Default to 'User'?
-                        };
-                         // Need to fetch Role 'User'
-                         var userRole = await _unitOfWork.RoleRepository.GetAllQueryable().FirstOrDefaultAsync(r => r.RoleName == "User"); // Assuming "User" role exists
-                         if (userRole != null) participantUser.RoleId = userRole.Id;
-
-                        await _unitOfWork.UserRepository.AddAsync(participantUser);
-                        // We need to save to get ID? Or EF Core handles it?
-                        // Better to save user first.
+                        // Create default user logic delegated to UserService
+                        var createUserResult = await _userService.CreateDefaultUserAsync(pDto);
+                        if (!createUserResult.IsSuccess) return Result<BookingResponseDto>.Failure(createUserResult.ErrorMessage);
+                        participantUser = createUserResult.Value;
                     }
                     else
                     {
@@ -182,17 +153,17 @@ namespace HotelManagementIt008.Services.Implementations
                          var userOverlapping = await _unitOfWork.BookingRepository.FindUserOverlappingBookingsAsync(participantUser.Id, dto.CheckInDate, dto.CheckOutDate);
                          if (userOverlapping.Any()) return Result<BookingResponseDto>.Failure($"User {pDto.Email} is already booked for these dates");
                     }
-                    participants.push(participantUser); // Wait, List<User>
+                    // participants.Add(participantUser); // Already added below
                     participants.Add(participantUser);
                 }
 
                 // Calculate Price
                 var dayRent = (int)Math.Ceiling((dto.CheckOutDate - dto.CheckInDate).TotalDays);
-                var basePrice = room.RoomType.Price; // Assuming Price property
+                var basePrice = room.RoomType.PricePerNight;
                 var totalPrice = basePrice * dayRent;
 
                 var numberOfParticipants = participants.Count;
-                var hasForeign = participants.Any(p => p.UserType?.TypeName == "Foreign"); // Check UserType string
+                var hasForeign = participants.Any(p => p.UserType?.Type == UserTypeType.Foreign);
 
                 if (numberOfParticipants > 2)
                 {
@@ -208,30 +179,13 @@ namespace HotelManagementIt008.Services.Implementations
                     totalPrice *= (decimal)foreignFactor;
                 }
 
-                // Create Invoice
+                // Create Invoice DTO
                 var invoiceDto = new CreateInvoiceDto
                 {
                     BasePrice = basePrice,
                     TotalPrice = totalPrice,
                     DaysStayed = dayRent,
-                    BookingId = Guid.Empty // Will be set after booking creation? Circular dependency?
-                    // Invoice needs BookingId. Booking needs InvoiceId?
-                    // TS code: create invoice first, then booking.
-                    // But Invoice model has BookingId required?
-                    // TS: invoiceRepository.create({...}) -> save.
-                    // In TS, Invoice entity has @OneToOne(() => Booking, (booking) => booking.invoice)
-                    // If Invoice is created first, it might not have BookingId yet if it's required.
-                    // Let's check Invoice model again. BookingId is Guid (not nullable).
-                    // So we can't create Invoice without BookingId.
-                    // But TS code does: const invoice = await this.invoicesService.create({...});
-                    // Maybe in TS/TypeORM it allows it or it updates it later.
-                    // In C# EF Core, if BookingId is required, we must provide it.
-                    // But we are creating Booking now.
-                    // Solution: Create Booking first, then Invoice, then update Booking with InvoiceId?
-                    // Or create both and save together?
-                    // Let's try creating Booking with null InvoiceId (if nullable), then create Invoice with BookingId, then update Booking.
-                    // Booking.InvoiceId is nullable?
-                    // Checking Booking.cs: public Guid? InvoiceId { get; set; } -> Yes, nullable.
+                    BookingId = Guid.Empty // Will be set after booking creation
                 };
 
                 // Create Booking
@@ -242,12 +196,11 @@ namespace HotelManagementIt008.Services.Implementations
                     CheckInDate = dto.CheckInDate,
                     CheckOutDate = dto.CheckOutDate,
                     TotalPrice = totalPrice,
-                    // InvoiceId = null initially
+                    InvoiceId = null // Initially null
                 };
 
                 await _unitOfWork.BookingRepository.AddAsync(booking);
-                // Need to save to get Booking Id for Invoice
-                await _unitOfWork.SaveAsync();
+                await _unitOfWork.SaveAsync(); // Save to generate Booking Id
 
                 // Create Invoice
                 invoiceDto.BookingId = booking.Id;
@@ -304,7 +257,7 @@ namespace HotelManagementIt008.Services.Implementations
                 if (booking == null) return Result<BookingResponseDto>.Failure("Booking not found");
 
                 var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
-                bool isAdmin = role?.RoleName == "admin";
+                bool isAdmin = role?.Type == RoleType.Admin;
 
                 if (booking.BookerId.ToString() != userId && !isAdmin)
                 {
@@ -340,7 +293,7 @@ namespace HotelManagementIt008.Services.Implementations
                 if (booking == null) return Result<bool>.Failure("Booking not found");
 
                 var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
-                bool isAdmin = role?.RoleName == "admin";
+                bool isAdmin = role?.Type == RoleType.Admin;
 
                 if (booking.BookerId.ToString() != userId && !isAdmin)
                 {

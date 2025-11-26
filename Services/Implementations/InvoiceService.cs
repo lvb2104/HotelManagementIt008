@@ -145,22 +145,29 @@ namespace HotelManagementIt008.Services.Implementations
         {
             try
             {
-                var invoices = await _unitOfWork.InvoiceRepository.GetInvoicesByMonthOrYearAsync(year, month);
-                // We might need to load relations if not loaded by repository, but repository returns entities.
-                // The repository method I implemented uses GetAllQueryable() which is AsNoTracking().
-                // It doesn't include relations. I should update repository or include here.
-                // Since repository method returns IEnumerable, I can't chain Include easily unless I change repository return type to IQueryable or include there.
-                // But I can't change repository interface easily now without another tool call.
-                // Actually, I can just use GetAllQueryable here and filter, but the requirement was to use repository method.
-                // I will assume for now that basic info is enough or I will fetch relations in a loop (bad) or modify repository.
-                // Let's modify repository method to include relations?
-                // Or I can just implement logic here using GetAllQueryable and ignore the repository method if it's not sufficient.
-                // But I already implemented the repository method.
-                // I'll stick to using the repository method. If relations are missing, I'll fix it.
-                // Actually, let's check if I can just use GetAllQueryable here for better control.
-                // The user asked to create repository.
-                // I'll use the repository method.
-                
+                IQueryable<Invoice> query = _unitOfWork.InvoiceRepository.GetAllQueryable()
+                    .Include(i => i.Booking)
+                        .ThenInclude(b => b.Booker)
+                    .Include(i => i.Booking)
+                        .ThenInclude(b => b.Room);
+
+                if (year.HasValue)
+                {
+                    query = query.Where(i => i.CreatedAt.Year == year.Value);
+                }
+
+                if (month.HasValue)
+                {
+                    query = query.Where(i => i.CreatedAt.Month == month.Value);
+
+                    if (!year.HasValue)
+                    {
+                        var currentYear = DateTime.Now.Year;
+                        query = query.Where(i => i.CreatedAt.Year == currentYear);
+                    }
+                }
+
+                var invoices = await query.OrderByDescending(i => i.CreatedAt).ToListAsync();
                 return Result<IEnumerable<InvoiceResponseDto>>.Success(_mapper.Map<IEnumerable<InvoiceResponseDto>>(invoices));
             }
             catch (Exception ex)
@@ -173,7 +180,7 @@ namespace HotelManagementIt008.Services.Implementations
         {
             try
             {
-                var query = _unitOfWork.InvoiceRepository.GetAllQueryable()
+                IQueryable<Invoice> query = _unitOfWork.InvoiceRepository.GetAllQueryable()
                     .Include(i => i.Booking)
                         .ThenInclude(b => b.Booker)
                     .Include(i => i.Booking)
