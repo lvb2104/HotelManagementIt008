@@ -1,4 +1,5 @@
 ﻿global using HotelManagementIt008.Configurations;
+global using HotelManagementIt008.Core;
 global using HotelManagementIt008.Data;
 global using HotelManagementIt008.Data.Seeders;
 global using HotelManagementIt008.Dtos.Requests;
@@ -7,6 +8,7 @@ global using HotelManagementIt008.Extensions;
 global using HotelManagementIt008.Forms;
 global using HotelManagementIt008.Helpers;
 global using HotelManagementIt008.Models;
+global using HotelManagementIt008.Properties;
 global using HotelManagementIt008.Repositories.Implementations;
 global using HotelManagementIt008.Repositories.Interfaces;
 global using HotelManagementIt008.Services.Implementations;

@@ -38,6 +38,7 @@
             panel1 = new Panel();
             panel2 = new Panel();
             pictureBox1 = new PictureBox();
+            chkRememberMe = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)logoPic).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
@@ -52,7 +53,7 @@
             txtUsername.Margin = new Padding(4, 2, 4, 2);
             txtUsername.Name = "txtUsername";
             txtUsername.PlaceholderText = "Username";
-            txtUsername.Size = new Size(196, 17);
+            txtUsername.Size = new Size(179, 17);
             txtUsername.TabIndex = 1;
             // 
             // txtPassword
@@ -65,18 +66,19 @@
             txtPassword.Name = "txtPassword";
             txtPassword.PasswordChar = '●';
             txtPassword.PlaceholderText = "Password";
-            txtPassword.Size = new Size(196, 17);
+            txtPassword.Size = new Size(179, 17);
             txtPassword.TabIndex = 3;
             // 
             // chkShowPassword
             // 
             chkShowPassword.AutoSize = true;
             chkShowPassword.Cursor = Cursors.Hand;
+            chkShowPassword.Font = new Font("Microsoft Sans Serif", 7.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
             chkShowPassword.ForeColor = Color.FromArgb(70, 70, 70);
-            chkShowPassword.Location = new Point(35, 339);
+            chkShowPassword.Location = new Point(35, 351);
             chkShowPassword.Margin = new Padding(4, 2, 4, 2);
             chkShowPassword.Name = "chkShowPassword";
-            chkShowPassword.Size = new Size(149, 22);
+            chkShowPassword.Size = new Size(115, 17);
             chkShowPassword.TabIndex = 4;
             chkShowPassword.Text = "Show Password";
             chkShowPassword.UseVisualStyleBackColor = true;
@@ -101,7 +103,7 @@
             // 
             // logoPic
             // 
-            logoPic.Image = Properties.Resources.logo;
+            logoPic.Image = Resources.logo;
             logoPic.Location = new Point(89, 12);
             logoPic.Margin = new Padding(4, 3, 4, 3);
             logoPic.Name = "logoPic";
@@ -124,7 +126,7 @@
             // 
             // pictureBox2
             // 
-            pictureBox2.Image = Properties.Resources.user;
+            pictureBox2.Image = Resources.user;
             pictureBox2.Location = new Point(35, 216);
             pictureBox2.Margin = new Padding(4, 3, 4, 3);
             pictureBox2.Name = "pictureBox2";
@@ -153,7 +155,7 @@
             // 
             // pictureBox1
             // 
-            pictureBox1.Image = Properties.Resources._lock;
+            pictureBox1.Image = Resources._lock;
             pictureBox1.Location = new Point(35, 280);
             pictureBox1.Margin = new Padding(4, 3, 4, 3);
             pictureBox1.Name = "pictureBox1";
@@ -162,12 +164,27 @@
             pictureBox1.TabIndex = 11;
             pictureBox1.TabStop = false;
             // 
+            // chkRememberMe
+            // 
+            chkRememberMe.AutoSize = true;
+            chkRememberMe.Cursor = Cursors.Hand;
+            chkRememberMe.Font = new Font("Microsoft Sans Serif", 7.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            chkRememberMe.ForeColor = Color.FromArgb(70, 70, 70);
+            chkRememberMe.Location = new Point(180, 351);
+            chkRememberMe.Margin = new Padding(4, 2, 4, 2);
+            chkRememberMe.Name = "chkRememberMe";
+            chkRememberMe.Size = new Size(105, 17);
+            chkRememberMe.TabIndex = 13;
+            chkRememberMe.Text = "Remember me";
+            chkRememberMe.UseVisualStyleBackColor = true;
+            // 
             // LoginForm
             // 
             AutoScaleDimensions = new SizeF(9F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(331, 500);
+            Controls.Add(chkRememberMe);
             Controls.Add(panel2);
             Controls.Add(pictureBox1);
             Controls.Add(panel1);
@@ -185,7 +202,6 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "LoginForm";
-            StartPosition = FormStartPosition.CenterScreen;
             Text = "Hotel Management - Login";
             ((System.ComponentModel.ISupportInitialize)logoPic).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
@@ -205,5 +221,6 @@
         private Panel panel1;
         private Panel panel2;
         private PictureBox pictureBox1;
+        private CheckBox chkRememberMe;
     }
 }

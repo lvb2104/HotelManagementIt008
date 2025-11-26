@@ -1,6 +1,3 @@
-using HotelManagementIt008.Services.Interfaces;
-using HotelManagementIt008.Dtos.Requests;
-
 namespace HotelManagementIt008.Forms
 {
     public partial class ParamForm : Form
@@ -21,6 +18,7 @@ namespace HotelManagementIt008.Forms
                 var result = await _paramService.GetAllParamsAsync();
                 if (result.IsSuccess)
                 {
+                    if (result.Value == null) return;
                     dgvParams.DataSource = result.Value.Select(p => new
                     {
                         p.Key,
@@ -36,11 +34,9 @@ namespace HotelManagementIt008.Forms
                     }
 
                     // Make Key read-only
-                    if (dgvParams.Columns["Key"] != null)
-                        dgvParams.Columns["Key"].ReadOnly = true;
-                    
-                    if (dgvParams.Columns["Description"] != null)
-                        dgvParams.Columns["Description"].ReadOnly = true;
+                    dgvParams.Columns["Key"]?.ReadOnly = true;
+
+                    dgvParams.Columns["Description"]?.ReadOnly = true;
                 }
                 else
                 {
@@ -85,6 +81,15 @@ namespace HotelManagementIt008.Forms
             catch (Exception ex)
             {
                 MessageBox.Show($"Error updating param: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void cbKey_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var value = await _paramService.GetParamByKeyAsync(cbKey.Text);
+            if (value.IsSuccess)
+            {
+                txtValue.Text = value.Value?.Value ?? string.Empty;
             }
         }
     }

@@ -73,9 +73,9 @@ namespace HotelManagementIt008.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] Bauhaus_93_Regular {
+        internal static byte[] Bauhaus93Regular {
             get {
-                object obj = ResourceManager.GetObject("Bauhaus_93_Regular", resourceCulture);
+                object obj = ResourceManager.GetObject("Bauhaus93Regular", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -87,6 +87,16 @@ namespace HotelManagementIt008.Properties {
             get {
                 object obj = ResourceManager.GetObject("logo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon Tray {
+            get {
+                object obj = ResourceManager.GetObject("Tray", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
         

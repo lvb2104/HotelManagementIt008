@@ -1,6 +1,6 @@
 ﻿namespace HotelManagementIt008.Forms
 {
-    public partial class DashboardForm : Form
+    public partial class DashboardForm : BaseForm
     {
         private readonly IRoomService _roomService;
         private readonly IUserService _userService;

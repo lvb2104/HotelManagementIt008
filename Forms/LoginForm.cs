@@ -1,26 +1,33 @@
 ﻿using System.Drawing.Text;
 using System.Runtime.InteropServices;
 
-using HotelManagementIt008.Services.Interfaces;
-
-using Microsoft.Extensions.DependencyInjection;
-
 namespace HotelManagementIt008.Forms
 {
-    public partial class LoginForm : Form
+    public partial class LoginForm : BaseForm
     {
         private readonly IUserService _userService;
-        private readonly IServiceProvider _serviceProvider;
+        public event EventHandler<LoginResponseDto>? LoginSuccess;
 
-        public LoginForm(IUserService userService, IServiceProvider serviceProvider)
+        public LoginForm(IUserService userService)
         {
             _userService = userService;
-            _serviceProvider = serviceProvider;
 
             InitializeComponent();
             ApplyCustomFont();
             SetupCustomEvents();
+            LoadSavedCredentials();
         }
+
+        private void LoadSavedCredentials()
+        {
+            if (Settings.Default.IsRemembered)
+            {
+                txtUsername.Text = Settings.Default.Username;
+                txtPassword.Text = SecurityHelper.Unprotect(Settings.Default.EncryptedPassword);
+                chkRememberMe.Checked = true;
+            }
+        }
+
         private void SetupCustomEvents()
         {
             // Hover effects for Login button
@@ -42,7 +49,7 @@ namespace HotelManagementIt008.Forms
             txtPassword.PasswordChar = chkShowPassword.Checked ? '\0' : '•';
         }
 
-        private async void btnLogin_Click(object sender, EventArgs e)
+        private async void btnLogin_Click(object? sender, EventArgs e)
         {
             // Validation
             if (string.IsNullOrWhiteSpace(txtUsername.Text))
@@ -72,13 +79,14 @@ namespace HotelManagementIt008.Forms
 
                 if (result.IsSuccess)
                 {
-                    Hide();
-
-                    var mainDashboardForm = ActivatorUtilities.CreateInstance<MainDashboardForm>(_serviceProvider, result.Value!);
-
-                    // When room form closes, close login form (so app exits)
-                    mainDashboardForm.FormClosed += (_, __) => Close();
-                    mainDashboardForm.Show();
+                    if (result.Value == null)
+                    {
+                        MessageBox.Show("Login failed. Please try again.",
+                            "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    SaveCredentials();
+                    LoginSuccess?.Invoke(this, result.Value);
                 }
                 else
                 {
@@ -94,10 +102,27 @@ namespace HotelManagementIt008.Forms
             }
         }
 
+        private void SaveCredentials()
+        {
+            if (chkRememberMe.Checked)
+            {
+                Settings.Default.Username = txtUsername.Text;
+                Settings.Default.EncryptedPassword = SecurityHelper.Protect(txtPassword.Text);
+                Settings.Default.IsRemembered = true;
+            }
+            else
+            {
+                Settings.Default.Username = string.Empty;
+                Settings.Default.EncryptedPassword = string.Empty;
+                Settings.Default.IsRemembered = false;
+            }
+            Settings.Default.Save();
+        }
+
         private void ApplyCustomFont()
         {
             // Get the font bytes from Resources
-            var fontData = HotelManagementIt008.Properties.Resources.Bauhaus_93_Regular;
+            var fontData = Resources.Bauhaus93Regular;
 
             // Allocate memory
             IntPtr fontPtr = Marshal.AllocCoTaskMem(fontData.Length);

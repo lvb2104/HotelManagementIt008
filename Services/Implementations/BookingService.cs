@@ -1,8 +1,6 @@
 using AutoMapper;
+
 using Microsoft.EntityFrameworkCore;
-using HotelManagementIt008.Dtos.Requests;
-using HotelManagementIt008.Dtos.Responses;
-using HotelManagementIt008.Types;
 
 namespace HotelManagementIt008.Services.Implementations
 {
@@ -144,17 +142,19 @@ namespace HotelManagementIt008.Services.Implementations
                     {
                         // Create default user logic delegated to UserService
                         var createUserResult = await _userService.CreateDefaultUserAsync(pDto);
-                        if (!createUserResult.IsSuccess) return Result<BookingResponseDto>.Failure(createUserResult.ErrorMessage);
+                        if (!createUserResult.IsSuccess)
+                        {
+                            return Result<BookingResponseDto>.Failure(createUserResult.ErrorMessage ?? "Failed to create participant user");
+                        }
                         participantUser = createUserResult.Value;
                     }
                     else
                     {
                         // Check if participant is valid (not booked elsewhere)
-                         var userOverlapping = await _unitOfWork.BookingRepository.FindUserOverlappingBookingsAsync(participantUser.Id, dto.CheckInDate, dto.CheckOutDate);
-                         if (userOverlapping.Any()) return Result<BookingResponseDto>.Failure($"User {pDto.Email} is already booked for these dates");
+                        var userOverlapping = await _unitOfWork.BookingRepository.FindUserOverlappingBookingsAsync(participantUser.Id, dto.CheckInDate, dto.CheckOutDate);
+                        if (userOverlapping.Any()) return Result<BookingResponseDto>.Failure($"User {pDto.Email} is already booked for these dates");
+                        participants.Add(participantUser);
                     }
-                    // participants.Add(participantUser); // Already added below
-                    participants.Add(participantUser);
                 }
 
                 // Calculate Price
@@ -168,6 +168,10 @@ namespace HotelManagementIt008.Services.Implementations
                 if (numberOfParticipants > 2)
                 {
                     var surchargeParam = await _paramService.GetParamByKeyAsync("surcharge_rate");
+                    if (!surchargeParam.IsSuccess || surchargeParam.Value is null)
+                    {
+                        return Result<BookingResponseDto>.Failure("Failed to retrieve surcharge rate parameter");
+                    }
                     var surchargeRate = surchargeParam.IsSuccess ? double.Parse(surchargeParam.Value.Value) : 0.25;
                     totalPrice += totalPrice * (decimal)surchargeRate * (numberOfParticipants - 2);
                 }
@@ -175,6 +179,10 @@ namespace HotelManagementIt008.Services.Implementations
                 if (hasForeign)
                 {
                     var foreignParam = await _paramService.GetParamByKeyAsync("foreign_guest_factor");
+                    if (!foreignParam.IsSuccess || foreignParam.Value is null)
+                    {
+                        return Result<BookingResponseDto>.Failure("Failed to retrieve foreign guest factor parameter");
+                    }
                     var foreignFactor = foreignParam.IsSuccess ? double.Parse(foreignParam.Value.Value) : 1.5;
                     totalPrice *= (decimal)foreignFactor;
                 }
@@ -205,11 +213,11 @@ namespace HotelManagementIt008.Services.Implementations
                 // Create Invoice
                 invoiceDto.BookingId = booking.Id;
                 var invoiceResult = await _invoiceService.CreateInvoiceAsync(invoiceDto);
-                if (!invoiceResult.IsSuccess) return Result<BookingResponseDto>.Failure("Failed to create invoice");
+                if (!invoiceResult.IsSuccess || invoiceResult.Value is null) return Result<BookingResponseDto>.Failure("Failed to create invoice");
 
                 // Update Booking with InvoiceId
                 booking.InvoiceId = invoiceResult.Value.Id;
-                
+
                 // Add Participants (BookingDetails)
                 foreach (var p in participants)
                 {
@@ -241,7 +249,7 @@ namespace HotelManagementIt008.Services.Implementations
 
         public async Task<Result<BookingResponseDto>> UpdateBookingAsync(string id, UpdateBookingDto dto, string userId)
         {
-             try
+            try
             {
                 var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
                 if (user == null) return Result<BookingResponseDto>.Failure("User not found");
@@ -266,10 +274,10 @@ namespace HotelManagementIt008.Services.Implementations
 
                 // Update logic (simplified for brevity, but should follow TS logic)
                 // ... (Room change, Date change, Participants change -> Recalculate Price)
-                
+
                 // For now, returning failure as full implementation is complex and might exceed token limit in one go.
                 // I will implement the core structure.
-                
+
                 return Result<BookingResponseDto>.Failure("Update not fully implemented yet");
             }
             catch (Exception ex)
@@ -313,9 +321,9 @@ namespace HotelManagementIt008.Services.Implementations
                 // Delete Invoice
                 if (booking.Invoice != null)
                 {
-                   await _invoiceService.DeleteInvoiceAsync(booking.Invoice.Id.ToString());
+                    await _invoiceService.DeleteInvoiceAsync(booking.Invoice.Id.ToString());
                 }
-                
+
                 await _unitOfWork.SaveAsync();
 
                 return Result<bool>.Success(true);

@@ -220,9 +220,10 @@ namespace HotelManagementIt008.Data
                 }
 
                 // Handle CreatedAt and UpdatedAt
+                var currentValue = entry.Property("CreatedAt").CurrentValue;
                 if (entry.State == EntityState.Added)
                 {
-                    if (hasCreatedAt && (entry.Property("CreatedAt").CurrentValue == null || entry.Property("CreatedAt").CurrentValue.Equals(default(DateTime))))
+                    if (hasCreatedAt && (entry.Property("CreatedAt").CurrentValue is null || (currentValue is DateTime dt && dt == default)))
                     {
                         entry.Property("CreatedAt").CurrentValue = utcNow;
                     }

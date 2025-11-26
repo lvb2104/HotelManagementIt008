@@ -2,7 +2,7 @@
 
 namespace HotelManagementIt008.Forms
 {
-    public partial class RoomManagementForm : Form
+    public partial class RoomManagementForm : BaseForm
     {
         private readonly IRoomTypeService _roomTypeService;
         private readonly IRoomService _roomService;

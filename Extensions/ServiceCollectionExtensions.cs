@@ -13,80 +13,83 @@ namespace HotelManagementIt008.Extensions
     public static class ServiceCollectionExtensions
     {
         // AddDatabaseService: Register DbContext used Npgsql (Postgres)
-        public static IServiceCollection AddDatabaseService(this IServiceCollection services)
+        extension(IServiceCollection services)
         {
-            services.AddDbContext<HotelManagementDbContext>((serviceProvider, options) =>
+            public IServiceCollection AddDatabaseService()
             {
-                // Get EFCoreSettings from DI
-                var settings = serviceProvider.GetRequiredService<IOptions<EFCoreSettings>>().Value;
-
-                // Use Npgsql (Postgres)
-                options.UseNpgsql(settings.DefaultConnection, npgsqlOptions =>
+                services.AddDbContext<HotelManagementDbContext>((serviceProvider, options) =>
                 {
-                    // Options for Npgsql can be configured here
-                    // npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory");
+                    // Get EFCoreSettings from DI
+                    var settings = serviceProvider.GetRequiredService<IOptions<EFCoreSettings>>().Value;
+
+                    // Use Npgsql (Postgres)
+                    options.UseNpgsql(settings.DefaultConnection, npgsqlOptions =>
+                    {
+                        // Options for Npgsql can be configured here
+                        // npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory");
+                    });
                 });
-            });
 
-            return services;
-        }
+                return services;
+            }
 
-        // AddConfigurationService: Bind options from appsettings.json
-        public static IServiceCollection AddConfigurationService(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddOptions<EFCoreSettings>()
-                .Bind(configuration.GetSection(EFCoreSettings.SettingsSection))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
-
-            services.AddOptions<SecuritySettings>()
-                .Bind(configuration.GetSection(SecuritySettings.SettingsSection))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
-
-            return services;
-        }
-
-        // AddAutoMapperService: Register AutoMapper
-        public static IServiceCollection AddAutoMapperService(this IServiceCollection services)
-        {
-            // Register Mapper configuration as a singleton
-            services.AddSingleton(provider =>
+            // AddConfigurationService: Bind options from appsettings.json
+            public IServiceCollection AddConfigurationService(IConfiguration configuration)
             {
-                // Get logger factory from DI
-                var loggerFactory = provider.GetService<ILoggerFactory>();
+                services.AddOptions<EFCoreSettings>()
+                    .Bind(configuration.GetSection(EFCoreSettings.SettingsSection))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
 
-                // Create Mapper configuration expression (contains mapping profiles)
-                var configExpression = new MapperConfigurationExpression();
+                services.AddOptions<SecuritySettings>()
+                    .Bind(configuration.GetSection(SecuritySettings.SettingsSection))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
 
-                // Scan and add all profiles in the assembly
-                configExpression.AddMaps(typeof(ServiceCollectionExtensions).Assembly);
+                return services;
+            }
 
-                // Create Mapper configuration
-                var config = new MapperConfiguration(configExpression, loggerFactory);
+            // AddAutoMapperService: Register AutoMapper
+            public IServiceCollection AddAutoMapperService()
+            {
+                // Register Mapper configuration as a singleton
+                services.AddSingleton(provider =>
+                {
+                    // Get logger factory from DI
+                    var loggerFactory = provider.GetService<ILoggerFactory>();
 
-                // Validate the configuration
-                config.AssertConfigurationIsValid();
+                    // Create Mapper configuration expression (contains mapping profiles)
+                    var configExpression = new MapperConfigurationExpression();
 
-                return config;
-            });
+                    // Scan and add all profiles in the assembly
+                    configExpression.AddMaps(typeof(ServiceCollectionExtensions).Assembly);
 
-            // Register IMapper as a singleton
-            services.AddSingleton<IMapper>(sp =>
-                new Mapper(
-                    sp.GetRequiredService<MapperConfiguration>(), // Get the registered MapperConfiguration from above
-                    sp.GetService)); // Use the service provider to resolve dependencies
+                    // Create Mapper configuration
+                    var config = new MapperConfiguration(configExpression, loggerFactory);
 
-            return services;
-        }
+                    // Validate the configuration
+                    config.AssertConfigurationIsValid();
 
-        // AddGridifyService: Register Gridify
-        public static IServiceCollection AddGridifyService(this IServiceCollection services)
-        {
-            // Enable Entity Framework compatibility layer to optimize Gridify for EF Core
-            GridifyGlobalConfiguration.EnableEntityFrameworkCompatibilityLayer();
-            services.AddGridifyMappers(typeof(Program).Assembly);
-            return services;
+                    return config;
+                });
+
+                // Register IMapper as a singleton
+                services.AddSingleton<IMapper>(sp =>
+                    new Mapper(
+                        sp.GetRequiredService<MapperConfiguration>(), // Get the registered MapperConfiguration from above
+                        sp.GetService)); // Use the service provider to resolve dependencies
+
+                return services;
+            }
+
+            // AddGridifyService: Register Gridify
+            public IServiceCollection AddGridifyService()
+            {
+                // Enable Entity Framework compatibility layer to optimize Gridify for EF Core
+                GridifyGlobalConfiguration.EnableEntityFrameworkCompatibilityLayer();
+                services.AddGridifyMappers(typeof(Program).Assembly);
+                return services;
+            }
         }
     }
 }

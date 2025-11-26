@@ -347,7 +347,6 @@
             Controls.Add(pnlHeader);
             Controls.Add(pnlSidebar);
             Name = "MainDashboardForm";
-            StartPosition = FormStartPosition.CenterScreen;
             Text = "Hotel Management System";
             pnlSidebar.ResumeLayout(false);
             pnlLogo.ResumeLayout(false);
