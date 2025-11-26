@@ -2,11 +2,12 @@
 
 namespace HotelManagementIt008.Forms
 {
-    public partial class MainDashboardForm : Form
+    public partial class MainDashboardForm : BaseForm
     {
         private Form? _currentChildForm; // To keep track of the currently opened child form
         private readonly LoginResponseDto _currentUser; // Store current user info
         private readonly IServiceProvider _serviceProvider;
+        public event EventHandler? Logout;
 
         public MainDashboardForm(LoginResponseDto currentUser, IServiceProvider serviceProvider)
         {
@@ -100,12 +101,9 @@ namespace HotelManagementIt008.Forms
             }
         }
 
-        private void btnLogout_Click(object sender, EventArgs e)
+        private void btnLogout_Click(object? sender, EventArgs e)
         {
-            Hide();
-            var loginForm = ActivatorUtilities.CreateInstance<LoginForm>(_serviceProvider);
-            loginForm.FormClosed += (_, __) => Close();
-            loginForm.Show();
+            Logout?.Invoke(this, EventArgs.Empty);
         }
     }
 }

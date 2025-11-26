@@ -41,8 +41,10 @@ namespace HotelManagementIt008
 
             // Start WinForms app
             ApplicationConfiguration.Initialize();
-            var loginForm = host.Services.GetRequiredService<LoginForm>();
-            Application.Run(loginForm);
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            var context = new TrayIconApplicationContext(host.Services);
+            Application.Run(context);
         }
     }
 }
