@@ -14,9 +14,14 @@ namespace HotelManagementIt008.Mapping.AutoMapperProfiles
 
             CreateMap<User, UserBookingResponseDto>();
             CreateMap<User, ParticipantResponseDto>();
-            CreateMap<Models.Profile, ProfileResponseDto>();
-            CreateMap<UserType, UserTypeResponseDto>();
-            CreateMap<Role, RoleResponseDto>();
+            CreateMap<Models.Profile, ProfileResponseDto>()
+                .ForMember(dest => dest.IdentityNumber, opt => opt.MapFrom(src => src.IdentityCardNumber));
+
+            CreateMap<UserType, UserTypeResponseDto>()
+                .ForMember(dest => dest.TypeName, opt => opt.MapFrom(src => src.Type.ToString()));
+
+            CreateMap<Role, RoleResponseDto>()
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Type.ToString()));
         }
     }
 }
