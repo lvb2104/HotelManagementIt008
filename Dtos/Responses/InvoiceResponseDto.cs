@@ -1,5 +1,3 @@
-using HotelManagementIt008.Types;
-
 namespace HotelManagementIt008.Dtos.Responses
 {
     public class InvoiceResponseDto
@@ -11,7 +9,7 @@ namespace HotelManagementIt008.Dtos.Responses
         public InvoiceStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public BookingInvoiceResponseDto Booking { get; set; }
+        public BookingInvoiceResponseDto Booking { get; set; } = default!;
     }
 
     public class BookingInvoiceResponseDto
@@ -19,14 +17,14 @@ namespace HotelManagementIt008.Dtos.Responses
         public Guid Id { get; set; }
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }
-        public UserInvoiceResponseDto User { get; set; }
-        public RoomResponseDto Room { get; set; }
+        public UserInvoiceResponseDto User { get; set; } = default!;
+        public RoomResponseDto Room { get; set; } = default!;
     }
 
     public class UserInvoiceResponseDto
     {
         public Guid Id { get; set; }
-        public string Username { get; set; }
-        public string Email { get; set; }
+        public string Username { get; set; } = default!;
+        public string Email { get; set; } = default!;
     }
 }
