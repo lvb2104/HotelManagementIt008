@@ -32,6 +32,7 @@ namespace HotelManagementIt008
                 // Forms
                 services.AddTransient<LoginForm>();
                 services.AddTransient<RoomManagementForm>();
+                services.AddTransient<ParamForm>();
             }).Build();
 
             // Seed database using a scope
