@@ -24,11 +24,15 @@ namespace HotelManagementIt008
                     .AddTransient<IUserService, UserService>()
                     .AddTransient<IRoomService, RoomService>()
                     .AddTransient<IRoomTypeService, RoomTypeService>()
+                    .AddTransient<IParamService, ParamService>()
+                    .AddTransient<IInvoiceService, InvoiceService>()
+                    .AddTransient<IBookingService, BookingService>()
                     .AddTransient<IUnitOfWork, UnitOfWork>();
 
                 // Forms
                 services.AddTransient<LoginForm>();
                 services.AddTransient<RoomManagementForm>();
+                services.AddTransient<ParamForm>();
             }).Build();
 
             // Seed database using a scope
