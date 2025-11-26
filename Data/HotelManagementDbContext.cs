@@ -213,18 +213,16 @@ namespace HotelManagementIt008.Data
                 var hasCreatedAt = entry.Metadata.FindProperty("CreatedAt") is not null;
 
                 // Handle soft delete
-                if (entry.Entity is ISoftDeletable sd)
+                if (entry.Entity is ISoftDeletable sd && entry.State == EntityState.Deleted)
                 {
-                    if (entry.State == EntityState.Deleted)
-                    {
-                        entry.State = EntityState.Modified;
-                        sd.DeletedAt ??= utcNow;
-                    }
+                    entry.State = EntityState.Modified;
+                    sd.DeletedAt ??= utcNow;
                 }
+
                 // Handle CreatedAt and UpdatedAt
-                else if (entry.State == EntityState.Added)
+                if (entry.State == EntityState.Added)
                 {
-                    if (hasCreatedAt && entry.Property("CreatedAt").CurrentValue is null)
+                    if (hasCreatedAt && (entry.Property("CreatedAt").CurrentValue == null || entry.Property("CreatedAt").CurrentValue.Equals(default(DateTime))))
                     {
                         entry.Property("CreatedAt").CurrentValue = utcNow;
                     }
@@ -233,7 +231,6 @@ namespace HotelManagementIt008.Data
                         entry.Property("UpdatedAt").CurrentValue = utcNow;
                     }
                 }
-                // Handle UpdatedAt
                 else if (entry.State == EntityState.Modified)
                 {
                     if (hasUpdatedAt)

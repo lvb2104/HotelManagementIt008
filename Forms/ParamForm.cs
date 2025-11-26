@@ -25,9 +25,15 @@ namespace HotelManagementIt008.Forms
                     {
                         p.Key,
                         p.Value,
-                        p.Description,
-                        p.UpdatedAt
+                        p.Description
                     }).ToList();
+
+                    // Populate ComboBox
+                    cbKey.Items.Clear();
+                    foreach (var param in result.Value)
+                    {
+                        cbKey.Items.Add(param.Key);
+                    }
 
                     // Make Key read-only
                     if (dgvParams.Columns["Key"] != null)
@@ -35,9 +41,6 @@ namespace HotelManagementIt008.Forms
                     
                     if (dgvParams.Columns["Description"] != null)
                         dgvParams.Columns["Description"].ReadOnly = true;
-
-                    if (dgvParams.Columns["UpdatedAt"] != null)
-                        dgvParams.Columns["UpdatedAt"].ReadOnly = true;
                 }
                 else
                 {
@@ -50,14 +53,13 @@ namespace HotelManagementIt008.Forms
             }
         }
 
-        private async void btnSave_Click(object sender, EventArgs e)
+
+        private async void btnUpdate_Click(object sender, EventArgs e)
         {
             try
             {
-                if (dgvParams.CurrentRow == null) return;
-
-                var key = dgvParams.CurrentRow.Cells["Key"].Value?.ToString();
-                var value = dgvParams.CurrentRow.Cells["Value"].Value?.ToString();
+                var key = cbKey.Text.Trim();
+                var value = txtValue.Text.Trim();
 
                 if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 {
@@ -71,7 +73,9 @@ namespace HotelManagementIt008.Forms
                 if (result.IsSuccess)
                 {
                     MessageBox.Show("Parameter updated successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LoadParams(); // Refresh
+                    LoadParams(); // Refresh grid
+                    cbKey.Text = string.Empty;
+                    txtValue.Clear();
                 }
                 else
                 {
