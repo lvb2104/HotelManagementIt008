@@ -115,7 +115,8 @@ namespace HotelManagementIt008.Data
                 typeof(Booking),
                 typeof(BookingDetails),
                 typeof(Invoice),
-                typeof(Payment)
+                typeof(Payment),
+                typeof(Params)
             };
 
             foreach (var entityType in softDeletableTypes)
@@ -163,7 +164,8 @@ namespace HotelManagementIt008.Data
                 typeof(Booking),
                 typeof(BookingDetails),
                 typeof(Invoice),
-                typeof(Payment)
+                typeof(Payment),
+                typeof(Params)
             };
 
             foreach (var entityType in entities)
