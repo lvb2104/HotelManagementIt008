@@ -30,6 +30,7 @@
         {
             pnlSidebar = new Panel();
             btnSettings = new Button();
+            btnParams = new Button();
             btnReports = new Button();
             btnUsers = new Button();
             btnPayments = new Button();
@@ -55,6 +56,7 @@
             // 
             pnlSidebar.BackColor = Color.FromArgb(31, 41, 55);
             pnlSidebar.Controls.Add(btnSettings);
+            pnlSidebar.Controls.Add(btnParams);
             pnlSidebar.Controls.Add(btnReports);
             pnlSidebar.Controls.Add(btnUsers);
             pnlSidebar.Controls.Add(btnPayments);
@@ -87,6 +89,25 @@
             btnSettings.Text = "⚙️ Settings";
             btnSettings.TextAlign = ContentAlignment.MiddleLeft;
             btnSettings.UseVisualStyleBackColor = false;
+            // 
+            // btnParams
+            // 
+            btnParams.BackColor = Color.Transparent;
+            btnParams.Cursor = Cursors.Hand;
+            btnParams.Dock = DockStyle.Top;
+            btnParams.FlatAppearance.BorderSize = 0;
+            btnParams.FlatAppearance.MouseDownBackColor = Color.FromArgb(55, 65, 81);
+            btnParams.FlatStyle = FlatStyle.Flat;
+            btnParams.Font = new Font("Segoe UI", 11F);
+            btnParams.ForeColor = Color.FromArgb(209, 213, 219);
+            btnParams.Location = new Point(0, 480);
+            btnParams.Name = "btnParams";
+            btnParams.Padding = new Padding(20, 0, 0, 0);
+            btnParams.Size = new Size(250, 50);
+            btnParams.TabIndex = 10;
+            btnParams.Text = "⚙️ Params";
+            btnParams.TextAlign = ContentAlignment.MiddleLeft;
+            btnParams.UseVisualStyleBackColor = false;
             // 
             // btnReports
             // 
@@ -345,6 +366,7 @@
         private Button btnBookings;
         private Button btnRooms;
         private Button btnSettings;
+        private Button btnParams;
         private Button btnReports;
         private Button btnUsers;
         private Button btnPayments;

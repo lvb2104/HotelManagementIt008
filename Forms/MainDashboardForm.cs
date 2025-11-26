@@ -24,6 +24,7 @@ namespace HotelManagementIt008.Forms
             {
                 btnUsers.Visible = false;
                 btnSettings.Visible = false;
+                btnParams.Visible = false;
             }
 
             // Load dashboard by default
@@ -46,13 +47,14 @@ namespace HotelManagementIt008.Forms
             btnUsers.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<UserManagementForm>(_serviceProvider));
             btnReports.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<ReportsForm>(_serviceProvider));
             btnSettings.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<SettingsForm>(_serviceProvider));
+            btnParams.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<ParamForm>(_serviceProvider));
 
             btnLogout.Click += btnLogout_Click;
         }
 
         private void SetupButtonHoverEffects()
         {
-            var sidebarButtons = new[] { btnDashboard, btnRooms, btnBookings, btnInvoices, btnPayments, btnUsers, btnReports, btnSettings };
+            var sidebarButtons = new[] { btnDashboard, btnRooms, btnBookings, btnInvoices, btnPayments, btnUsers, btnReports, btnSettings, btnParams };
 
             foreach (var btn in sidebarButtons)
             {
@@ -91,7 +93,7 @@ namespace HotelManagementIt008.Forms
 
         private void ResetSidebarButtonStates()
         {
-            var sidebarButtons = new[] { btnDashboard, btnRooms, btnBookings, btnInvoices, btnPayments, btnUsers, btnReports, btnSettings };
+            var sidebarButtons = new[] { btnDashboard, btnRooms, btnBookings, btnInvoices, btnPayments, btnUsers, btnReports, btnSettings, btnParams };
 
             foreach (var btn in sidebarButtons)
             {

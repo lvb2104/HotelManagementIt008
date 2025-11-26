@@ -26,8 +26,8 @@
 
         public Booking Booking { get; set; } = null!;
 
-        public Guid PaymentId { get; set; }
+        public Guid? PaymentId { get; set; }
 
-        public Payment Payment { get; set; } = null!;
+        public Payment? Payment { get; set; }
     }
 }
