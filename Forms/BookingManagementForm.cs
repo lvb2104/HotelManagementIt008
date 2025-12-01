@@ -26,6 +26,14 @@ namespace HotelManagementIt008.Forms
 
         private async void BookingManagementForm_Load(object sender, EventArgs e)
         {
+            // Enable checkboxes for optional filtering
+            dtpFilterCheckIn.ShowCheckBox = true;
+            dtpFilterCheckOut.ShowCheckBox = true;
+
+            // Initialize filters to unchecked so all data shows by default
+            dtpFilterCheckIn.Checked = false;
+            dtpFilterCheckOut.Checked = false;
+            
             await LoadBookings();
         }
 
@@ -92,6 +100,7 @@ namespace HotelManagementIt008.Forms
             });
 
             dgvBookings.SelectionChanged += DgvBookings_SelectionChanged;
+            dgvBookings.CellDoubleClick += DgvBookings_CellDoubleClick;
         }
 
         private void DgvBookings_SelectionChanged(object? sender, EventArgs e)
@@ -100,6 +109,14 @@ namespace HotelManagementIt008.Forms
             btnEditBooking.Enabled = hasSelection;
             btnDeleteBooking.Enabled = hasSelection;
             btnPrintBooking.Enabled = hasSelection;
+        }
+
+        private void DgvBookings_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                btnEditBooking_Click(sender, e);
+            }
         }
 
         private async Task LoadBookings()
@@ -134,19 +151,19 @@ namespace HotelManagementIt008.Forms
                 filtered = filtered.Where(b => b.RoomNumber.Contains(txtFilterRoomNumber.Text.Trim(), StringComparison.OrdinalIgnoreCase));
             }
 
-            // Filter by Check In
+            // Filter by Check In (Exact Match)
             if (dtpFilterCheckIn.Checked)
             {
-                filtered = filtered.Where(b => b.CheckInDate.Date >= dtpFilterCheckIn.Value.Date);
+                filtered = filtered.Where(b => b.CheckInDate.Date == dtpFilterCheckIn.Value.Date);
             }
 
-            // Filter by Check Out
+            // Filter by Check Out (Exact Match)
             if (dtpFilterCheckOut.Checked)
             {
-                filtered = filtered.Where(b => b.CheckOutDate.Date <= dtpFilterCheckOut.Value.Date);
+                filtered = filtered.Where(b => b.CheckOutDate.Date == dtpFilterCheckOut.Value.Date);
             }
 
-            var filteredList = filtered.ToList();
+            var filteredList = filtered.OrderByDescending(b => b.CreatedAt).ToList();
 
             // Pagination
             _totalPages = (int)Math.Ceiling((decimal)filteredList.Count / _pageSize);
@@ -216,13 +233,24 @@ namespace HotelManagementIt008.Forms
         {
             if (dgvBookings.SelectedRows.Count > 0)
             {
-                var id = (Guid)dgvBookings.SelectedRows[0].Cells["colId"].Value;
-                var form = _serviceProvider.GetRequiredService<BookingDetailForm>();
-                form.UserId = _userId;
-                form.BookingId = id;
-                if (form.ShowDialog() == DialogResult.OK)
+                try
                 {
-                    LoadBookings(); // Reload after edit
+                    var idCell = dgvBookings.SelectedRows[0].Cells["colId"];
+                    if (idCell.Value != null)
+                    {
+                        var id = (Guid)idCell.Value;
+                        var form = _serviceProvider.GetRequiredService<BookingDetailForm>();
+                        form.UserId = _userId;
+                        form.BookingId = id;
+                        if (form.ShowDialog() == DialogResult.OK)
+                        {
+                            LoadBookings(); // Reload after edit
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error opening booking details: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
