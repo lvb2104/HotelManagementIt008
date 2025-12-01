@@ -98,6 +98,7 @@ namespace HotelManagementIt008.Data
                 .HasMany(p => p.Invoices)
                 .WithOne(i => i.Payment)
                 .HasForeignKey(i => i.PaymentId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
