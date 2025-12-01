@@ -182,10 +182,14 @@ namespace HotelManagementIt008.Services.Implementations
                     .FirstOrDefaultAsync(r => r.Id == dto.RoomId);
 
                 if (room == null) return Result<BookingResponseDto>.Failure("Room not found");
-                if (room.Status != RoomStatus.Available) return Result<BookingResponseDto>.Failure("Room is not available");
+                if (room.Status == RoomStatus.OutOfService) return Result<BookingResponseDto>.Failure("Room is out of service");
+
+                // Convert to UTC for database consistency
+                dto.CheckInDate = dto.CheckInDate.ToUniversalTime();
+                dto.CheckOutDate = dto.CheckOutDate.ToUniversalTime();
 
                 if (dto.CheckInDate >= dto.CheckOutDate) return Result<BookingResponseDto>.Failure("Check-out date must be after check-in date");
-                if (dto.CheckInDate.Date < DateTime.Now.Date) return Result<BookingResponseDto>.Failure("Check-in date cannot be in the past");
+                if (dto.CheckInDate.Date < DateTime.UtcNow.Date) return Result<BookingResponseDto>.Failure("Check-in date cannot be in the past");
 
                 var overlapping = await _unitOfWork.BookingRepository.FindOverlappingBookingsAsync(dto.RoomId, dto.CheckInDate, dto.CheckOutDate);
                 if (overlapping.Any()) return Result<BookingResponseDto>.Failure("Room is already booked for these dates");
@@ -274,7 +278,7 @@ namespace HotelManagementIt008.Services.Implementations
                 // Create Invoice
                 invoiceDto.BookingId = booking.Id;
                 var invoiceResult = await _invoiceService.CreateInvoiceAsync(invoiceDto);
-                if (!invoiceResult.IsSuccess || invoiceResult.Value is null) return Result<BookingResponseDto>.Failure("Failed to create invoice");
+                if (!invoiceResult.IsSuccess || invoiceResult.Value is null) return Result<BookingResponseDto>.Failure($"Failed to create invoice: {invoiceResult.ErrorMessage}");
 
                 // Update Booking with InvoiceId
                 booking.InvoiceId = invoiceResult.Value.Id;
