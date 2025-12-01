@@ -60,7 +60,14 @@ namespace HotelManagementIt008.Services.Implementations
                 }
                 else
                 {
-                    bookings = await query.Where(b => b.BookerId.ToString() == userId).ToListAsync();
+                    if (Guid.TryParse(userId, out var userGuid))
+                    {
+                        bookings = await query.Where(b => b.BookerId == userGuid).ToListAsync();
+                    }
+                    else
+                    {
+                        bookings = new List<Booking>();
+                    }
                 }
 
                 return Result<IEnumerable<BookingResponseDto>>.Success(_mapper.Map<IEnumerable<BookingResponseDto>>(bookings));
@@ -68,6 +75,53 @@ namespace HotelManagementIt008.Services.Implementations
             catch (Exception ex)
             {
                 return Result<IEnumerable<BookingResponseDto>>.Failure($"Error retrieving bookings: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<IEnumerable<BookingSummaryDto>>> GetBookingSummariesAsync(string userId)
+        {
+            try
+            {
+                var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+                if (user == null) return Result<IEnumerable<BookingSummaryDto>>.Failure("User not found");
+
+                // Check if admin
+                var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
+                bool isAdmin = role?.Type == RoleType.Admin;
+
+                var query = _unitOfWork.BookingRepository.GetAllQueryable();
+
+                if (!isAdmin)
+                {
+                    if (Guid.TryParse(userId, out var userGuid))
+                    {
+                        query = query.Where(b => b.BookerId == userGuid);
+                    }
+                    else
+                    {
+                        return Result<IEnumerable<BookingSummaryDto>>.Success(new List<BookingSummaryDto>());
+                    }
+                }
+
+                var bookings = await query
+                    .Select(b => new BookingSummaryDto
+                    {
+                        Id = b.Id,
+                        RoomNumber = b.Room.RoomNumber,
+                        CheckInDate = b.CheckInDate,
+                        CheckOutDate = b.CheckOutDate,
+                        TotalPrice = b.TotalPrice,
+                        BookerEmail = b.Booker.Email,
+                        CreatedAt = b.CreatedAt
+                    })
+                    .OrderByDescending(b => b.CreatedAt)
+                    .ToListAsync();
+
+                return Result<IEnumerable<BookingSummaryDto>>.Success(bookings);
+            }
+            catch (Exception ex)
+            {
+                return Result<IEnumerable<BookingSummaryDto>>.Failure($"Error retrieving bookings: {ex.Message}");
             }
         }
 
@@ -96,9 +150,16 @@ namespace HotelManagementIt008.Services.Implementations
                 var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
                 bool isAdmin = role?.Type == RoleType.Admin;
 
-                if (booking.BookerId.ToString() != userId && !isAdmin)
+                if (Guid.TryParse(userId, out var userGuid))
                 {
-                    return Result<BookingResponseDto>.Failure("This booking does not belong to you.");
+                    if (booking.BookerId != userGuid && !isAdmin)
+                    {
+                        return Result<BookingResponseDto>.Failure("This booking does not belong to you.");
+                    }
+                }
+                else if (!isAdmin)
+                {
+                     return Result<BookingResponseDto>.Failure("Invalid User ID.");
                 }
 
                 return Result<BookingResponseDto>.Success(_mapper.Map<BookingResponseDto>(booking));
@@ -267,9 +328,16 @@ namespace HotelManagementIt008.Services.Implementations
                 var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
                 bool isAdmin = role?.Type == RoleType.Admin;
 
-                if (booking.BookerId.ToString() != userId && !isAdmin)
+                if (Guid.TryParse(userId, out var userGuid))
                 {
-                    return Result<BookingResponseDto>.Failure("This booking does not belong to you.");
+                    if (booking.BookerId != userGuid && !isAdmin)
+                    {
+                        return Result<BookingResponseDto>.Failure("This booking does not belong to you.");
+                    }
+                }
+                else if (!isAdmin)
+                {
+                     return Result<BookingResponseDto>.Failure("Invalid User ID.");
                 }
 
                 // Update logic (simplified for brevity, but should follow TS logic)
@@ -303,9 +371,16 @@ namespace HotelManagementIt008.Services.Implementations
                 var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
                 bool isAdmin = role?.Type == RoleType.Admin;
 
-                if (booking.BookerId.ToString() != userId && !isAdmin)
+                if (Guid.TryParse(userId, out var userGuid))
                 {
-                    return Result<bool>.Failure("This booking does not belong to you.");
+                    if (booking.BookerId != userGuid && !isAdmin)
+                    {
+                        return Result<bool>.Failure("This booking does not belong to you.");
+                    }
+                }
+                else if (!isAdmin)
+                {
+                     return Result<bool>.Failure("Invalid User ID.");
                 }
 
                 // Update Room Status

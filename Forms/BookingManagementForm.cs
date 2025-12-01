@@ -8,16 +8,19 @@ namespace HotelManagementIt008.Forms
     {
         private readonly IBookingService _bookingService;
         private readonly IServiceProvider _serviceProvider;
-        private List<BookingResponseDto> _allBookings = new();
+        private List<BookingSummaryDto> _allBookings = new();
         private int _currentPage = 1;
         private readonly int _pageSize = 20;
         private int _totalPages = 1;
 
-        public BookingManagementForm(IBookingService bookingService, IServiceProvider serviceProvider)
+        private readonly Guid _userId;
+
+        public BookingManagementForm(IBookingService bookingService, IServiceProvider serviceProvider, Guid userId)
         {
             InitializeComponent();
             _bookingService = bookingService;
             _serviceProvider = serviceProvider;
+            _userId = userId;
             ConfigureDataGridView();
         }
 
@@ -30,6 +33,9 @@ namespace HotelManagementIt008.Forms
         {
             dgvBookings.AutoGenerateColumns = false;
             dgvBookings.Columns.Clear();
+            dgvBookings.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvBookings.MultiSelect = false;
+            dgvBookings.ReadOnly = true;
 
             dgvBookings.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -43,40 +49,46 @@ namespace HotelManagementIt008.Forms
                 Name = "colRoomNumber",
                 DataPropertyName = "RoomNumber",
                 HeaderText = "Room Number",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
             dgvBookings.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "colCheckIn",
                 DataPropertyName = "CheckInDate",
                 HeaderText = "Check In",
-                DefaultCellStyle = new DataGridViewCellStyle { Format = "d" }
+                DefaultCellStyle = new DataGridViewCellStyle { Format = "d" },
+                Width = 100
             });
             dgvBookings.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "colCheckOut",
                 DataPropertyName = "CheckOutDate",
                 HeaderText = "Check Out",
-                DefaultCellStyle = new DataGridViewCellStyle { Format = "d" }
+                DefaultCellStyle = new DataGridViewCellStyle { Format = "d" },
+                Width = 100
             });
             dgvBookings.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "colTotalPrice",
                 DataPropertyName = "TotalPrice",
                 HeaderText = "Total Price",
-                DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" }
+                DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" },
+                Width = 100
             });
             dgvBookings.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "colBooker",
                 DataPropertyName = "BookerEmail",
                 HeaderText = "Booker",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
             dgvBookings.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "colCreatedAt",
                 DataPropertyName = "CreatedAt",
                 HeaderText = "Created At",
-                DefaultCellStyle = new DataGridViewCellStyle { Format = "d" }
+                DefaultCellStyle = new DataGridViewCellStyle { Format = "d" },
+                Width = 100
             });
 
             dgvBookings.SelectionChanged += DgvBookings_SelectionChanged;
@@ -92,18 +104,23 @@ namespace HotelManagementIt008.Forms
 
         private async Task LoadBookings()
         {
-            // Since API doesn't support filtering/pagination yet, we fetch all and do it in memory
-            // In a real app with many records, this should be done on server side
-            var result = await _bookingService.GetAllBookingsAsync(null!); // Assuming userId is not needed for admin or handled in service
+            try
+            {
+                var result = await _bookingService.GetBookingSummariesAsync(_userId.ToString());
 
-            if (result.IsSuccess && result.Value != null)
-            {
-                _allBookings = result.Value.ToList();
-                ApplyFiltersAndBind();
+                if (result.IsSuccess && result.Value != null)
+                {
+                    _allBookings = result.Value.ToList();
+                    ApplyFiltersAndBind();
+                }
+                else
+                {
+                    MessageBox.Show("Failed to load bookings: " + (result.ErrorMessage ?? "Unknown error"), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Failed to load bookings: " + result.ErrorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("An error occurred while loading bookings: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -114,7 +131,7 @@ namespace HotelManagementIt008.Forms
             // Filter by Room Number
             if (!string.IsNullOrWhiteSpace(txtFilterRoomNumber.Text))
             {
-                filtered = filtered.Where(b => b.Room.RoomNumber.Contains(txtFilterRoomNumber.Text.Trim(), StringComparison.OrdinalIgnoreCase));
+                filtered = filtered.Where(b => b.RoomNumber.Contains(txtFilterRoomNumber.Text.Trim(), StringComparison.OrdinalIgnoreCase));
             }
 
             // Filter by Check In
@@ -139,16 +156,6 @@ namespace HotelManagementIt008.Forms
             var pagedList = filteredList
                 .Skip((_currentPage - 1) * _pageSize)
                 .Take(_pageSize)
-                .Select(b => new
-                {
-                    b.Id,
-                    RoomNumber = b.Room.RoomNumber,
-                    b.CheckInDate,
-                    b.CheckOutDate,
-                    b.TotalPrice,
-                    BookerEmail = b.User.Email,
-                    b.CreatedAt
-                })
                 .ToList();
 
             dgvBookings.DataSource = pagedList;
@@ -198,6 +205,7 @@ namespace HotelManagementIt008.Forms
         private void btnAddBooking_Click(object sender, EventArgs e)
         {
             var form = _serviceProvider.GetRequiredService<BookingDetailForm>();
+            form.UserId = _userId;
             if (form.ShowDialog() == DialogResult.OK)
             {
                 LoadBookings(); // Reload after add
@@ -210,6 +218,7 @@ namespace HotelManagementIt008.Forms
             {
                 var id = (Guid)dgvBookings.SelectedRows[0].Cells["colId"].Value;
                 var form = _serviceProvider.GetRequiredService<BookingDetailForm>();
+                form.UserId = _userId;
                 form.BookingId = id;
                 if (form.ShowDialog() == DialogResult.OK)
                 {
@@ -224,17 +233,24 @@ namespace HotelManagementIt008.Forms
             {
                 if (MessageBox.Show("Are you sure you want to delete this booking?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
-                    var id = (Guid)dgvBookings.SelectedRows[0].Cells["colId"].Value;
-                    var result = await _bookingService.RemoveBookingAsync(id.ToString(), null!); // userId?
+                    try
+                    {
+                        var id = (Guid)dgvBookings.SelectedRows[0].Cells["colId"].Value;
+                        var result = await _bookingService.RemoveBookingAsync(id.ToString(), _userId.ToString());
 
-                    if (result.IsSuccess)
-                    {
-                        MessageBox.Show("Booking deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        await LoadBookings();
+                        if (result.IsSuccess)
+                        {
+                            MessageBox.Show("Booking deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            await LoadBookings();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to delete booking: " + result.ErrorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        MessageBox.Show("Failed to delete booking: " + result.ErrorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("An error occurred while deleting: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
