@@ -35,12 +35,21 @@ namespace HotelManagementIt008.Repositories.Implementations
 
         public virtual async Task<T?> GetByIdAsync(string id)
         {
+            if (Guid.TryParse(id, out var guidId))
+            {
+                return await _dbSet.FindAsync(guidId);
+            }
             return await _dbSet.FindAsync(id);
         }
 
         public virtual async Task<bool> RemoveAsync(string id)
         {
-            var entityToDelete = await _dbSet.FindAsync(id);
+            object key = id;
+            if (Guid.TryParse(id, out var guidId))
+            {
+                key = guidId;
+            }
+            var entityToDelete = await _dbSet.FindAsync(key);
             if (entityToDelete is null)
             {
                 return false;

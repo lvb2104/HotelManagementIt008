@@ -41,7 +41,7 @@ namespace HotelManagementIt008.Forms
         {
             btnDashboard.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<DashboardForm>(_serviceProvider));
             btnRooms.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<RoomManagementForm>(_serviceProvider));
-            btnBookings.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<BookingManagementForm>(_serviceProvider));
+            btnBookings.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<BookingManagementForm>(_serviceProvider, _currentUser.Id));
             btnInvoices.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<InvoiceManagementForm>(_serviceProvider));
             btnPayments.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<PaymentManagementForm>(_serviceProvider));
             btnUsers.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<UserManagementForm>(_serviceProvider));

@@ -9,7 +9,7 @@ namespace HotelManagementIt008
         ///  The main entry point for the application.
         /// </summary>
         [STAThread]
-        static async Task Main()
+        static void Main()
         {
             var host = Host.CreateDefaultBuilder().ConfigureServices((context, services) =>
             {
@@ -33,6 +33,8 @@ namespace HotelManagementIt008
                 services.AddTransient<LoginForm>();
                 services.AddTransient<RoomManagementForm>();
                 services.AddTransient<ParamForm>();
+                services.AddTransient<BookingManagementForm>();
+                services.AddTransient<BookingDetailForm>();
             }).Build();
 
             // Seed database using a scope
@@ -40,7 +42,7 @@ namespace HotelManagementIt008
             {
                 var services = scope.ServiceProvider;
                 var seeder = services.GetRequiredService<DatabaseSeeder>();
-                await seeder.SeedDatabaseAsync();
+                seeder.SeedDatabaseAsync().GetAwaiter().GetResult();
             }
 
             // Start WinForms app

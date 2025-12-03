@@ -9,6 +9,7 @@ namespace HotelManagementIt008.Mapping.AutoMapperProfiles
         public BookingMappingProfile()
         {
             CreateMap<Booking, BookingResponseDto>()
+                .ForMember(dest => dest.RoomNumber, opt => opt.MapFrom(src => src.Room.RoomNumber))
                 .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.Booker))
                 .ForMember(dest => dest.Participants, opt => opt.MapFrom(src => src.BookingDetails.Select(bd => bd.User)));
 

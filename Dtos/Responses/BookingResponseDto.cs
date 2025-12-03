@@ -3,6 +3,7 @@ namespace HotelManagementIt008.Dtos.Responses
     public class BookingResponseDto
     {
         public Guid Id { get; set; }
+        public string RoomNumber { get; set; } = string.Empty;
         public decimal TotalPrice { get; set; }
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }
