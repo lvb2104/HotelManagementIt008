@@ -28,30 +28,32 @@
         /// </summary>
         private void InitializeComponent()
         {
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             pnlTop = new Panel();
             lblTitle = new Label();
             pnlFilters = new Panel();
+            grpFilters = new GroupBox();
             dtpFilterDate = new DateTimePicker();
             lblFilterDate = new Label();
             cboFilterStatus = new ComboBox();
             lblFilterStatus = new Label();
             btnClearFilters = new Button();
             btnSearch = new Button();
-            pnlCenter = new Panel();
-            dgvInvoices = new DataGridView();
-            pnlBottom = new Panel();
-            lblPageInfo = new Label();
-            btnNext = new Button();
-            btnPrevious = new Button();
             pnlActions = new Panel();
-            btnMarkAsPaid = new Button();
+            btnNext = new Button();
+            lblPageInfo = new Label();
+            btnPrevious = new Button();
             btnPrintInvoice = new Button();
+            btnMarkAsPaid = new Button();
+            dgvInvoices = new DataGridView();
             pnlTop.SuspendLayout();
             pnlFilters.SuspendLayout();
-            pnlCenter.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dgvInvoices).BeginInit();
-            pnlBottom.SuspendLayout();
+            grpFilters.SuspendLayout();
+            pnlTop.SuspendLayout();
+            pnlFilters.SuspendLayout();
+            grpFilters.SuspendLayout();
             pnlActions.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvInvoices).BeginInit();
             SuspendLayout();
             // 
             // pnlTop
@@ -61,7 +63,7 @@
             pnlTop.Dock = DockStyle.Top;
             pnlTop.Location = new Point(0, 0);
             pnlTop.Name = "pnlTop";
-            pnlTop.Size = new Size(1000, 60);
+            pnlTop.Size = new Size(1090, 60);
             pnlTop.TabIndex = 0;
             // 
             // lblTitle
@@ -75,35 +77,49 @@
             lblTitle.TabIndex = 0;
             lblTitle.Text = "Invoice Management";
             // 
+            // 
             // pnlFilters
             // 
-            pnlFilters.BackColor = Color.WhiteSmoke;
-            pnlFilters.Controls.Add(dtpFilterDate);
-            pnlFilters.Controls.Add(lblFilterDate);
-            pnlFilters.Controls.Add(cboFilterStatus);
-            pnlFilters.Controls.Add(lblFilterStatus);
-            pnlFilters.Controls.Add(btnClearFilters);
-            pnlFilters.Controls.Add(btnSearch);
+            pnlFilters.BackColor = Color.FromArgb(240, 244, 248);
+            pnlFilters.Controls.Add(grpFilters);
             pnlFilters.Dock = DockStyle.Top;
             pnlFilters.Location = new Point(0, 60);
             pnlFilters.Name = "pnlFilters";
-            pnlFilters.Size = new Size(1000, 70);
+            pnlFilters.Padding = new Padding(10);
+            pnlFilters.Size = new Size(1090, 120);
             pnlFilters.TabIndex = 1;
+            // 
+            // grpFilters
+            // 
+            grpFilters.Controls.Add(dtpFilterDate);
+            grpFilters.Controls.Add(lblFilterDate);
+            grpFilters.Controls.Add(cboFilterStatus);
+            grpFilters.Controls.Add(lblFilterStatus);
+            grpFilters.Controls.Add(btnClearFilters);
+            grpFilters.Controls.Add(btnSearch);
+            grpFilters.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpFilters.Font = new Font("Segoe UI", 10F);
+            grpFilters.Location = new Point(10, 10);
+            grpFilters.Name = "grpFilters";
+            grpFilters.Size = new Size(1070, 100);
+            grpFilters.TabIndex = 1;
+            grpFilters.TabStop = false;
+            grpFilters.Text = "Search Filters";
             // 
             // dtpFilterDate
             // 
             dtpFilterDate.Format = DateTimePickerFormat.Short;
-            dtpFilterDate.Location = new Point(280, 25);
+            dtpFilterDate.Location = new Point(350, 45);
             dtpFilterDate.Name = "dtpFilterDate";
-            dtpFilterDate.Size = new Size(120, 23);
+            dtpFilterDate.Size = new Size(150, 25);
             dtpFilterDate.TabIndex = 5;
             // 
             // lblFilterDate
             // 
             lblFilterDate.AutoSize = true;
-            lblFilterDate.Location = new Point(240, 29);
+            lblFilterDate.Location = new Point(350, 23);
             lblFilterDate.Name = "lblFilterDate";
-            lblFilterDate.Size = new Size(34, 15);
+            lblFilterDate.Size = new Size(41, 19);
             lblFilterDate.TabIndex = 4;
             lblFilterDate.Text = "Date:";
             // 
@@ -111,169 +127,170 @@
             // 
             cboFilterStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cboFilterStatus.FormattingEnabled = true;
-            cboFilterStatus.Location = new Point(70, 25);
+            cboFilterStatus.Location = new Point(20, 45);
             cboFilterStatus.Name = "cboFilterStatus";
-            cboFilterStatus.Size = new Size(150, 23);
+            cboFilterStatus.Size = new Size(150, 25);
             cboFilterStatus.TabIndex = 3;
             // 
             // lblFilterStatus
             // 
             lblFilterStatus.AutoSize = true;
-            lblFilterStatus.Location = new Point(20, 29);
+            lblFilterStatus.Location = new Point(20, 23);
             lblFilterStatus.Name = "lblFilterStatus";
-            lblFilterStatus.Size = new Size(42, 15);
+            lblFilterStatus.Size = new Size(50, 19);
             lblFilterStatus.TabIndex = 2;
             lblFilterStatus.Text = "Status:";
             // 
             // btnClearFilters
             // 
-            btnClearFilters.BackColor = Color.Gray;
+            btnClearFilters.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnClearFilters.BackColor = Color.FromArgb(158, 158, 158);
+            btnClearFilters.Cursor = Cursors.Hand;
             btnClearFilters.FlatStyle = FlatStyle.Flat;
             btnClearFilters.ForeColor = Color.White;
-            btnClearFilters.Location = new Point(520, 20);
+            btnClearFilters.Location = new Point(960, 35);
             btnClearFilters.Name = "btnClearFilters";
-            btnClearFilters.Size = new Size(80, 30);
+            btnClearFilters.Size = new Size(100, 35);
             btnClearFilters.TabIndex = 1;
-            btnClearFilters.Text = "Clear";
+            btnClearFilters.Text = "Clear Filters";
             btnClearFilters.UseVisualStyleBackColor = false;
             btnClearFilters.Click += btnClearFilters_Click;
             // 
             // btnSearch
             // 
-            btnSearch.BackColor = Color.FromArgb(63, 81, 181);
+            btnSearch.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnSearch.BackColor = Color.FromArgb(33, 150, 243);
+            btnSearch.Cursor = Cursors.Hand;
             btnSearch.FlatStyle = FlatStyle.Flat;
             btnSearch.ForeColor = Color.White;
-            btnSearch.Location = new Point(420, 20);
+            btnSearch.Location = new Point(850, 35);
             btnSearch.Name = "btnSearch";
-            btnSearch.Size = new Size(80, 30);
+            btnSearch.Size = new Size(100, 35);
             btnSearch.TabIndex = 0;
             btnSearch.Text = "Search";
             btnSearch.UseVisualStyleBackColor = false;
             btnSearch.Click += btnSearch_Click;
             // 
-            // pnlCenter
-            // 
-            pnlCenter.Controls.Add(dgvInvoices);
-            pnlCenter.Dock = DockStyle.Fill;
-            pnlCenter.Location = new Point(0, 130);
-            pnlCenter.Name = "pnlCenter";
-            pnlCenter.Padding = new Padding(20);
-            pnlCenter.Size = new Size(1000, 410);
-            pnlCenter.TabIndex = 2;
-            // 
-            // dgvInvoices
-            // 
-            dgvInvoices.AllowUserToAddRows = false;
-            dgvInvoices.AllowUserToDeleteRows = false;
-            dgvInvoices.BackgroundColor = Color.White;
-            dgvInvoices.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvInvoices.Dock = DockStyle.Fill;
-            dgvInvoices.Location = new Point(20, 20);
-            dgvInvoices.Name = "dgvInvoices";
-            dgvInvoices.ReadOnly = true;
-            dgvInvoices.RowTemplate.Height = 25;
-            dgvInvoices.Size = new Size(960, 370);
-            dgvInvoices.TabIndex = 0;
-            // 
-            // pnlBottom
-            // 
-            pnlBottom.BackColor = Color.White;
-            pnlBottom.Controls.Add(lblPageInfo);
-            pnlBottom.Controls.Add(btnNext);
-            pnlBottom.Controls.Add(btnPrevious);
-            pnlBottom.Controls.Add(pnlActions);
-            pnlBottom.Dock = DockStyle.Bottom;
-            pnlBottom.Location = new Point(0, 540);
-            pnlBottom.Name = "pnlBottom";
-            pnlBottom.Size = new Size(1000, 60);
-            pnlBottom.TabIndex = 3;
-            // 
-            // lblPageInfo
-            // 
-            lblPageInfo.AutoSize = true;
-            lblPageInfo.Location = new Point(130, 23);
-            lblPageInfo.Name = "lblPageInfo";
-            lblPageInfo.Size = new Size(65, 15);
-            lblPageInfo.TabIndex = 3;
-            lblPageInfo.Text = "Page 1 of 1";
-            // 
-            // btnNext
-            // 
-            btnNext.Location = new Point(220, 15);
-            btnNext.Name = "btnNext";
-            btnNext.Size = new Size(80, 30);
-            btnNext.TabIndex = 2;
-            btnNext.Text = "Next >";
-            btnNext.UseVisualStyleBackColor = true;
-            btnNext.Click += btnNext_Click;
-            // 
-            // btnPrevious
-            // 
-            btnPrevious.Location = new Point(20, 15);
-            btnPrevious.Name = "btnPrevious";
-            btnPrevious.Size = new Size(80, 30);
-            btnPrevious.TabIndex = 1;
-            btnPrevious.Text = "< Prev";
-            btnPrevious.UseVisualStyleBackColor = true;
-            btnPrevious.Click += btnPrevious_Click;
             // 
             // pnlActions
             // 
-            pnlActions.Controls.Add(btnMarkAsPaid);
+            pnlActions.BackColor = Color.White;
+            pnlActions.Controls.Add(btnNext);
+            pnlActions.Controls.Add(lblPageInfo);
+            pnlActions.Controls.Add(btnPrevious);
             pnlActions.Controls.Add(btnPrintInvoice);
-            pnlActions.Dock = DockStyle.Right;
-            pnlActions.Location = new Point(500, 0);
+            pnlActions.Controls.Add(btnMarkAsPaid);
+            pnlActions.Dock = DockStyle.Top;
+            pnlActions.Location = new Point(0, 180);
             pnlActions.Name = "pnlActions";
-            pnlActions.Size = new Size(500, 60);
-            pnlActions.TabIndex = 0;
+            pnlActions.Padding = new Padding(10);
+            pnlActions.Size = new Size(1090, 60);
+            pnlActions.TabIndex = 2;
             // 
-            // btnMarkAsPaid
+            // btnNext
             // 
-            btnMarkAsPaid.BackColor = Color.FromArgb(76, 175, 80);
-            btnMarkAsPaid.FlatStyle = FlatStyle.Flat;
-            btnMarkAsPaid.ForeColor = Color.White;
-            btnMarkAsPaid.Location = new Point(240, 15);
-            btnMarkAsPaid.Name = "btnMarkAsPaid";
-            btnMarkAsPaid.Size = new Size(120, 35);
-            btnMarkAsPaid.TabIndex = 1;
-            btnMarkAsPaid.Text = "Mark as Paid";
-            btnMarkAsPaid.UseVisualStyleBackColor = false;
-            btnMarkAsPaid.Click += btnMarkAsPaid_Click;
+            btnNext.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnNext.Location = new Point(970, 15);
+            btnNext.Name = "btnNext";
+            btnNext.Size = new Size(100, 30);
+            btnNext.TabIndex = 6;
+            btnNext.Text = "Next ▶";
+            btnNext.UseVisualStyleBackColor = true;
+            btnNext.Click += btnNext_Click;
+            // 
+            // lblPageInfo
+            // 
+            lblPageInfo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            lblPageInfo.AutoSize = true;
+            lblPageInfo.Location = new Point(860, 23);
+            lblPageInfo.Name = "lblPageInfo";
+            lblPageInfo.Size = new Size(71, 15);
+            lblPageInfo.TabIndex = 5;
+            lblPageInfo.Text = "Page 1 of 1";
+            lblPageInfo.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // btnPrevious
+            // 
+            btnPrevious.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnPrevious.Location = new Point(730, 15);
+            btnPrevious.Name = "btnPrevious";
+            btnPrevious.Size = new Size(100, 30);
+            btnPrevious.TabIndex = 4;
+            btnPrevious.Text = "◀ Previous";
+            btnPrevious.UseVisualStyleBackColor = true;
+            btnPrevious.Click += btnPrevious_Click;
             // 
             // btnPrintInvoice
             // 
             btnPrintInvoice.BackColor = Color.FromArgb(63, 81, 181);
             btnPrintInvoice.FlatStyle = FlatStyle.Flat;
             btnPrintInvoice.ForeColor = Color.White;
-            btnPrintInvoice.Location = new Point(370, 15);
+            btnPrintInvoice.Location = new Point(150, 15);
             btnPrintInvoice.Name = "btnPrintInvoice";
-            btnPrintInvoice.Size = new Size(110, 35);
-            btnPrintInvoice.TabIndex = 0;
-            btnPrintInvoice.Text = "🖨 Print Invoice";
+            btnPrintInvoice.Size = new Size(120, 35);
+            btnPrintInvoice.TabIndex = 3;
+            btnPrintInvoice.Text = "📄 Print";
             btnPrintInvoice.UseVisualStyleBackColor = false;
             btnPrintInvoice.Click += btnPrintInvoice_Click;
+            // 
+            // btnMarkAsPaid
+            // 
+            btnMarkAsPaid.BackColor = Color.FromArgb(76, 175, 80);
+            btnMarkAsPaid.FlatStyle = FlatStyle.Flat;
+            btnMarkAsPaid.ForeColor = Color.White;
+            btnMarkAsPaid.Location = new Point(20, 15);
+            btnMarkAsPaid.Name = "btnMarkAsPaid";
+            btnMarkAsPaid.Size = new Size(120, 35);
+            btnMarkAsPaid.TabIndex = 0;
+            btnMarkAsPaid.Text = "✅ Mark as Paid";
+            btnMarkAsPaid.UseVisualStyleBackColor = false;
+            btnMarkAsPaid.Click += btnMarkAsPaid_Click;
+            // 
+            // 
+            // dgvInvoices
+            // 
+            dgvInvoices.AllowUserToAddRows = false;
+            dgvInvoices.AllowUserToDeleteRows = false;
+            dgvInvoices.AllowUserToResizeRows = false;
+            dataGridViewCellStyle1.BackColor = Color.WhiteSmoke;
+            dgvInvoices.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dgvInvoices.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvInvoices.BackgroundColor = Color.White;
+            dgvInvoices.BorderStyle = BorderStyle.None;
+            dgvInvoices.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvInvoices.Dock = DockStyle.Fill;
+            dgvInvoices.Location = new Point(0, 240);
+            dgvInvoices.MultiSelect = false;
+            dgvInvoices.Name = "dgvInvoices";
+            dgvInvoices.ReadOnly = true;
+            dgvInvoices.RowHeadersVisible = false;
+            dgvInvoices.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvInvoices.Size = new Size(1090, 360);
+            dgvInvoices.TabIndex = 3;
             // 
             // InvoiceManagementForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1000, 600);
-            Controls.Add(pnlCenter);
-            Controls.Add(pnlBottom);
+            BackColor = Color.FromArgb(249, 250, 251);
+            ClientSize = new Size(1090, 660);
+            Controls.Add(dgvInvoices);
+            Controls.Add(pnlActions);
             Controls.Add(pnlFilters);
             Controls.Add(pnlTop);
+            FormBorderStyle = FormBorderStyle.None;
             Name = "InvoiceManagementForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Invoice Management";
             Load += InvoiceManagementForm_Load;
             pnlTop.ResumeLayout(false);
             pnlTop.PerformLayout();
             pnlFilters.ResumeLayout(false);
-            pnlFilters.PerformLayout();
-            pnlCenter.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dgvInvoices).EndInit();
-            pnlBottom.ResumeLayout(false);
-            pnlBottom.PerformLayout();
+            grpFilters.ResumeLayout(false);
+            grpFilters.PerformLayout();
             pnlActions.ResumeLayout(false);
+            pnlActions.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvInvoices).EndInit();
             ResumeLayout(false);
         }
 
@@ -282,11 +299,10 @@
         private Panel pnlTop;
         private Label lblTitle;
         private Panel pnlFilters;
+        private GroupBox grpFilters;
         private Button btnClearFilters;
         private Button btnSearch;
-        private Panel pnlCenter;
         private DataGridView dgvInvoices;
-        private Panel pnlBottom;
         private Panel pnlActions;
         private Button btnPrintInvoice;
         private Button btnMarkAsPaid;

@@ -45,9 +45,6 @@ namespace HotelManagementIt008.Forms
         {
             dgvInvoices.AutoGenerateColumns = false;
             dgvInvoices.Columns.Clear();
-            dgvInvoices.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvInvoices.MultiSelect = false;
-            dgvInvoices.ReadOnly = true;
 
             dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -56,25 +53,25 @@ namespace HotelManagementIt008.Forms
                 HeaderText = "ID",
                 Visible = false
             });
-             dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
+            dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "colRoom",
                 DataPropertyName = "RoomNumber", // Custom property or mapped
-                HeaderText = "Room",
-                Width = 80
+                HeaderText = "Room Number",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
             dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "colBooker",
                 DataPropertyName = "BookerEmail", // Custom property or mapped
-                HeaderText = "Booker",
+                HeaderText = "Booker Email",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
             dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "colAmount",
                 DataPropertyName = "TotalPrice",
-                HeaderText = "Amount",
+                HeaderText = "Total Price",
                 DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" },
                 Width = 100
             });
@@ -89,7 +86,7 @@ namespace HotelManagementIt008.Forms
             {
                 Name = "colDate",
                 DataPropertyName = "CreatedAt",
-                HeaderText = "Date",
+                HeaderText = "Created At",
                 DefaultCellStyle = new DataGridViewCellStyle { Format = "d" },
                 Width = 100
             });
