@@ -69,11 +69,34 @@ namespace HotelManagementIt008.Forms
             });
             dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
             {
+                Name = "colBasePrice",
+                DataPropertyName = "BasePrice",
+                HeaderText = "Base Price",
+                DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" },
+                Width = 100
+            });
+            dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "colTaxPrice",
+                DataPropertyName = "TaxPrice",
+                HeaderText = "Tax Price",
+                DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" },
+                Width = 100
+            });
+            dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
+            {
                 Name = "colAmount",
                 DataPropertyName = "TotalPrice",
                 HeaderText = "Total Price",
                 DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" },
                 Width = 100
+            });
+            dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "colDays",
+                DataPropertyName = "DaysStayed",
+                HeaderText = "Days",
+                Width = 60
             });
             dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -87,6 +110,22 @@ namespace HotelManagementIt008.Forms
                 Name = "colDate",
                 DataPropertyName = "CreatedAt",
                 HeaderText = "Created At",
+                DefaultCellStyle = new DataGridViewCellStyle { Format = "d" },
+                Width = 100
+            });
+            dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "colUpdated",
+                DataPropertyName = "UpdatedAt",
+                HeaderText = "Updated At",
+                DefaultCellStyle = new DataGridViewCellStyle { Format = "d" },
+                Width = 100
+            });
+            dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "colDeleted",
+                DataPropertyName = "DeletedAt",
+                HeaderText = "Deleted At",
                 DefaultCellStyle = new DataGridViewCellStyle { Format = "d" },
                 Width = 100
             });
@@ -167,9 +206,14 @@ namespace HotelManagementIt008.Forms
                 Id = i.Id,
                 RoomNumber = i.Booking?.Room?.RoomNumber ?? "N/A",
                 BookerEmail = i.Booking?.User?.Email ?? "N/A",
+                BasePrice = i.BasePrice,
+                TaxPrice = i.TaxPrice,
                 TotalPrice = i.TotalPrice,
+                DaysStayed = i.DaysStayed,
                 Status = i.Status,
                 CreatedAt = i.CreatedAt,
+                UpdatedAt = i.UpdatedAt,
+                DeletedAt = i.DeletedAt,
                 OriginalDto = i
             }).OrderByDescending(i => i.CreatedAt).ToList();
 
@@ -349,9 +393,14 @@ namespace HotelManagementIt008.Forms
             public Guid Id { get; set; }
             public string RoomNumber { get; set; } = string.Empty;
             public string BookerEmail { get; set; } = string.Empty;
+            public decimal BasePrice { get; set; }
+            public decimal TaxPrice { get; set; }
             public decimal TotalPrice { get; set; }
+            public int DaysStayed { get; set; }
             public InvoiceStatus Status { get; set; }
             public DateTime CreatedAt { get; set; }
+            public DateTime UpdatedAt { get; set; }
+            public DateTime? DeletedAt { get; set; }
             public InvoiceResponseDto OriginalDto { get; set; } = default!;
         }
     }
