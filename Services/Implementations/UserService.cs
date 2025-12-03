@@ -53,7 +53,7 @@ namespace HotelManagementIt008.Services.Implementations
         {
             try
             {
-                var userType = await _unitOfWork.UserTypeRepository.GetAllQueryable().FirstOrDefaultAsync(ut => ut.Type == dto.UserType);
+                var userType = await _unitOfWork.UserTypeRepository.GetAllQueryable().AsTracking().FirstOrDefaultAsync(ut => ut.Type == dto.UserType);
                 if (userType == null) return Result<User>.Failure($"UserType {dto.UserType} not found");
 
                 var user = new User
@@ -62,6 +62,7 @@ namespace HotelManagementIt008.Services.Implementations
                     Username = (!string.IsNullOrWhiteSpace(dto.FullName) ? dto.FullName.Replace(" ", "").ToLower() : dto.Email.Split('@')[0].ToLower()) + new Random().Next(1000, 9999),
                     // PasswordHash? Default password?
                     UserTypeId = userType.Id,
+                    UserType = userType,
                     Profile = new Models.Profile
                     {
                         FullName = dto.FullName,

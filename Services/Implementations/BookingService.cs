@@ -178,6 +178,7 @@ namespace HotelManagementIt008.Services.Implementations
                 if (user == null) return Result<BookingResponseDto>.Failure("User not found");
 
                 var room = await _unitOfWork.RoomRepository.GetAllQueryable()
+                    .AsTracking()
                     .Include(r => r.RoomType)
                     .FirstOrDefaultAsync(r => r.Id == dto.RoomId);
 
@@ -191,38 +192,76 @@ namespace HotelManagementIt008.Services.Implementations
                 if (dto.CheckInDate >= dto.CheckOutDate) return Result<BookingResponseDto>.Failure("Check-out date must be after check-in date");
                 if (dto.CheckInDate.Date < DateTime.UtcNow.Date) return Result<BookingResponseDto>.Failure("Check-in date cannot be in the past");
 
-                var overlapping = await _unitOfWork.BookingRepository.FindOverlappingBookingsAsync(dto.RoomId, dto.CheckInDate, dto.CheckOutDate);
+                var overlapping = await _unitOfWork.BookingRepository
+                    .FindOverlappingBookingsAsync(dto.RoomId, dto.CheckInDate, dto.CheckOutDate);
                 if (overlapping.Any()) return Result<BookingResponseDto>.Failure("Room is already booked for these dates");
 
-                // Handle participants
                 var participants = new List<User>();
-                foreach (var pDto in dto.Participants)
-                {
-                    var participantUser = await _unitOfWork.UserRepository.GetAllQueryable()
-                        .Include(u => u.Profile)
-                        .Include(u => u.UserType)
-                        .FirstOrDefaultAsync(u => u.Email == pDto.Email);
 
-                    if (participantUser == null)
+                if (dto.Participants != null && dto.Participants.Any())
+                {
+                    foreach (var pDto in dto.Participants)
                     {
-                        // Create default user logic delegated to UserService
-                        var createUserResult = await _userService.CreateDefaultUserAsync(pDto);
-                        if (!createUserResult.IsSuccess)
+                        var participantUser = await _unitOfWork.UserRepository.GetAllQueryable()
+                            .AsTracking()
+                            .Include(u => u.Profile)
+                            .Include(u => u.UserType)
+                            .FirstOrDefaultAsync(u => u.Email == pDto.Email);
+
+                        if (participantUser == null)
                         {
-                            return Result<BookingResponseDto>.Failure(createUserResult.ErrorMessage ?? "Failed to create participant user");
+                            // Tạo user mặc định
+                            var createUserResult = await _userService.CreateDefaultUserAsync(pDto);
+                            if (!createUserResult.IsSuccess)
+                            {
+                                return Result<BookingResponseDto>.Failure(createUserResult.ErrorMessage ?? "Failed to create participant user");
+                            }
+                            participantUser = createUserResult.Value;
                         }
-                        participantUser = createUserResult.Value;
-                    }
-                    else
-                    {
-                        // Check if participant is valid (not booked elsewhere)
-                        var userOverlapping = await _unitOfWork.BookingRepository.FindUserOverlappingBookingsAsync(participantUser.Id, dto.CheckInDate, dto.CheckOutDate);
-                        if (userOverlapping.Any()) return Result<BookingResponseDto>.Failure($"User {pDto.Email} is already booked for these dates");
+                        else
+                        {
+                            // Cập nhật profile
+                            if (participantUser.Profile != null)
+                            {
+                                if (!string.IsNullOrWhiteSpace(pDto.FullName))
+                                {
+                                    participantUser.Profile.FullName = pDto.FullName;
+                                }
+                                participantUser.Profile.Address = pDto.Address;
+                                participantUser.Profile.IdentityCardNumber = pDto.IdentityNumber;
+                                // EF đang tracking nên không cần gọi Update
+                            }
+
+                            // Cập nhật UserType nếu khác
+                            if (participantUser.UserType?.Type != pDto.UserType)
+                            {
+                                var newUserType = await _unitOfWork.UserTypeRepository.GetAllQueryable()
+                                    .AsTracking()
+                                    .FirstOrDefaultAsync(ut => ut.Type == pDto.UserType);
+                                if (newUserType != null)
+                                {
+                                    participantUser.UserTypeId = newUserType.Id;
+                                    participantUser.UserType = newUserType;
+                                }
+                            }
+                        }
+
+                        // Check overlap cho participant (không truyền bookingId vì là booking mới)
+                        var userOverlapping = await _unitOfWork.BookingRepository
+                            .FindUserOverlappingBookingsAsync(participantUser.Id, dto.CheckInDate, dto.CheckOutDate);
+                        if (userOverlapping.Any())
+                        {
+                            return Result<BookingResponseDto>.Failure($"User {pDto.Email} is already booked for these dates");
+                        }
+
+                        // Nhớ add vào list để tính giá & tạo BookingDetails
                         participants.Add(participantUser);
                     }
                 }
 
-                // Calculate Price
+                // =========================
+                // Calculate Price (dùng participants list giống UpdateBookingAsync)
+                // =========================
                 var dayRent = (int)Math.Ceiling((dto.CheckOutDate - dto.CheckInDate).TotalDays);
                 var basePrice = room.RoomType.PricePerNight;
                 var totalPrice = basePrice * dayRent;
@@ -233,22 +272,18 @@ namespace HotelManagementIt008.Services.Implementations
                 if (numberOfParticipants > 2)
                 {
                     var surchargeParam = await _paramService.GetParamByKeyAsync("surcharge_rate");
-                    if (!surchargeParam.IsSuccess || surchargeParam.Value is null)
-                    {
-                        return Result<BookingResponseDto>.Failure("Failed to retrieve surcharge rate parameter");
-                    }
-                    var surchargeRate = surchargeParam.IsSuccess ? double.Parse(surchargeParam.Value.Value) : 0.25;
+                    var surchargeRate = (surchargeParam.IsSuccess && surchargeParam.Value != null)
+                        ? double.Parse(surchargeParam.Value.Value)
+                        : 0.25;
                     totalPrice += totalPrice * (decimal)surchargeRate * (numberOfParticipants - 2);
                 }
 
                 if (hasForeign)
                 {
                     var foreignParam = await _paramService.GetParamByKeyAsync("foreign_guest_factor");
-                    if (!foreignParam.IsSuccess || foreignParam.Value is null)
-                    {
-                        return Result<BookingResponseDto>.Failure("Failed to retrieve foreign guest factor parameter");
-                    }
-                    var foreignFactor = foreignParam.IsSuccess ? double.Parse(foreignParam.Value.Value) : 1.5;
+                    var foreignFactor = (foreignParam.IsSuccess && foreignParam.Value != null)
+                        ? double.Parse(foreignParam.Value.Value)
+                        : 1.5;
                     totalPrice *= (decimal)foreignFactor;
                 }
 
@@ -278,7 +313,8 @@ namespace HotelManagementIt008.Services.Implementations
                 // Create Invoice
                 invoiceDto.BookingId = booking.Id;
                 var invoiceResult = await _invoiceService.CreateInvoiceAsync(invoiceDto);
-                if (!invoiceResult.IsSuccess || invoiceResult.Value is null) return Result<BookingResponseDto>.Failure($"Failed to create invoice: {invoiceResult.ErrorMessage}");
+                if (!invoiceResult.IsSuccess || invoiceResult.Value is null)
+                    return Result<BookingResponseDto>.Failure($"Failed to create invoice: {invoiceResult.ErrorMessage}");
 
                 // Update Booking with InvoiceId
                 booking.InvoiceId = invoiceResult.Value.Id;
@@ -296,13 +332,12 @@ namespace HotelManagementIt008.Services.Implementations
                 }
 
                 // Update Room Status if check-in is today
-                if (dto.CheckInDate.Date == DateTime.Now.Date)
+                if (dto.CheckInDate.Date == DateTime.UtcNow.Date) // nên dùng Utc cho đồng bộ
                 {
                     room.Status = RoomStatus.Occupied;
                     await _unitOfWork.RoomRepository.UpdateAsync(room);
                 }
 
-                await _unitOfWork.BookingRepository.UpdateAsync(booking);
                 await _unitOfWork.SaveAsync();
 
                 return await GetBookingByIdAsync(booking.Id.ToString(), userId);
@@ -312,6 +347,7 @@ namespace HotelManagementIt008.Services.Implementations
                 return Result<BookingResponseDto>.Failure($"Error creating booking: {ex.Message}");
             }
         }
+
 
         public async Task<Result<BookingResponseDto>> UpdateBookingAsync(string id, UpdateBookingDto dto, string userId)
         {
