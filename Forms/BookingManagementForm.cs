@@ -284,9 +284,156 @@ namespace HotelManagementIt008.Forms
             }
         }
 
-        private void btnPrintBooking_Click(object sender, EventArgs e)
+        private async void btnPrintBooking_Click(object sender, EventArgs e)
         {
-             MessageBox.Show("Print functionality is not implemented yet.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (dgvBookings.SelectedRows.Count > 0)
+            {
+                try
+                {
+                    var idCell = dgvBookings.SelectedRows[0].Cells["colId"];
+                    if (idCell.Value != null)
+                    {
+                        var id = (Guid)idCell.Value;
+                        // Fetch full booking details including participants
+                        var result = await _bookingService.GetBookingByIdAsync(id.ToString(), _userId.ToString());
+
+                        if (result.IsSuccess && result.Value != null)
+                        {
+                            PrintBookingDetails(result.Value);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to retrieve booking details for printing: " + result.ErrorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error printing booking: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void PrintBookingDetails(BookingResponseDto booking)
+        {
+            var printDoc = new System.Drawing.Printing.PrintDocument();
+            printDoc.PrintPage += (sender, e) => PrintPageHandler(sender, e, booking);
+
+            var previewDialog = new PrintPreviewDialog
+            {
+                Document = printDoc,
+                Width = 800,
+                Height = 600
+            };
+            previewDialog.ShowDialog();
+        }
+
+        private void PrintPageHandler(object sender, System.Drawing.Printing.PrintPageEventArgs e, BookingResponseDto booking)
+        {
+            var g = e.Graphics;
+            if (g == null) return;
+
+            // Styles
+            var titleFont = new Font("Arial", 24, FontStyle.Bold);
+            var sectionFont = new Font("Arial", 18, FontStyle.Bold);
+            var labelFont = new Font("Arial", 12, FontStyle.Bold);
+            var valueFont = new Font("Arial", 12, FontStyle.Regular);
+            var headerFont = new Font("Arial", 10, FontStyle.Bold);
+            var cellFont = new Font("Arial", 10, FontStyle.Regular);
+
+            var brush = Brushes.Black;
+            float yPos = 50;
+            float leftMargin = 50;
+            float rightMargin = e.PageBounds.Width - 50;
+            float contentWidth = rightMargin - leftMargin;
+
+            // Title
+            var title = "Booking Details";
+            var titleSize = g.MeasureString(title, titleFont);
+            g.DrawString(title, titleFont, brush, (e.PageBounds.Width - titleSize.Width) / 2, yPos);
+            yPos += 50;
+
+            // Section: Booking Information
+            g.DrawString("Booking Information", sectionFont, brush, leftMargin, yPos);
+            yPos += 30;
+
+            // Summary Rows
+            DrawSummaryRow(g, "Room Number:", booking.RoomNumber, leftMargin, ref yPos, labelFont, valueFont);
+            DrawSummaryRow(g, "Check In Date:", booking.CheckInDate.ToString("yyyy-MM-dd"), leftMargin, ref yPos, labelFont, valueFont);
+            DrawSummaryRow(g, "Check Out Date:", booking.CheckOutDate.ToString("yyyy-MM-dd"), leftMargin, ref yPos, labelFont, valueFont);
+            DrawSummaryRow(g, "Booker Email:", booking.User?.Email ?? "N/A", leftMargin, ref yPos, labelFont, valueFont);
+            DrawSummaryRow(g, "Created At:", booking.CreatedAt.ToString("yyyy-MM-dd"), leftMargin, ref yPos, labelFont, valueFont);
+            DrawSummaryRow(g, "Updated At:", booking.UpdatedAt.ToString("yyyy-MM-dd"), leftMargin, ref yPos, labelFont, valueFont);
+
+            yPos += 20;
+
+            // Section: Participants
+            g.DrawString("Participants", sectionFont, brush, leftMargin, yPos);
+            yPos += 30;
+
+            // Table Header
+            float[] colWidths = { 150, 150, 200, 100 }; // Email, Name, Address, Identity
+            string[] headers = { "Email", "Full Name", "Address", "Identity Number" };
+            float currentX = leftMargin;
+
+            // Draw Header Background
+            var headerRect = new RectangleF(leftMargin, yPos, contentWidth, 25);
+            g.FillRectangle(Brushes.LightGray, headerRect);
+
+            for (int i = 0; i < headers.Length; i++)
+            {
+                g.DrawString(headers[i], headerFont, brush, currentX + 5, yPos + 5);
+                currentX += colWidths[i];
+            }
+            yPos += 25;
+
+            // Table Rows
+            if (booking.Participants != null)
+            {
+                foreach (var p in booking.Participants)
+                {
+                    currentX = leftMargin;
+                    
+                    // Calculate max height for this row
+                    string[] cellValues = {
+                        p.Email,
+                        p.Profile?.FullName ?? "",
+                        p.Profile?.Address ?? "",
+                        p.Profile?.IdentityNumber ?? ""
+                    };
+
+                    float maxRowHeight = 25; // Minimum height
+                    for (int i = 0; i < cellValues.Length; i++)
+                    {
+                        var size = g.MeasureString(cellValues[i], cellFont, (int)colWidths[i]);
+                        if (size.Height > maxRowHeight)
+                        {
+                            maxRowHeight = size.Height;
+                        }
+                    }
+                    maxRowHeight += 10; // Add some padding
+
+                    // Draw Cells
+                    for (int i = 0; i < cellValues.Length; i++)
+                    {
+                        var rect = new RectangleF(currentX + 5, yPos + 5, colWidths[i], maxRowHeight - 5);
+                        g.DrawString(cellValues[i], cellFont, brush, rect);
+                        currentX += colWidths[i];
+                    }
+
+                    // Draw bottom border
+                    g.DrawLine(Pens.Black, leftMargin, yPos + maxRowHeight, leftMargin + contentWidth, yPos + maxRowHeight);
+
+                    yPos += maxRowHeight;
+                }
+            }
+        }
+
+        private void DrawSummaryRow(Graphics g, string label, string value, float x, ref float y, Font labelFont, Font valueFont)
+        {
+            g.DrawString(label, labelFont, Brushes.Black, x, y);
+            g.DrawString(value, valueFont, Brushes.Black, x + 150, y);
+            y += 20;
         }
     }
 }
