@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.pnlTop = new System.Windows.Forms.Panel();
+            this.lblTitle = new System.Windows.Forms.Label();
             this.pnlFilters = new System.Windows.Forms.Panel();
             this.grpFilters = new System.Windows.Forms.GroupBox();
             this.lblFilterCheckOut = new System.Windows.Forms.Label();
@@ -48,11 +50,33 @@
             this.btnEditBooking = new System.Windows.Forms.Button();
             this.btnAddBooking = new System.Windows.Forms.Button();
             this.dgvBookings = new System.Windows.Forms.DataGridView();
+            this.pnlTop.SuspendLayout();
             this.pnlFilters.SuspendLayout();
             this.grpFilters.SuspendLayout();
             this.pnlActions.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvBookings)).BeginInit();
             this.SuspendLayout();
+            // 
+            // pnlTop
+            // 
+            this.pnlTop.BackColor = System.Drawing.Color.White;
+            this.pnlTop.Controls.Add(this.lblTitle);
+            this.pnlTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlTop.Location = new System.Drawing.Point(0, 0);
+            this.pnlTop.Name = "pnlTop";
+            this.pnlTop.Size = new System.Drawing.Size(1110, 60);
+            this.pnlTop.TabIndex = 0;
+            // 
+            // lblTitle
+            // 
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(81)))), ((int)(((byte)(181)))));
+            this.lblTitle.Location = new System.Drawing.Point(20, 10);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(283, 37);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "Booking Management";
             // 
             // pnlFilters
             // 
@@ -295,11 +319,14 @@
             this.Controls.Add(this.dgvBookings);
             this.Controls.Add(this.pnlActions);
             this.Controls.Add(this.pnlFilters);
+            this.Controls.Add(this.pnlTop);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "BookingManagementForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Booking Management";
             this.Load += new System.EventHandler(this.BookingManagementForm_Load);
+            this.pnlTop.ResumeLayout(false);
+            this.pnlTop.PerformLayout();
             this.pnlFilters.ResumeLayout(false);
             this.grpFilters.ResumeLayout(false);
             this.grpFilters.PerformLayout();
@@ -331,5 +358,7 @@
         private System.Windows.Forms.DateTimePicker dtpFilterCheckIn;
         private System.Windows.Forms.Label lblFilterCheckOut;
         private System.Windows.Forms.DateTimePicker dtpFilterCheckOut;
+        private System.Windows.Forms.Panel pnlTop;
+        private System.Windows.Forms.Label lblTitle;
     }
 }
