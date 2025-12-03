@@ -59,7 +59,7 @@ namespace HotelManagementIt008.Services.Implementations
                 var user = new User
                 {
                     Email = dto.Email,
-                    Username = dto.FullName.Replace(" ", "").ToLower() + new Random().Next(1000, 9999),
+                    Username = (!string.IsNullOrWhiteSpace(dto.FullName) ? dto.FullName.Replace(" ", "").ToLower() : dto.Email.Split('@')[0].ToLower()) + new Random().Next(1000, 9999),
                     // PasswordHash? Default password?
                     UserTypeId = userType.Id,
                     Profile = new Models.Profile

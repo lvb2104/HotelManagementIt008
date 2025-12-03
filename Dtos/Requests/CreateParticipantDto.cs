@@ -9,7 +9,6 @@ namespace HotelManagementIt008.Dtos.Requests
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
-        [Required]
         public string FullName { get; set; } = string.Empty;
 
         [Required]

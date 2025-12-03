@@ -289,7 +289,8 @@ namespace HotelManagementIt008.Services.Implementations
                     var bookingDetail = new BookingDetails
                     {
                         BookingId = booking.Id,
-                        UserId = p.Id
+                        UserId = p.Id,
+                        Id = Guid.NewGuid()
                     };
                     await _unitOfWork.BookingDetailsRepository.AddAsync(bookingDetail);
                 }
@@ -320,6 +321,7 @@ namespace HotelManagementIt008.Services.Implementations
                 if (user == null) return Result<BookingResponseDto>.Failure("User not found");
 
                 var booking = await _unitOfWork.BookingRepository.GetAllQueryable()
+                    .AsTracking()
                     .Include(b => b.Room)
                         .ThenInclude(r => r.RoomType)
                     .Include(b => b.Invoice)
@@ -344,13 +346,119 @@ namespace HotelManagementIt008.Services.Implementations
                      return Result<BookingResponseDto>.Failure("Invalid User ID.");
                 }
 
-                // Update logic (simplified for brevity, but should follow TS logic)
-                // ... (Room change, Date change, Participants change -> Recalculate Price)
+                // 1. Handle Room and Date Changes - DISABLED (Only participants update allowed)
+                // Logic for updating room and dates has been removed as per requirement.
 
-                // For now, returning failure as full implementation is complex and might exceed token limit in one go.
-                // I will implement the core structure.
 
-                return Result<BookingResponseDto>.Failure("Update not fully implemented yet");
+                // 2. Handle Participants
+                var participants = new List<User>();
+                if (dto.Participants != null)
+                {
+                    // Remove existing details
+                    // Use ToList() to create a copy of the collection to iterate over safely while modifying
+                    var existingDetails = booking.BookingDetails.ToList();
+                    foreach (var detail in existingDetails)
+                    {
+                        await _unitOfWork.BookingDetailsRepository.RemoveAsync(detail);
+                    }
+
+                    // Add new participants
+                    foreach (var pDto in dto.Participants)
+                    {
+                        var participantUser = await _unitOfWork.UserRepository.GetAllQueryable()
+                            .AsTracking()
+                            .Include(u => u.Profile)
+                            .Include(u => u.UserType)
+                            .FirstOrDefaultAsync(u => u.Email == pDto.Email);
+
+                        if (participantUser == null)
+                        {
+                            var createUserResult = await _userService.CreateDefaultUserAsync(pDto);
+                            if (!createUserResult.IsSuccess) return Result<BookingResponseDto>.Failure(createUserResult.ErrorMessage ?? "Failed to create participant");
+                            participantUser = createUserResult.Value;
+                        }
+                        else
+                        {
+                            // Update existing user profile and type
+                            if (participantUser.Profile != null)
+                            {
+                                if (!string.IsNullOrWhiteSpace(pDto.FullName))
+                                {
+                                    participantUser.Profile.FullName = pDto.FullName;
+                                }
+                                participantUser.Profile.Address = pDto.Address;
+                                participantUser.Profile.IdentityCardNumber = pDto.IdentityNumber;
+                                // await _unitOfWork.ProfileRepository.UpdateAsync(participantUser.Profile); // Removed: Tracked by EF
+                            }
+
+                            if (participantUser.UserType?.Type != pDto.UserType)
+                            {
+                                var newUserType = await _unitOfWork.UserTypeRepository.GetAllQueryable()
+                                    .AsTracking()
+                                    .FirstOrDefaultAsync(ut => ut.Type == pDto.UserType);
+                                if (newUserType != null)
+                                {
+                                    participantUser.UserTypeId = newUserType.Id;
+                                    participantUser.UserType = newUserType;
+                                    // await _unitOfWork.UserRepository.UpdateAsync(participantUser); // Removed: Tracked by EF
+                                }
+                            }
+
+                             // Check overlap for participant
+                             var userOverlapping = await _unitOfWork.BookingRepository.FindUserOverlappingBookingsAsync(participantUser.Id, booking.CheckInDate, booking.CheckOutDate, booking.Id);
+                             if (userOverlapping.Any()) return Result<BookingResponseDto>.Failure($"User {pDto.Email} is already booked for these dates");
+                        }
+                        participants.Add(participantUser);
+                        
+                        await _unitOfWork.BookingDetailsRepository.AddAsync(new BookingDetails { Id = Guid.NewGuid(), BookingId = booking.Id, UserId = participantUser.Id });
+                    }
+                }
+                else
+                {
+                    // Keep existing participants for price calc
+                    participants = booking.BookingDetails.Select(bd => bd.User).ToList();
+                }
+
+                // 3. Recalculate Price
+                var dayRent = (int)Math.Ceiling((booking.CheckOutDate - booking.CheckInDate).TotalDays);
+                var basePrice = booking.Room.RoomType.PricePerNight; // Ensure Room.RoomType is loaded
+                var totalPrice = basePrice * dayRent;
+
+                var numberOfParticipants = participants.Count;
+                var hasForeign = participants.Any(p => p.UserType?.Type == UserTypeType.Foreign);
+
+                if (numberOfParticipants > 2)
+                {
+                    var surchargeParam = await _paramService.GetParamByKeyAsync("surcharge_rate");
+                    var surchargeRate = (surchargeParam.IsSuccess && surchargeParam.Value != null) ? double.Parse(surchargeParam.Value.Value) : 0.25;
+                    totalPrice += totalPrice * (decimal)surchargeRate * (numberOfParticipants - 2);
+                }
+
+                if (hasForeign)
+                {
+                    var foreignParam = await _paramService.GetParamByKeyAsync("foreign_guest_factor");
+                    var foreignFactor = (foreignParam.IsSuccess && foreignParam.Value != null) ? double.Parse(foreignParam.Value.Value) : 1.5;
+                    totalPrice *= (decimal)foreignFactor;
+                }
+
+                booking.TotalPrice = totalPrice;
+                // await _unitOfWork.BookingRepository.UpdateAsync(booking); // Removed: Tracked by EF
+
+                // 4. Update Invoice
+                if (booking.Invoice != null)
+                {
+                    var updateInvoiceDto = new UpdateInvoiceDto
+                    {
+                        BasePrice = basePrice,
+                        TotalPrice = totalPrice,
+                        DaysStayed = dayRent
+                    };
+                    await _invoiceService.UpdateInvoiceAsync(booking.Invoice.Id.ToString(), updateInvoiceDto);
+                }
+
+                await _unitOfWork.SaveAsync();
+
+                return await GetBookingByIdAsync(booking.Id.ToString(), userId);
             }
             catch (Exception ex)
             {

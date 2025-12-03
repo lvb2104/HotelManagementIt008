@@ -32,6 +32,9 @@ namespace HotelManagementIt008.Forms
             if (BookingId.HasValue)
             {
                 this.Text = "Edit Booking";
+                cboRooms.Enabled = false;
+                dtpCheckIn.Enabled = false;
+                dtpCheckOut.Enabled = false;
                 await LoadBookingDetails();
             }
             else
@@ -51,12 +54,7 @@ namespace HotelManagementIt008.Forms
 
             dgvParticipants.Columns.Clear();
 
-            dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "FullName",
-                HeaderText = "Full Name",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            });
+
             dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Email",
@@ -92,7 +90,7 @@ namespace HotelManagementIt008.Forms
             {
                 // Load all rooms for selection. Ideally filter by availability but for now load all.
                 // Using GridifyQuery to get all (empty filter)
-                var result = await _roomService.GetAllRoomsAsync(new Gridify.GridifyQuery());
+                var result = await _roomService.GetAllRoomsAsync(new Gridify.GridifyQuery { PageSize = 1000 });
                 if (result.IsSuccess && result.Value != null)
                 {
                     cboRooms.DataSource = result.Value.Data;
@@ -213,9 +211,9 @@ namespace HotelManagementIt008.Forms
             // Validate participants
             foreach (var p in _participants)
             {
-                if (string.IsNullOrWhiteSpace(p.Email) || string.IsNullOrWhiteSpace(p.FullName))
+                if (string.IsNullOrWhiteSpace(p.Email))
                 {
-                    MessageBox.Show("All participants must have an Email and Full Name.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("All participants must have an Email.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
             }
