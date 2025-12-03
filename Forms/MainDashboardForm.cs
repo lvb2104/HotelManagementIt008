@@ -9,6 +9,10 @@ namespace HotelManagementIt008.Forms
         private readonly IServiceProvider _serviceProvider;
         public event EventHandler? Logout;
 
+        // Active Style Colors
+        private readonly Color _activeBackColor = ColorTranslator.FromHtml("#2d3748");
+        private readonly Color _accentColor = ColorTranslator.FromHtml("#3b82f6");
+
         public MainDashboardForm(LoginResponseDto currentUser, IServiceProvider serviceProvider)
         {
             InitializeComponent();
@@ -28,7 +32,7 @@ namespace HotelManagementIt008.Forms
             }
 
             // Load dashboard by default
-            OpenChildForm(ActivatorUtilities.CreateInstance<DashboardForm>(_serviceProvider));
+            OpenChildForm(ActivatorUtilities.CreateInstance<DashboardForm>(_serviceProvider), btnDashboard);
         }
 
         private void SetupUserInfo()
@@ -39,15 +43,15 @@ namespace HotelManagementIt008.Forms
 
         private void SetupButtonEvents()
         {
-            btnDashboard.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<DashboardForm>(_serviceProvider));
-            btnRooms.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<RoomManagementForm>(_serviceProvider));
-            btnBookings.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<BookingManagementForm>(_serviceProvider, _currentUser.Id));
-            btnInvoices.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<InvoiceManagementForm>(_serviceProvider));
-            btnPayments.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<PaymentManagementForm>(_serviceProvider));
-            btnUsers.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<UserManagementForm>(_serviceProvider));
-            btnReports.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<ReportsForm>(_serviceProvider));
-            btnSettings.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<SettingsForm>(_serviceProvider));
-            btnParams.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<ParamForm>(_serviceProvider));
+            btnDashboard.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<DashboardForm>(_serviceProvider), s);
+            btnRooms.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<RoomManagementForm>(_serviceProvider), s);
+            btnBookings.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<BookingManagementForm>(_serviceProvider, _currentUser.Id), s);
+            btnInvoices.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<InvoiceManagementForm>(_serviceProvider, _currentUser.Id), s);
+            btnPayments.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<PaymentManagementForm>(_serviceProvider), s);
+            btnUsers.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<UserManagementForm>(_serviceProvider), s);
+            btnReports.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<ReportsForm>(_serviceProvider), s);
+            btnSettings.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<SettingsForm>(_serviceProvider), s);
+            btnParams.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<ParamForm>(_serviceProvider), s);
 
             btnLogout.Click += btnLogout_Click;
         }
@@ -75,7 +79,7 @@ namespace HotelManagementIt008.Forms
             }
         }
 
-        private void OpenChildForm(Form childForm)
+        private void OpenChildForm(Form childForm, object? sender)
         {
             _currentChildForm?.Close(); // Close existing child form
             _currentChildForm = childForm; // Update current child form reference
@@ -89,6 +93,26 @@ namespace HotelManagementIt008.Forms
             childForm.Show(); // Show the child form
 
             ResetSidebarButtonStates(); // Reset all button states
+            
+            if (sender is Button btn)
+            {
+                btn.BackColor = _activeBackColor;
+                btn.ForeColor = Color.White;
+                btn.Tag = "active";
+                btn.Paint += Button_Paint_Active; // Subscribe to paint event for custom border
+            }
+        }
+
+        private void Button_Paint_Active(object? sender, PaintEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                // Draw left border
+                using (var brush = new SolidBrush(_accentColor))
+                {
+                    e.Graphics.FillRectangle(brush, 0, 0, 5, btn.Height);
+                }
+            }
         }
 
         private void ResetSidebarButtonStates()
@@ -97,6 +121,12 @@ namespace HotelManagementIt008.Forms
 
             foreach (var btn in sidebarButtons)
             {
+                if (btn.Tag?.ToString() == "active")
+                {
+                    btn.Paint -= Button_Paint_Active; // Unsubscribe to avoid memory leaks or double drawing
+                    btn.Invalidate(); // Force redraw to remove border
+                }
+
                 btn.BackColor = Color.Transparent;
                 btn.ForeColor = Color.FromArgb(209, 213, 219);
                 btn.Tag = null;
