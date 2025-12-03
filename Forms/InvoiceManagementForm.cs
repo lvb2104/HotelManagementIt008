@@ -77,14 +77,6 @@ namespace HotelManagementIt008.Forms
             });
             dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
             {
-                Name = "colTaxPrice",
-                DataPropertyName = "TaxPrice",
-                HeaderText = "Tax Price",
-                DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" },
-                Width = 100
-            });
-            dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
-            {
                 Name = "colAmount",
                 DataPropertyName = "TotalPrice",
                 HeaderText = "Total Price",
@@ -205,9 +197,8 @@ namespace HotelManagementIt008.Forms
             {
                 Id = i.Id,
                 RoomNumber = i.Booking?.Room?.RoomNumber ?? "N/A",
-                BookerEmail = i.Booking?.User?.Email ?? "N/A",
+                BookerEmail = i.Booking?.User?.Email ?? "Admin",
                 BasePrice = i.BasePrice,
-                TaxPrice = i.TaxPrice,
                 TotalPrice = i.TotalPrice,
                 DaysStayed = i.DaysStayed,
                 Status = i.Status,
@@ -394,7 +385,6 @@ namespace HotelManagementIt008.Forms
             public string RoomNumber { get; set; } = string.Empty;
             public string BookerEmail { get; set; } = string.Empty;
             public decimal BasePrice { get; set; }
-            public decimal TaxPrice { get; set; }
             public decimal TotalPrice { get; set; }
             public int DaysStayed { get; set; }
             public InvoiceStatus Status { get; set; }
