@@ -16,20 +16,18 @@
 
         public DateTime? DeletedAt { get; set; }
 
-        // -------------- Navigation Properties --------------
-
         public Guid BookerId { get; set; }
+
+        public Guid RoomId { get; set; }
+
+        // -------------- Navigation Properties --------------
 
         public User Booker { get; set; } = null!;
 
         public ICollection<BookingDetails> BookingDetails { get; set; } = new List<BookingDetails>();
 
-        public Guid RoomId { get; set; }
-
         public Room Room { get; set; } = null!;
 
-        public Guid? InvoiceId { get; set; }
-
-        public Invoice? Invoice { get; set; } = null!;
+        public Invoice Invoice { get; set; } = null!;
     }
 }

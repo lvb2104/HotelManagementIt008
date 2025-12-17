@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HotelManagementIt008.Data.Migrations
 {
     [DbContext(typeof(HotelManagementDbContext))]
-    [Migration("20251121090304_AddTables")]
-    partial class AddTables
+    [Migration("20251217074954_InitTables")]
+    partial class InitTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,9 +48,6 @@ namespace HotelManagementIt008.Data.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("InvoiceId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("RoomId")
                         .HasColumnType("uuid");
 
@@ -65,9 +62,6 @@ namespace HotelManagementIt008.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BookerId");
-
-                    b.HasIndex("InvoiceId")
-                        .IsUnique();
 
                     b.HasIndex("RoomId");
 
@@ -150,6 +144,9 @@ namespace HotelManagementIt008.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BookingId")
+                        .IsUnique();
+
                     b.HasIndex("PaymentId");
 
                     b.ToTable("Invoices");
@@ -162,7 +159,9 @@ namespace HotelManagementIt008.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -393,9 +392,6 @@ namespace HotelManagementIt008.Data.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("ProfileId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uuid");
 
@@ -460,11 +456,6 @@ namespace HotelManagementIt008.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("HotelManagementIt008.Models.Invoice", "Invoice")
-                        .WithOne("Booking")
-                        .HasForeignKey("HotelManagementIt008.Models.Booking", "InvoiceId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("HotelManagementIt008.Models.Room", "Room")
                         .WithMany("Bookings")
                         .HasForeignKey("RoomId")
@@ -472,8 +463,6 @@ namespace HotelManagementIt008.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Booker");
-
-                    b.Navigation("Invoice");
 
                     b.Navigation("Room");
                 });
@@ -499,11 +488,19 @@ namespace HotelManagementIt008.Data.Migrations
 
             modelBuilder.Entity("HotelManagementIt008.Models.Invoice", b =>
                 {
+                    b.HasOne("HotelManagementIt008.Models.Booking", "Booking")
+                        .WithOne("Invoice")
+                        .HasForeignKey("HotelManagementIt008.Models.Invoice", "BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("HotelManagementIt008.Models.Payment", "Payment")
                         .WithMany("Invoices")
                         .HasForeignKey("PaymentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Booking");
 
                     b.Navigation("Payment");
                 });
@@ -551,11 +548,8 @@ namespace HotelManagementIt008.Data.Migrations
             modelBuilder.Entity("HotelManagementIt008.Models.Booking", b =>
                 {
                     b.Navigation("BookingDetails");
-                });
 
-            modelBuilder.Entity("HotelManagementIt008.Models.Invoice", b =>
-                {
-                    b.Navigation("Booking")
+                    b.Navigation("Invoice")
                         .IsRequired();
                 });
 
@@ -585,7 +579,8 @@ namespace HotelManagementIt008.Data.Migrations
 
                     b.Navigation("Bookings");
 
-                    b.Navigation("Profile");
+                    b.Navigation("Profile")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("HotelManagementIt008.Models.UserType", b =>

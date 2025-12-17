@@ -5,7 +5,7 @@ namespace HotelManagementIt008.Forms
     public partial class MainDashboardForm : BaseForm
     {
         private Form? _currentChildForm; // To keep track of the currently opened child form
-        private readonly LoginResponseDto _currentUser; // Store current user info
+        private readonly ICurrentUserService _currentUserService;
         private readonly IServiceProvider _serviceProvider;
         public event EventHandler? Logout;
 
@@ -13,10 +13,10 @@ namespace HotelManagementIt008.Forms
         private readonly Color _activeBackColor = ColorTranslator.FromHtml("#2d3748");
         private readonly Color _accentColor = ColorTranslator.FromHtml("#3b82f6");
 
-        public MainDashboardForm(LoginResponseDto currentUser, IServiceProvider serviceProvider)
+        public MainDashboardForm(ICurrentUserService currentUserService, IServiceProvider serviceProvider)
         {
             InitializeComponent();
-            _currentUser = currentUser;
+            _currentUserService = currentUserService;
             _serviceProvider = serviceProvider;
 
             SetupUserInfo();
@@ -24,7 +24,7 @@ namespace HotelManagementIt008.Forms
             SetupButtonHoverEffects();
 
             // Hide admin-only buttons if not admin
-            if (_currentUser.Role != RoleType.Admin)
+            if (_currentUserService.Role != RoleType.Admin)
             {
                 btnUsers.Visible = false;
                 btnSettings.Visible = false;
@@ -32,26 +32,26 @@ namespace HotelManagementIt008.Forms
             }
 
             // Load dashboard by default
-            OpenChildForm(ActivatorUtilities.CreateInstance<DashboardForm>(_serviceProvider), btnDashboard);
+            OpenChildForm(_serviceProvider.GetRequiredService<DashboardForm>(), btnDashboard);
         }
 
         private void SetupUserInfo()
         {
-            lblUsername.Text = $"Welcome, {_currentUser.Username}";
-            lblRole.Text = $"Role: {_currentUser.Role}";
+            lblUsername.Text = $"Welcome, {_currentUserService.Username}";
+            lblRole.Text = $"Role: {_currentUserService.Role}";
         }
 
         private void SetupButtonEvents()
         {
-            btnDashboard.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<DashboardForm>(_serviceProvider), s);
-            btnRooms.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<RoomManagementForm>(_serviceProvider), s);
-            btnBookings.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<BookingManagementForm>(_serviceProvider, _currentUser.Id), s);
-            btnInvoices.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<InvoiceManagementForm>(_serviceProvider, _currentUser.Id), s);
-            btnPayments.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<PaymentManagementForm>(_serviceProvider), s);
-            btnUsers.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<UserManagementForm>(_serviceProvider), s);
-            btnReports.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<ReportsForm>(_serviceProvider), s);
-            btnSettings.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<SettingsForm>(_serviceProvider), s);
-            btnParams.Click += (s, e) => OpenChildForm(ActivatorUtilities.CreateInstance<ParamForm>(_serviceProvider), s);
+            btnDashboard.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<DashboardForm>(), s);
+            btnRooms.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<RoomManagementForm>(), s);
+            btnBookings.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<BookingManagementForm>(), s);
+            btnInvoices.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<InvoiceManagementForm>(), s);
+            btnPayments.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<PaymentManagementForm>(), s);
+            btnUsers.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<UserManagementForm>(), s);
+            btnReports.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<ReportsForm>(), s);
+            btnSettings.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<SettingsForm>(), s);
+            btnParams.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<ParamForm>(), s);
 
             btnLogout.Click += btnLogout_Click;
         }
@@ -93,7 +93,7 @@ namespace HotelManagementIt008.Forms
             childForm.Show(); // Show the child form
 
             ResetSidebarButtonStates(); // Reset all button states
-            
+
             if (sender is Button btn)
             {
                 btn.BackColor = _activeBackColor;

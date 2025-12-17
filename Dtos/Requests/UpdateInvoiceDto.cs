@@ -8,6 +8,9 @@ namespace HotelManagementIt008.Dtos.Requests
         [Range(0, double.MaxValue)]
         public decimal? BasePrice { get; set; }
 
+        [Range(0, double.MaxValue)]
+        public decimal? TaxPrice { get; set; }
+
         [Range(1, int.MaxValue)]
         public int? DaysStayed { get; set; }
 

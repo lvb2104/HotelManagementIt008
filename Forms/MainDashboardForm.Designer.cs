@@ -81,7 +81,7 @@
             btnSettings.FlatStyle = FlatStyle.Flat;
             btnSettings.Font = new Font("Segoe UI", 11F);
             btnSettings.ForeColor = Color.FromArgb(209, 213, 219);
-            btnSettings.Location = new Point(0, 430);
+            btnSettings.Location = new Point(0, 480);
             btnSettings.Name = "btnSettings";
             btnSettings.Padding = new Padding(20, 0, 0, 0);
             btnSettings.Size = new Size(250, 50);
@@ -100,7 +100,7 @@
             btnParams.FlatStyle = FlatStyle.Flat;
             btnParams.Font = new Font("Segoe UI", 11F);
             btnParams.ForeColor = Color.FromArgb(209, 213, 219);
-            btnParams.Location = new Point(0, 480);
+            btnParams.Location = new Point(0, 430);
             btnParams.Name = "btnParams";
             btnParams.Padding = new Padding(20, 0, 0, 0);
             btnParams.Size = new Size(250, 50);

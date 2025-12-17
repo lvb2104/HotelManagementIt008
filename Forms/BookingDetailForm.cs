@@ -10,18 +10,18 @@ namespace HotelManagementIt008.Forms
     {
         private readonly IBookingService _bookingService;
         private readonly IRoomService _roomService;
+        private readonly ICurrentUserService _currentUserService;
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Guid? BookingId { get; set; }
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public Guid UserId { get; set; }
 
         private BindingList<CreateParticipantDto> _participants = new BindingList<CreateParticipantDto>();
 
-        public BookingDetailForm(IBookingService bookingService, IRoomService roomService)
+        public BookingDetailForm(IBookingService bookingService, IRoomService roomService, ICurrentUserService currentUserService)
         {
             InitializeComponent();
             _bookingService = bookingService;
             _roomService = roomService;
+            _currentUserService = currentUserService;
             ConfigureParticipantsGrid();
         }
 
@@ -114,7 +114,7 @@ namespace HotelManagementIt008.Forms
 
             try
             {
-                var result = await _bookingService.GetBookingByIdAsync(BookingId.Value.ToString(), UserId.ToString());
+                var result = await _bookingService.GetBookingByIdAsync(BookingId.Value.ToString(), _currentUserService.UserId.ToString());
                 if (result.IsSuccess && result.Value != null)
                 {
                     var booking = result.Value;
@@ -231,7 +231,7 @@ namespace HotelManagementIt008.Forms
                         Participants = _participants.ToList()
                     };
 
-                    var result = await _bookingService.UpdateBookingAsync(BookingId.Value.ToString(), dto, UserId.ToString());
+                    var result = await _bookingService.UpdateBookingAsync(BookingId.Value.ToString(), dto, _currentUserService.UserId.ToString());
                     if (result.IsSuccess)
                     {
                         DialogResult = DialogResult.OK;
@@ -253,7 +253,7 @@ namespace HotelManagementIt008.Forms
                         Participants = _participants.ToList()
                     };
 
-                    var result = await _bookingService.CreateBookingAsync(dto, UserId.ToString());
+                    var result = await _bookingService.CreateBookingAsync(dto, _currentUserService.UserId.ToString());
                     if (result.IsSuccess)
                     {
                         DialogResult = DialogResult.OK;

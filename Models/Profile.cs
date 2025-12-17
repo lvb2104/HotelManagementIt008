@@ -24,9 +24,9 @@
 
         public DateTime? DeletedAt { get; set; }
 
-        // -------------- Navigation properties --------------
-
         public Guid UserId { get; set; }
+
+        // -------------- Navigation properties --------------
 
         public User User { get; set; } = null!;
     }

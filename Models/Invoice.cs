@@ -20,14 +20,14 @@
 
         public DateTime? DeletedAt { get; set; }
 
-        // -------------- Navigation Properties --------------
-
         public Guid BookingId { get; set; }
+
+        public Guid PaymentId { get; set; }
+
+        // -------------- Navigation Properties --------------
 
         public Booking Booking { get; set; } = null!;
 
-        public Guid? PaymentId { get; set; }
-
-        public Payment? Payment { get; set; }
+        public Payment Payment { get; set; } = null!;
     }
 }

@@ -90,7 +90,7 @@ namespace HotelManagementIt008.Data
             modelBuilder.Entity<Invoice>()
                 .HasOne(i => i.Booking)
                 .WithOne(b => b.Invoice)
-                .HasForeignKey<Booking>(b => b.InvoiceId)
+                .HasForeignKey<Invoice>(i => i.BookingId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // Payment - Invoice (One-to-Many)
@@ -98,7 +98,6 @@ namespace HotelManagementIt008.Data
                 .HasMany(p => p.Invoices)
                 .WithOne(i => i.Payment)
                 .HasForeignKey(i => i.PaymentId)
-                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 

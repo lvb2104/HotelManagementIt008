@@ -12,7 +12,6 @@ namespace HotelManagementIt008.Mapping.AutoMapperProfiles
             CreateMap<Invoice, InvoiceResponseDto>();
             CreateMap<CreateInvoiceDto, Invoice>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.TaxPrice, opt => opt.Ignore())
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())

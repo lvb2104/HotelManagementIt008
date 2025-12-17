@@ -274,7 +274,7 @@
             this.btnEditBooking.TabIndex = 1;
             this.btnEditBooking.Text = "✏️ Edit";
             this.btnEditBooking.UseVisualStyleBackColor = false;
-            this.btnEditBooking.Click += new System.EventHandler(this.btnEditBooking_Click);
+            this.btnEditBooking.Click += new System.EventHandler(this.btnEditBooking_ClickAsync);
             // 
             // btnAddBooking
             // 
@@ -287,7 +287,7 @@
             this.btnAddBooking.TabIndex = 0;
             this.btnAddBooking.Text = "➕ Add Booking";
             this.btnAddBooking.UseVisualStyleBackColor = false;
-            this.btnAddBooking.Click += new System.EventHandler(this.btnAddBooking_Click);
+            this.btnAddBooking.Click += new System.EventHandler(this.btnAddBooking_ClickAsync);
             // 
             // dgvBookings
             // 

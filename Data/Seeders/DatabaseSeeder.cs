@@ -51,11 +51,11 @@ namespace HotelManagementIt008.Data.Seeders
                 var staffs = await SeedStaffs(roles, passwordHash);
                 var customers = await SeedCustomersAndProfiles(roles, userTypes);
 
-                // Phase 4: Seed bookings, invoices, and booking details
-                await SeedBookingsInvoicesAndDetails(customers, rooms, payments, roomTypes, userTypes);
+                // Phase 4: Seed system parameters (needed for booking calculations)
+                var systemParams = await SeedParams();
 
-                // Phase 5: Seed system parameters
-                await SeedParams();
+                // Phase 5: Seed bookings, invoices, and booking details
+                await SeedBookingsInvoicesAndDetails(customers, rooms, payments, roomTypes, userTypes, systemParams);
 
                 // Commit transaction
                 await transaction.CommitAsync();
@@ -288,19 +288,19 @@ namespace HotelManagementIt008.Data.Seeders
             await _context.Profiles.AddRangeAsync(profiles);
             await _context.SaveChangesAsync();
 
-            // Update users with profile IDs
-            for (int i = 0; i < customers.Count; i++)
-            {
-                customers[i].ProfileId = profiles[i].Id;
-            }
-            await _context.SaveChangesAsync();
-
             return customers;
         }
 
-        private async Task SeedBookingsInvoicesAndDetails(List<User> customers, List<Room> rooms, List<Payment> payments, List<RoomType> roomTypes, List<UserType> userTypes)
+        private async Task SeedBookingsInvoicesAndDetails(List<User> customers, List<Room> rooms, List<Payment> payments, List<RoomType> roomTypes, List<UserType> userTypes, Dictionary<string, string> systemParams)
         {
+            // Parse system parameters
+            var taxRate = decimal.Parse(systemParams["TAX_RATE"]);
+            var maxGuestsPerRoom = int.Parse(systemParams["MAX_GUESTS_PER_ROOM"]);
+            var foreignSurchargeRate = decimal.Parse(systemParams["FOREIGN_SURCHARGE_RATE"]);
+            var extraGuestSurcharge = decimal.Parse(systemParams["EXTRA_GUEST_SURCHARGE"]);
+
             var availablePayments = payments.ToList();
+            var potentialGuests = customers.Take(50).ToList(); // Pool of potential guests
 
             var bookingFaker = new Faker<Booking>()
                 .RuleFor(b => b.Id, f => Guid.NewGuid())
@@ -311,56 +311,15 @@ namespace HotelManagementIt008.Data.Seeders
                 .RuleFor(b => b.TotalPrice, f => 0.0m);
 
             var bookings = bookingFaker.Generate(300);
-            await _context.Set<Booking>().AddRangeAsync(bookings);
-            await _context.SaveChangesAsync();
 
-            // Create invoices for bookings
-            var invoices = new List<Invoice>();
-            for (int i = 0; i < bookings.Count; i++)
-            {
-                var booking = bookings[i];
-                var room = rooms.First(r => r.Id == booking.RoomId);
-                var roomType = roomTypes.First(rt => rt.Id == room.RoomTypeId);
-                var booker = customers.First(u => u.Id == booking.BookerId);
-                var userType = userTypes.First(ut => ut.Id == booker.UserTypeId);
-
-                var daysStayed = (booking.CheckOutDate - booking.CheckInDate).Days;
-                var basePrice = Math.Round(roomType.PricePerNight * daysStayed * userType.SurchargeRate, 2);
-                var taxPrice = Math.Round(basePrice * 0.1m, 2); // 10% tax
-                var totalPrice = basePrice + taxPrice;
-
-                var invoice = new Invoice
-                {
-                    Id = Guid.NewGuid(),
-                    BasePrice = basePrice,
-                    TaxPrice = taxPrice,
-                    TotalPrice = totalPrice,
-                    DaysStayed = daysStayed,
-                    Status = _rng.Next(100) < 70 ? InvoiceStatus.Paid : (_rng.Next(100) < 20 ? InvoiceStatus.Pending : InvoiceStatus.Cancelled),
-                    PaymentId = availablePayments[i % availablePayments.Count].Id,
-                    BookingId = booking.Id
-                };
-
-                booking.TotalPrice = totalPrice;
-                invoices.Add(invoice);
-            }
-
-            await _context.Set<Invoice>().AddRangeAsync(invoices);
-            await _context.SaveChangesAsync();
-
-            // Update bookings with invoice IDs
-            for (int i = 0; i < bookings.Count; i++)
-            {
-                bookings[i].InvoiceId = invoices[i].Id;
-            }
-            await _context.SaveChangesAsync();
-
-            // Create booking details (guests)
+            // Create booking details (guests) first to determine guest count for price calculation
+            var bookingGuestCounts = new Dictionary<Guid, int>();
             var bookingDetails = new List<BookingDetails>();
+
             foreach (var booking in bookings)
             {
-                var guestCount = _rng.Next(1, 5); // 1-4 guests per booking
-                var potentialGuests = customers.Take(50).ToList(); // Pool of potential guests
+                var guestCount = _rng.Next(1, 6); // 1-5 guests per booking (some may exceed max)
+                bookingGuestCounts[booking.Id] = guestCount;
 
                 for (int i = 0; i < guestCount; i++)
                 {
@@ -374,11 +333,105 @@ namespace HotelManagementIt008.Data.Seeders
                 }
             }
 
+            // Calculate total price for each booking using system params
+            foreach (var booking in bookings)
+            {
+                var room = rooms.First(r => r.Id == booking.RoomId);
+                var roomType = roomTypes.First(rt => rt.Id == room.RoomTypeId);
+                var booker = customers.First(u => u.Id == booking.BookerId);
+                var userType = userTypes.First(ut => ut.Id == booker.UserTypeId);
+
+                var daysStayed = (booking.CheckOutDate - booking.CheckInDate).Days;
+                var guestCount = bookingGuestCounts[booking.Id];
+
+                // Base price = room price * days only (no surcharges)
+                var basePrice = roomType.PricePerNight * daysStayed;
+
+                // Calculate surcharges separately
+                var subtotal = basePrice;
+
+                // Apply foreign surcharge if customer is foreign
+                if (userType.Type == UserTypeType.Foreign)
+                {
+                    subtotal *= foreignSurchargeRate;
+                }
+
+                // Apply extra guest surcharge if exceeding max guests
+                if (guestCount > maxGuestsPerRoom)
+                {
+                    var extraGuests = guestCount - maxGuestsPerRoom;
+                    subtotal += subtotal * extraGuestSurcharge * extraGuests;
+                }
+
+                subtotal = Math.Round(subtotal, 2);
+                var taxPrice = Math.Round(subtotal * taxRate, 2);
+                booking.TotalPrice = subtotal + taxPrice;
+            }
+
+            await _context.Set<Booking>().AddRangeAsync(bookings);
+            await _context.SaveChangesAsync();
+
+            // Save booking details
             await _context.Set<BookingDetails>().AddRangeAsync(bookingDetails);
+            await _context.SaveChangesAsync();
+
+            // Create invoices for bookings (Invoice references Booking via BookingId)
+            var invoices = new List<Invoice>();
+            for (int i = 0; i < bookings.Count; i++)
+            {
+                var booking = bookings[i];
+                var room = rooms.First(r => r.Id == booking.RoomId);
+                var roomType = roomTypes.First(rt => rt.Id == room.RoomTypeId);
+                var booker = customers.First(u => u.Id == booking.BookerId);
+                var userType = userTypes.First(ut => ut.Id == booker.UserTypeId);
+
+                var daysStayed = (booking.CheckOutDate - booking.CheckInDate).Days;
+                var guestCount = bookingGuestCounts[booking.Id];
+
+                // Base price = room price * days only (no surcharges)
+                var basePrice = roomType.PricePerNight * daysStayed;
+
+                // Calculate surcharges separately
+                var subtotal = basePrice;
+
+                // Apply foreign surcharge if customer is foreign
+                if (userType.Type == UserTypeType.Foreign)
+                {
+                    subtotal *= foreignSurchargeRate;
+                }
+
+                // Apply extra guest surcharge if exceeding max guests
+                if (guestCount > maxGuestsPerRoom)
+                {
+                    var extraGuests = guestCount - maxGuestsPerRoom;
+                    subtotal += subtotal * extraGuestSurcharge * extraGuests;
+                }
+
+                subtotal = Math.Round(subtotal, 2);
+                var taxPrice = Math.Round(subtotal * taxRate, 2);
+                var totalPrice = subtotal + taxPrice;
+
+                // BasePrice = pure base (per night * days), TaxPrice = tax on subtotal, TotalPrice = subtotal + tax
+                var invoice = new Invoice
+                {
+                    Id = Guid.NewGuid(),
+                    BasePrice = Math.Round(basePrice, 2),
+                    TaxPrice = taxPrice,
+                    TotalPrice = totalPrice,
+                    DaysStayed = daysStayed,
+                    Status = _rng.Next(100) < 70 ? InvoiceStatus.Paid : (_rng.Next(100) < 20 ? InvoiceStatus.Pending : InvoiceStatus.Cancelled),
+                    PaymentId = availablePayments[i % availablePayments.Count].Id,
+                    BookingId = booking.Id
+                };
+
+                invoices.Add(invoice);
+            }
+
+            await _context.Set<Invoice>().AddRangeAsync(invoices);
             await _context.SaveChangesAsync();
         }
 
-        private async Task SeedParams()
+        private async Task<Dictionary<string, string>> SeedParams()
         {
             var parameters = new List<Params>
             {
@@ -393,8 +446,8 @@ namespace HotelManagementIt008.Data.Seeders
                 {
                     Id = Guid.NewGuid(),
                     Key = "MAX_GUESTS_PER_ROOM",
-                    Value = "4",
-                    Description = "Maximum number of guests allowed per room"
+                    Value = "3",
+                    Description = "Maximum number of guests allowed per room before surcharge"
                 },
                 new Params
                 {
@@ -406,35 +459,16 @@ namespace HotelManagementIt008.Data.Seeders
                 new Params
                 {
                     Id = Guid.NewGuid(),
-                    Key = "CANCELLATION_DEADLINE_HOURS",
-                    Value = "24",
-                    Description = "Hours before check-in to allow free cancellation"
+                    Key = "EXTRA_GUEST_SURCHARGE",
+                    Value = "0.25",
+                    Description = "Surcharge rate per extra guest exceeding MAX_GUESTS_PER_ROOM (25%)"
                 },
-                new Params
-                {
-                    Id = Guid.NewGuid(),
-                    Key = "MAX_BOOKING_DAYS",
-                    Value = "30",
-                    Description = "Maximum number of days for a single booking"
-                },
-                new Params
-                {
-                    Id = Guid.NewGuid(),
-                    Key = "EARLY_CHECKIN_FEE",
-                    Value = "20.00",
-                    Description = "Additional fee for early check-in requests"
-                },
-                new Params
-                {
-                    Id = Guid.NewGuid(),
-                    Key = "LATE_CHECKOUT_FEE",
-                    Value = "25.00",
-                    Description = "Additional fee for late check-out requests"
-                }
             };
 
             await _context.Set<Params>().AddRangeAsync(parameters);
             await _context.SaveChangesAsync();
+
+            return parameters.ToDictionary(p => p.Key, p => p.Value);
         }
     }
 }

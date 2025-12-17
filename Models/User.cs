@@ -16,22 +16,20 @@
 
         public DateTime? DeletedAt { get; set; }
 
-        // -------------- Navigation properties --------------
-
-        public Guid? ProfileId { get; set; }
-
-        public Profile? Profile { get; set; }
-
         public Guid RoleId { get; set; }
-
-        public Role Role { get; set; } = null!;
 
         public Guid? UserTypeId { get; set; }
 
+        // -------------- Navigation properties --------------
+
+        public Profile Profile { get; set; } = null!;
+
+        public Role Role { get; set; } = null!;
+
         public UserType? UserType { get; set; }
 
-        public ICollection<Booking>? Bookings { get; set; }
+        public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
-        public ICollection<BookingDetails>? BookingDetails { get; set; }
+        public ICollection<BookingDetails> BookingDetails { get; set; } = new List<BookingDetails>();
     }
 }

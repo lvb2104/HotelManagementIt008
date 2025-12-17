@@ -1,6 +1,4 @@
-﻿using HotelManagementIt008.Dtos.Responses;
-using HotelManagementIt008.Services.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace HotelManagementIt008.Forms
 {
@@ -8,19 +6,18 @@ namespace HotelManagementIt008.Forms
     {
         private readonly IBookingService _bookingService;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ICurrentUserService _currentUserService;
         private List<BookingSummaryDto> _allBookings = new();
         private int _currentPage = 1;
         private readonly int _pageSize = 20;
         private int _totalPages = 1;
 
-        private readonly Guid _userId;
-
-        public BookingManagementForm(IBookingService bookingService, IServiceProvider serviceProvider, Guid userId)
+        public BookingManagementForm(IBookingService bookingService, IServiceProvider serviceProvider, ICurrentUserService currentUserService)
         {
             InitializeComponent();
             _bookingService = bookingService;
             _serviceProvider = serviceProvider;
-            _userId = userId;
+            _currentUserService = currentUserService;
             ConfigureDataGridView();
         }
 
@@ -33,7 +30,7 @@ namespace HotelManagementIt008.Forms
             // Initialize filters to unchecked so all data shows by default
             dtpFilterCheckIn.Checked = false;
             dtpFilterCheckOut.Checked = false;
-            
+
             await LoadBookings();
         }
 
@@ -100,7 +97,7 @@ namespace HotelManagementIt008.Forms
             });
 
             dgvBookings.SelectionChanged += DgvBookings_SelectionChanged;
-            dgvBookings.CellDoubleClick += DgvBookings_CellDoubleClick;
+            dgvBookings.CellDoubleClick += DgvBookings_CellDoubleClickAsync;
         }
 
         private void DgvBookings_SelectionChanged(object? sender, EventArgs e)
@@ -111,11 +108,11 @@ namespace HotelManagementIt008.Forms
             btnPrintBooking.Enabled = hasSelection;
         }
 
-        private void DgvBookings_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+        private void DgvBookings_CellDoubleClickAsync(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
             {
-                btnEditBooking_Click(sender, e);
+                btnEditBooking_ClickAsync(sender, e);
             }
         }
 
@@ -123,7 +120,7 @@ namespace HotelManagementIt008.Forms
         {
             try
             {
-                var result = await _bookingService.GetBookingSummariesAsync(_userId.ToString());
+                var result = await _bookingService.GetBookingSummariesAsync(_currentUserService.UserId.ToString());
 
                 if (result.IsSuccess && result.Value != null)
                 {
@@ -219,32 +216,29 @@ namespace HotelManagementIt008.Forms
             }
         }
 
-        private void btnAddBooking_Click(object sender, EventArgs e)
+        private async void btnAddBooking_ClickAsync(object sender, EventArgs e)
         {
             var form = _serviceProvider.GetRequiredService<BookingDetailForm>();
-            form.UserId = _userId;
             if (form.ShowDialog() == DialogResult.OK)
             {
-                LoadBookings(); // Reload after add
+                await LoadBookings(); // Reload after add
             }
         }
 
-        private void btnEditBooking_Click(object sender, EventArgs e)
+        private async void btnEditBooking_ClickAsync(object? sender, EventArgs e)
         {
             if (dgvBookings.SelectedRows.Count > 0)
             {
                 try
                 {
                     var idCell = dgvBookings.SelectedRows[0].Cells["colId"];
-                    if (idCell.Value != null)
+                    if (idCell.Value is Guid id)
                     {
-                        var id = (Guid)idCell.Value;
                         var form = _serviceProvider.GetRequiredService<BookingDetailForm>();
-                        form.UserId = _userId;
                         form.BookingId = id;
                         if (form.ShowDialog() == DialogResult.OK)
                         {
-                            LoadBookings(); // Reload after edit
+                            await LoadBookings(); // Reload after edit
                         }
                     }
                 }
@@ -263,17 +257,20 @@ namespace HotelManagementIt008.Forms
                 {
                     try
                     {
-                        var id = (Guid)dgvBookings.SelectedRows[0].Cells["colId"].Value;
-                        var result = await _bookingService.RemoveBookingAsync(id.ToString(), _userId.ToString());
+                        var idCell = dgvBookings.SelectedRows[0].Cells["colId"];
+                        if (idCell.Value is Guid id)
+                        {
+                            var result = await _bookingService.RemoveBookingAsync(id.ToString(), _currentUserService.UserId.ToString());
 
-                        if (result.IsSuccess)
-                        {
-                            MessageBox.Show("Booking deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            await LoadBookings();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Failed to delete booking: " + result.ErrorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            if (result.IsSuccess)
+                            {
+                                MessageBox.Show("Booking deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                await LoadBookings();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Failed to delete booking: " + result.ErrorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -291,11 +288,10 @@ namespace HotelManagementIt008.Forms
                 try
                 {
                     var idCell = dgvBookings.SelectedRows[0].Cells["colId"];
-                    if (idCell.Value != null)
+                    if (idCell.Value is Guid id)
                     {
-                        var id = (Guid)idCell.Value;
                         // Fetch full booking details including participants
-                        var result = await _bookingService.GetBookingByIdAsync(id.ToString(), _userId.ToString());
+                        var result = await _bookingService.GetBookingByIdAsync(id.ToString(), _currentUserService.UserId.ToString());
 
                         if (result.IsSuccess && result.Value != null)
                         {
@@ -393,7 +389,7 @@ namespace HotelManagementIt008.Forms
                 foreach (var p in booking.Participants)
                 {
                     currentX = leftMargin;
-                    
+
                     // Calculate max height for this row
                     string[] cellValues = {
                         p.Email,

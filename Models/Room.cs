@@ -16,9 +16,9 @@
 
         public DateTime? DeletedAt { get; set; }
 
-        // -------------- Navigation properties --------------
-
         public Guid RoomTypeId { get; set; }
+
+        // -------------- Navigation properties --------------
 
         public RoomType RoomType { get; set; } = null!;
 

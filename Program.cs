@@ -20,7 +20,8 @@ namespace HotelManagementIt008
                     .AddGridifyService();
 
                 // Domain services
-                services.AddScoped<DatabaseSeeder>()
+                services.AddSingleton<ICurrentUserService, CurrentUserService>()
+                    .AddScoped<DatabaseSeeder>()
                     .AddTransient<IUserService, UserService>()
                     .AddTransient<IRoomService, RoomService>()
                     .AddTransient<IRoomTypeService, RoomTypeService>()
@@ -31,11 +32,17 @@ namespace HotelManagementIt008
 
                 // Forms
                 services.AddTransient<LoginForm>();
+                services.AddTransient<MainDashboardForm>();
+                services.AddTransient<DashboardForm>();
                 services.AddTransient<RoomManagementForm>();
                 services.AddTransient<ParamForm>();
                 services.AddTransient<BookingManagementForm>();
                 services.AddTransient<BookingDetailForm>();
                 services.AddTransient<InvoiceManagementForm>();
+                services.AddTransient<PaymentManagementForm>();
+                services.AddTransient<UserManagementForm>();
+                services.AddTransient<ReportsForm>();
+                services.AddTransient<SettingsForm>();
             }).Build();
 
             // Seed database using a scope
