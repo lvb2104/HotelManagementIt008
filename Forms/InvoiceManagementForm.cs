@@ -9,17 +9,17 @@ namespace HotelManagementIt008.Forms
     public partial class InvoiceManagementForm : BaseForm
     {
         private readonly IInvoiceService _invoiceService;
-        private readonly Guid _userId;
+        private readonly ICurrentUserService _currentUserService;
         private List<InvoiceResponseDto> _allInvoices = new();
         private int _currentPage = 1;
         private readonly int _pageSize = 20;
         private int _totalPages = 1;
 
-        public InvoiceManagementForm(IInvoiceService invoiceService, Guid userId)
+        public InvoiceManagementForm(IInvoiceService invoiceService, ICurrentUserService currentUserService)
         {
             InitializeComponent();
             _invoiceService = invoiceService;
-            _userId = userId;
+            _currentUserService = currentUserService;
             ConfigureDataGridView();
         }
 
@@ -155,7 +155,7 @@ namespace HotelManagementIt008.Forms
                 // I'll pass "Admin" for now as this form seems to be for management. 
                 // TODO: Pass correct role.
                 
-                var result = await _invoiceService.GetInvoicesAsync("Admin", _userId.ToString()); // Assuming Admin for management form
+                var result = await _invoiceService.GetInvoicesAsync(_currentUserService.Role.ToString(), _currentUserService.UserId.ToString());
 
                 if (result.IsSuccess && result.Value != null)
                 {

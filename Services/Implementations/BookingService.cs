@@ -111,7 +111,7 @@ namespace HotelManagementIt008.Services.Implementations
                         CheckInDate = b.CheckInDate,
                         CheckOutDate = b.CheckOutDate,
                         TotalPrice = b.TotalPrice,
-                        BookerEmail = b.Booker.Email,
+                        BookerEmail = b.Booker.Email ?? "",
                         CreatedAt = b.CreatedAt
                     })
                     .OrderByDescending(b => b.CreatedAt)
@@ -159,7 +159,7 @@ namespace HotelManagementIt008.Services.Implementations
                 }
                 else if (!isAdmin)
                 {
-                     return Result<BookingResponseDto>.Failure("Invalid User ID.");
+                    return Result<BookingResponseDto>.Failure("Invalid User ID.");
                 }
 
                 return Result<BookingResponseDto>.Success(_mapper.Map<BookingResponseDto>(booking));
@@ -248,7 +248,7 @@ namespace HotelManagementIt008.Services.Implementations
 
                         // Check overlap cho participant (không truyền bookingId vì là booking mới)
                         var userOverlapping = await _unitOfWork.BookingRepository
-                            .FindUserOverlappingBookingsAsync(participantUser.Id, dto.CheckInDate, dto.CheckOutDate);
+                            .FindUserOverlappingBookingsAsync(participantUser!.Id, dto.CheckInDate, dto.CheckOutDate);
                         if (userOverlapping.Any())
                         {
                             return Result<BookingResponseDto>.Failure($"User {pDto.Email} is already booked for these dates");
@@ -260,64 +260,94 @@ namespace HotelManagementIt008.Services.Implementations
                 }
 
                 // =========================
-                // Calculate Price (dùng participants list giống UpdateBookingAsync)
+                // Calculate Price using system params
                 // =========================
                 var dayRent = (int)Math.Ceiling((dto.CheckOutDate - dto.CheckInDate).TotalDays);
-                var basePrice = room.RoomType.PricePerNight;
-                var totalPrice = basePrice * dayRent;
+                var basePrice = room.RoomType.PricePerNight * dayRent; // Base price = per night * days only
 
                 var numberOfParticipants = participants.Count;
                 var hasForeign = participants.Any(p => p.UserType?.Type == UserTypeType.Foreign);
 
-                if (numberOfParticipants > 2)
-                {
-                    var surchargeParam = await _paramService.GetParamByKeyAsync("surcharge_rate");
-                    var surchargeRate = (surchargeParam.IsSuccess && surchargeParam.Value != null)
-                        ? double.Parse(surchargeParam.Value.Value)
-                        : 0.25;
-                    totalPrice += totalPrice * (decimal)surchargeRate * (numberOfParticipants - 2);
-                }
+                // Get system params
+                var maxGuestsParam = await _paramService.GetParamByKeyAsync("MAX_GUESTS_PER_ROOM");
+                var maxGuests = (maxGuestsParam.IsSuccess && maxGuestsParam.Value != null)
+                    ? int.Parse(maxGuestsParam.Value.Value)
+                    : 3;
 
+                var foreignSurchargeParam = await _paramService.GetParamByKeyAsync("FOREIGN_SURCHARGE_RATE");
+                var foreignSurchargeRate = (foreignSurchargeParam.IsSuccess && foreignSurchargeParam.Value != null)
+                    ? decimal.Parse(foreignSurchargeParam.Value.Value)
+                    : 1.5m;
+
+                var extraGuestParam = await _paramService.GetParamByKeyAsync("EXTRA_GUEST_SURCHARGE");
+                var extraGuestSurcharge = (extraGuestParam.IsSuccess && extraGuestParam.Value != null)
+                    ? decimal.Parse(extraGuestParam.Value.Value)
+                    : 0.25m;
+
+                var taxRateParam = await _paramService.GetParamByKeyAsync("TAX_RATE");
+                var taxRate = (taxRateParam.IsSuccess && taxRateParam.Value != null)
+                    ? decimal.Parse(taxRateParam.Value.Value)
+                    : 0.10m;
+
+                // Calculate surcharges separately
+                var subtotal = basePrice;
+
+                // Apply foreign surcharge if any participant is foreign
                 if (hasForeign)
                 {
-                    var foreignParam = await _paramService.GetParamByKeyAsync("foreign_guest_factor");
-                    var foreignFactor = (foreignParam.IsSuccess && foreignParam.Value != null)
-                        ? double.Parse(foreignParam.Value.Value)
-                        : 1.5;
-                    totalPrice *= (decimal)foreignFactor;
+                    subtotal *= foreignSurchargeRate;
                 }
 
-                // Create Invoice DTO
-                var invoiceDto = new CreateInvoiceDto
+                // Apply extra guest surcharge if exceeding max guests
+                if (numberOfParticipants > maxGuests)
                 {
-                    BasePrice = basePrice,
-                    TotalPrice = totalPrice,
-                    DaysStayed = dayRent,
-                    BookingId = Guid.Empty // Will be set after booking creation
-                };
+                    var extraGuests = numberOfParticipants - maxGuests;
+                    subtotal += subtotal * extraGuestSurcharge * extraGuests;
+                }
 
-                // Create Booking
+                subtotal = Math.Round(subtotal, 2);
+                var taxPrice = Math.Round(subtotal * taxRate, 2);
+                var totalPrice = subtotal + taxPrice;
+
+                // Create Booking first
                 var booking = new Booking
                 {
                     RoomId = room.Id,
                     BookerId = user.Id,
                     CheckInDate = dto.CheckInDate,
                     CheckOutDate = dto.CheckOutDate,
-                    TotalPrice = totalPrice,
-                    InvoiceId = null // Initially null
+                    TotalPrice = totalPrice
                 };
 
                 await _unitOfWork.BookingRepository.AddAsync(booking);
                 await _unitOfWork.SaveAsync(); // Save to generate Booking Id
 
-                // Create Invoice
-                invoiceDto.BookingId = booking.Id;
+                // Create Payment first (required for Invoice)
+                var payment = new Payment
+                {
+                    Id = Guid.NewGuid(),
+                    Amount = totalPrice,
+                    Method = PaymentMethod.Cash, // Default method, can be updated later
+                    Status = PaymentStatus.Pending
+                };
+                await _unitOfWork.PaymentRepository.AddAsync(payment);
+                await _unitOfWork.SaveAsync(); // Save to generate Payment Id
+
+                // Create Invoice (references Booking via BookingId)
+                // BasePrice = pure base (per night * days), TaxPrice = tax on subtotal, TotalPrice = subtotal + tax
+                var invoiceDto = new CreateInvoiceDto
+                {
+                    BasePrice = Math.Round(basePrice, 2),
+                    TaxPrice = taxPrice,
+                    TotalPrice = totalPrice,
+                    DaysStayed = dayRent,
+                    BookingId = booking.Id,
+                    PaymentId = payment.Id
+                };
+
                 var invoiceResult = await _invoiceService.CreateInvoiceAsync(invoiceDto);
                 if (!invoiceResult.IsSuccess || invoiceResult.Value is null)
                     return Result<BookingResponseDto>.Failure($"Failed to create invoice: {invoiceResult.ErrorMessage}");
-
-                // Update Booking with InvoiceId
-                booking.InvoiceId = invoiceResult.Value.Id;
 
                 // Add Participants (BookingDetails)
                 foreach (var p in participants)
@@ -379,7 +409,7 @@ namespace HotelManagementIt008.Services.Implementations
                 }
                 else if (!isAdmin)
                 {
-                     return Result<BookingResponseDto>.Failure("Invalid User ID.");
+                    return Result<BookingResponseDto>.Failure("Invalid User ID.");
                 }
 
                 // 1. Handle Room and Date Changes - DISABLED (Only participants update allowed)
@@ -440,13 +470,13 @@ namespace HotelManagementIt008.Services.Implementations
                                 }
                             }
 
-                             // Check overlap for participant
-                             var userOverlapping = await _unitOfWork.BookingRepository.FindUserOverlappingBookingsAsync(participantUser.Id, booking.CheckInDate, booking.CheckOutDate, booking.Id);
-                             if (userOverlapping.Any()) return Result<BookingResponseDto>.Failure($"User {pDto.Email} is already booked for these dates");
+                            // Check overlap for participant
+                            var userOverlapping = await _unitOfWork.BookingRepository.FindUserOverlappingBookingsAsync(participantUser.Id, booking.CheckInDate, booking.CheckOutDate, booking.Id);
+                            if (userOverlapping.Any()) return Result<BookingResponseDto>.Failure($"User {pDto.Email} is already booked for these dates");
                         }
-                        participants.Add(participantUser);
-                        
-                        await _unitOfWork.BookingDetailsRepository.AddAsync(new BookingDetails { Id = Guid.NewGuid(), BookingId = booking.Id, UserId = participantUser.Id });
+                        participants.Add(participantUser!);
+
+                        await _unitOfWork.BookingDetailsRepository.AddAsync(new BookingDetails { Id = Guid.NewGuid(), BookingId = booking.Id, UserId = participantUser!.Id });
                     }
                 }
                 else
@@ -455,37 +485,64 @@ namespace HotelManagementIt008.Services.Implementations
                     participants = booking.BookingDetails.Select(bd => bd.User).ToList();
                 }
 
-                // 3. Recalculate Price
+                // 3. Recalculate Price using system params
                 var dayRent = (int)Math.Ceiling((booking.CheckOutDate - booking.CheckInDate).TotalDays);
-                var basePrice = booking.Room.RoomType.PricePerNight; // Ensure Room.RoomType is loaded
-                var totalPrice = basePrice * dayRent;
+                var basePrice = booking.Room.RoomType.PricePerNight * dayRent; // Base price = per night * days only
 
                 var numberOfParticipants = participants.Count;
                 var hasForeign = participants.Any(p => p.UserType?.Type == UserTypeType.Foreign);
 
-                if (numberOfParticipants > 2)
-                {
-                    var surchargeParam = await _paramService.GetParamByKeyAsync("surcharge_rate");
-                    var surchargeRate = (surchargeParam.IsSuccess && surchargeParam.Value != null) ? double.Parse(surchargeParam.Value.Value) : 0.25;
-                    totalPrice += totalPrice * (decimal)surchargeRate * (numberOfParticipants - 2);
-                }
+                // Get system params
+                var maxGuestsParam = await _paramService.GetParamByKeyAsync("MAX_GUESTS_PER_ROOM");
+                var maxGuests = (maxGuestsParam.IsSuccess && maxGuestsParam.Value != null)
+                    ? int.Parse(maxGuestsParam.Value.Value)
+                    : 3;
 
+                var foreignSurchargeParam = await _paramService.GetParamByKeyAsync("FOREIGN_SURCHARGE_RATE");
+                var foreignSurchargeRate = (foreignSurchargeParam.IsSuccess && foreignSurchargeParam.Value != null)
+                    ? decimal.Parse(foreignSurchargeParam.Value.Value)
+                    : 1.5m;
+
+                var extraGuestParam = await _paramService.GetParamByKeyAsync("EXTRA_GUEST_SURCHARGE");
+                var extraGuestSurcharge = (extraGuestParam.IsSuccess && extraGuestParam.Value != null)
+                    ? decimal.Parse(extraGuestParam.Value.Value)
+                    : 0.25m;
+
+                var taxRateParam = await _paramService.GetParamByKeyAsync("TAX_RATE");
+                var taxRate = (taxRateParam.IsSuccess && taxRateParam.Value != null)
+                    ? decimal.Parse(taxRateParam.Value.Value)
+                    : 0.10m;
+
+                // Calculate surcharges separately
+                var subtotal = basePrice;
+
+                // Apply foreign surcharge if any participant is foreign
                 if (hasForeign)
                 {
-                    var foreignParam = await _paramService.GetParamByKeyAsync("foreign_guest_factor");
-                    var foreignFactor = (foreignParam.IsSuccess && foreignParam.Value != null) ? double.Parse(foreignParam.Value.Value) : 1.5;
-                    totalPrice *= (decimal)foreignFactor;
+                    subtotal *= foreignSurchargeRate;
                 }
 
+                // Apply extra guest surcharge if exceeding max guests
+                if (numberOfParticipants > maxGuests)
+                {
+                    var extraGuests = numberOfParticipants - maxGuests;
+                    subtotal += subtotal * extraGuestSurcharge * extraGuests;
+                }
+
+                subtotal = Math.Round(subtotal, 2);
+                var taxPrice = Math.Round(subtotal * taxRate, 2);
+                var totalPrice = subtotal + taxPrice;
+
                 booking.TotalPrice = totalPrice;
-                // await _unitOfWork.BookingRepository.UpdateAsync(booking); // Removed: Tracked by EF
 
                 // 4. Update Invoice
+                // BasePrice = pure base (per night * days), TaxPrice = tax on subtotal, TotalPrice = subtotal + tax
                 if (booking.Invoice != null)
                 {
                     var updateInvoiceDto = new UpdateInvoiceDto
                     {
-                        BasePrice = basePrice,
+                        BasePrice = Math.Round(basePrice, 2),
+                        TaxPrice = taxPrice,
                         TotalPrice = totalPrice,
                         DaysStayed = dayRent
                     };
@@ -528,7 +585,7 @@ namespace HotelManagementIt008.Services.Implementations
                 }
                 else if (!isAdmin)
                 {
-                     return Result<bool>.Failure("Invalid User ID.");
+                    return Result<bool>.Failure("Invalid User ID.");
                 }
 
                 // Update Room Status

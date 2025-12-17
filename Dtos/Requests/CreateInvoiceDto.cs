@@ -11,6 +11,10 @@ namespace HotelManagementIt008.Dtos.Requests
 
         [Required]
         [Range(0, double.MaxValue)]
+        public decimal TaxPrice { get; set; }
+
+        [Required]
+        [Range(0, double.MaxValue)]
         public decimal TotalPrice { get; set; }
 
         [Required]
@@ -19,10 +23,8 @@ namespace HotelManagementIt008.Dtos.Requests
 
         [Required]
         public Guid BookingId { get; set; }
-        
-        // PaymentId might be needed if the model requires it, 
-        // but for "Unpaid" invoice it might be null. 
-        // We will see if we need to make it nullable in the model.
-        public Guid? PaymentId { get; set; }
+
+        [Required]
+        public Guid PaymentId { get; set; }
     }
 }

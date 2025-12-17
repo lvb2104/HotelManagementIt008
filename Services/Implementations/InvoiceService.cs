@@ -126,6 +126,7 @@ namespace HotelManagementIt008.Services.Implementations
                 }
 
                 if (dto.BasePrice.HasValue) invoice.BasePrice = dto.BasePrice.Value;
+                if (dto.TaxPrice.HasValue) invoice.TaxPrice = dto.TaxPrice.Value;
                 if (dto.TotalPrice.HasValue) invoice.TotalPrice = dto.TotalPrice.Value;
                 if (dto.DaysStayed.HasValue) invoice.DaysStayed = dto.DaysStayed.Value;
                 if (dto.Status.HasValue) invoice.Status = dto.Status.Value;

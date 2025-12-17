@@ -34,13 +34,17 @@ namespace HotelManagementIt008.Core
 
         private void ShowLogin()
         {
+            // Clear current user on logout
+            var currentUserService = _serviceProvider.GetRequiredService<ICurrentUserService>();
+            currentUserService.Clear();
+
             if (_currentForm is not null)
             {
                 _currentForm.FormClosing -= OnFormClosing; // Unsubscribe to avoid triggering hiding
                 _currentForm.Close();
             }
 
-            var loginForm = ActivatorUtilities.CreateInstance<LoginForm>(_serviceProvider);
+            var loginForm = _serviceProvider.GetRequiredService<LoginForm>();
 
             // If Login in LoginForm is successful, invoke ShowMainDashBoard function
             loginForm.LoginSuccess += (s, response) => ShowMainDashBoard(response);
@@ -69,13 +73,17 @@ namespace HotelManagementIt008.Core
 
         private void ShowMainDashBoard(LoginResponseDto response)
         {
+            // Set current user after successful login
+            var currentUserService = _serviceProvider.GetRequiredService<ICurrentUserService>();
+            currentUserService.SetUser(response);
+
             if (_currentForm != null)
             {
                 _currentForm.FormClosing -= OnFormClosing; // Unsubscribe to avoid triggering hiding
                 _currentForm.Close();
             }
 
-            var mainDashBoardForm = ActivatorUtilities.CreateInstance<MainDashboardForm>(_serviceProvider, response);
+            var mainDashBoardForm = _serviceProvider.GetRequiredService<MainDashboardForm>();
 
             // If Logout is triggered in MainDashBoardForm, invoke ShowLogin function
             mainDashBoardForm.Logout += (s, e) => ShowLogin();

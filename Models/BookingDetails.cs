@@ -10,13 +10,13 @@
 
         public DateTime? DeletedAt { get; set; }
 
-        // -------------- Navigation Properties --------------
-
         public Guid BookingId { get; set; }
 
-        public Booking Booking { get; set; } = null!;
-
         public Guid UserId { get; set; }
+
+        // -------------- Navigation Properties --------------
+
+        public Booking Booking { get; set; } = null!;
 
         public User User { get; set; } = null!;
     }
