@@ -17,6 +17,8 @@
 
         private void InitializeComponent()
         {
+            this.pnlTop = new System.Windows.Forms.Panel();
+            this.lblTitle = new System.Windows.Forms.Label();
             this.grpChangePassword = new System.Windows.Forms.GroupBox();
             this.lblOldPassword = new System.Windows.Forms.Label();
             this.txtOldPassword = new System.Windows.Forms.TextBox();
@@ -29,8 +31,30 @@
             this.btnShowConfirmPassword = new FontAwesome.Sharp.IconButton();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
+            this.pnlTop.SuspendLayout();
             this.grpChangePassword.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // pnlTop
+            // 
+            this.pnlTop.BackColor = System.Drawing.Color.White;
+            this.pnlTop.Controls.Add(this.lblTitle);
+            this.pnlTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlTop.Location = new System.Drawing.Point(0, 0);
+            this.pnlTop.Name = "pnlTop";
+            this.pnlTop.Size = new System.Drawing.Size(384, 60);
+            this.pnlTop.TabIndex = 0;
+            // 
+            // lblTitle
+            // 
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(81)))), ((int)(((byte)(181)))));
+            this.lblTitle.Location = new System.Drawing.Point(20, 10);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(120, 37);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "Settings";
             // 
             // grpChangePassword
             // 
@@ -45,10 +69,10 @@
             this.grpChangePassword.Controls.Add(this.btnShowConfirmPassword);
             this.grpChangePassword.Controls.Add(this.btnSave);
             this.grpChangePassword.Controls.Add(this.btnCancel);
-            this.grpChangePassword.Location = new System.Drawing.Point(12, 12);
+            this.grpChangePassword.Location = new System.Drawing.Point(12, 70);
             this.grpChangePassword.Name = "grpChangePassword";
             this.grpChangePassword.Size = new System.Drawing.Size(350, 250);
-            this.grpChangePassword.TabIndex = 0;
+            this.grpChangePassword.TabIndex = 1;
             this.grpChangePassword.TabStop = false;
             this.grpChangePassword.Text = "Change Password";
             // 
@@ -179,14 +203,17 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(384, 280);
+            this.ClientSize = new System.Drawing.Size(384, 340);
             this.Controls.Add(this.grpChangePassword);
+            this.Controls.Add(this.pnlTop);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "SettingsForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Settings";
+            this.pnlTop.ResumeLayout(false);
+            this.pnlTop.PerformLayout();
             this.grpChangePassword.ResumeLayout(false);
             this.grpChangePassword.PerformLayout();
             this.ResumeLayout(false);
@@ -194,6 +221,8 @@
 
         #endregion
 
+        private System.Windows.Forms.Panel pnlTop;
+        private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.GroupBox grpChangePassword;
         private System.Windows.Forms.Label lblOldPassword;
         private System.Windows.Forms.TextBox txtOldPassword;
