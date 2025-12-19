@@ -282,5 +282,29 @@ namespace HotelManagementIt008.Services.Implementations
         }
 
 
+        public async Task<Result<bool>> ChangePasswordAsync(Guid userId, ChangePasswordRequestDto dto)
+        {
+            try
+            {
+                var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+                if (user == null)
+                    return Result<bool>.Failure("User not found.");
+
+                bool isOldPasswordValid = BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash);
+                if (!isOldPasswordValid)
+                    return Result<bool>.Failure("Incorrect old password.");
+
+                string newPasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+                user.PasswordHash = newPasswordHash;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                await _unitOfWork.SaveAsync();
+                return Result<bool>.Success(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Error changing password: {ex.Message}");
+            }
+        }
     }
 }
