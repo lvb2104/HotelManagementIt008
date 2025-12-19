@@ -44,9 +44,18 @@ namespace HotelManagementIt008.Forms
             };
         }
 
-        private void chkShowPassword_CheckedChanged(object sender, EventArgs e)
+        private void btnShowPassword_Click(object sender, EventArgs e)
         {
-            txtPassword.PasswordChar = chkShowPassword.Checked ? '\0' : '•';
+            if (txtPassword.PasswordChar == '*')
+            {
+                txtPassword.PasswordChar = '\0';
+                btnShowPassword.IconChar = FontAwesome.Sharp.IconChar.EyeSlash;
+            }
+            else
+            {
+                txtPassword.PasswordChar = '*';
+                btnShowPassword.IconChar = FontAwesome.Sharp.IconChar.Eye;
+            }
         }
 
         private async void btnLogin_Click(object? sender, EventArgs e)
