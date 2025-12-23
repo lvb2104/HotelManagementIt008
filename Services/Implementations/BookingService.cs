@@ -33,7 +33,10 @@ namespace HotelManagementIt008.Services.Implementations
         {
             try
             {
-                var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+                if (!Guid.TryParse(userId, out var guidUserId))
+                    return Result<IEnumerable<BookingResponseDto>>.Failure("Invalid user ID");
+
+                var user = await _unitOfWork.UserRepository.GetByIdAsync(guidUserId);
                 if (user == null) return Result<IEnumerable<BookingResponseDto>>.Failure("User not found");
 
                 // Check if admin
@@ -82,7 +85,10 @@ namespace HotelManagementIt008.Services.Implementations
         {
             try
             {
-                var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+                if (!Guid.TryParse(userId, out var guidUserId))
+                    return Result<IEnumerable<BookingSummaryDto>>.Failure("Invalid user ID");
+
+                var user = await _unitOfWork.UserRepository.GetByIdAsync(guidUserId);
                 if (user == null) return Result<IEnumerable<BookingSummaryDto>>.Failure("User not found");
 
                 // Check if admin
@@ -129,7 +135,10 @@ namespace HotelManagementIt008.Services.Implementations
         {
             try
             {
-                var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+                if (!Guid.TryParse(userId, out var guidUserId))
+                    return Result<BookingResponseDto>.Failure("Invalid user ID");
+
+                var user = await _unitOfWork.UserRepository.GetByIdAsync(guidUserId);
                 if (user == null) return Result<BookingResponseDto>.Failure("User not found");
 
                 var booking = await _unitOfWork.BookingRepository.GetAllQueryable()
@@ -174,7 +183,10 @@ namespace HotelManagementIt008.Services.Implementations
         {
             try
             {
-                var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+                if (!Guid.TryParse(userId, out var guidUserId))
+                    return Result<BookingResponseDto>.Failure("Invalid user ID");
+
+                var user = await _unitOfWork.UserRepository.GetByIdAsync(guidUserId);
                 if (user == null) return Result<BookingResponseDto>.Failure("User not found");
 
                 var room = await _unitOfWork.RoomRepository.GetAllQueryable()
@@ -383,7 +395,9 @@ namespace HotelManagementIt008.Services.Implementations
         {
             try
             {
-                var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+                if (!Guid.TryParse(userId, out var guidUserId))
+                    return Result<BookingResponseDto>.Failure("Invalid user ID");
+                var user = await _unitOfWork.UserRepository.GetByIdAsync(guidUserId);
                 if (user == null) return Result<BookingResponseDto>.Failure("User not found");
 
                 var booking = await _unitOfWork.BookingRepository.GetAllQueryable()
@@ -563,7 +577,9 @@ namespace HotelManagementIt008.Services.Implementations
         {
             try
             {
-                var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+                if (!Guid.TryParse(userId, out var guidUserId))
+                    return Result<bool>.Failure("Invalid user ID");
+                var user = await _unitOfWork.UserRepository.GetByIdAsync(guidUserId);
                 if (user == null) return Result<bool>.Failure("User not found");
 
                 var booking = await _unitOfWork.BookingRepository.GetAllQueryable()
