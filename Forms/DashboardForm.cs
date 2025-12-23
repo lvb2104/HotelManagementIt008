@@ -10,17 +10,19 @@
             _roomService = roomService;
             _userService = userService;
             InitializeComponent();
-            LoadStatCards();
+            this.Load += async (s,e) => await LoadStatCards();
         }
 
-        private void LoadStatCards()
+        private  async Task LoadStatCards()
         {
             var totalRooms = _roomService.CountRoomsByStatus().Value;
             var occupiedRooms = _roomService.CountRoomsByStatus(RoomStatus.Occupied).Value;
             var availableRooms = _roomService.CountRoomsByStatus(RoomStatus.Available).Value;
             var reservedRooms = _roomService.CountRoomsByStatus(RoomStatus.Reserved).Value;
             var outOfServiceRooms = _roomService.CountRoomsByStatus(RoomStatus.OutOfService).Value;
-            var numberOfCustomers = _userService.CountByRoleType(RoleType.Customer).Value;
+            //var numberOfCustomers = _userService.CountByRoleType(RoleType.Customer).Value;
+            var customerResult = await _userService.CountByRoleTypeAsync(RoleType.Customer);
+            int numberOfCustomers = customerResult.IsSuccess ? customerResult.Value : 0;
 
             statTotalRoomsCard.ValueText = totalRooms.ToString();
             statOccupiedRoomsCard.ValueText = occupiedRooms.ToString();
