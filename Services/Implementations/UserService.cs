@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
-using HotelManagementIt008.Dtos.Requests;
-using HotelManagementIt008.Dtos.Responses;
-using HotelManagementIt008.Helpers;
-using HotelManagementIt008.Models;
-using HotelManagementIt008.Types;
+
+using Gridify;
+using Gridify.EntityFramework;
+
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading.Tasks;
 
 namespace HotelManagementIt008.Services.Implementations
 {
@@ -14,11 +11,13 @@ namespace HotelManagementIt008.Services.Implementations
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IGridifyMapper<User> _gridifyMapper;
 
-        public UserService(IUnitOfWork unitOfWork, IMapper mapper)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper, IGridifyMapper<User> gridifyMapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _gridifyMapper = gridifyMapper;
         }
 
         public async Task<Result<LoginResponseDto>> LogInAsync(LoginRequestDto dto)
@@ -169,32 +168,41 @@ namespace HotelManagementIt008.Services.Implementations
                 _mapper.Map<UserResponseDto>(user)
             );
         }
-        public async Task<Result<List<UserSummaryDto>>> GetUserSummariesAsync()
+        public async Task<Result<Paging<UserSummaryDto>>> GetUserSummariesAsync(GridifyQuery query)
         {
             try
             {
-                var users = await _unitOfWork.UserRepository
+                var usersQuery = _unitOfWork.UserRepository
                     .GetAllQueryable()
                     .Include(u => u.Role)
                     .Include(u => u.UserType)
-                    .AsNoTracking()
-                    .ToListAsync();
+                    .Include(u => u.Profile)
+                    .AsNoTracking();
 
-                var result = users.Select(u => new UserSummaryDto
+                // Apply Gridify filtering, sorting, and paging
+                var pagedUsers = await usersQuery.GridifyAsync(query, _gridifyMapper);
+
+                // Project to DTOs
+                var userDtos = pagedUsers.Data.Select(u => new UserSummaryDto
                 {
                     Id = u.Id,
                     Username = u.Username ?? string.Empty,
                     Email = u.Email ?? string.Empty,
+                    FullName = u.Profile != null ? u.Profile.FullName : string.Empty,
                     Role = u.Role.Type.ToString(),
                     UserType = u.UserType != null ? u.UserType.Type.ToString() : string.Empty,
                     CreatedAt = u.CreatedAt
                 }).ToList();
 
-                return Result<List<UserSummaryDto>>.Success(result);
+                return Result<Paging<UserSummaryDto>>.Success(new Paging<UserSummaryDto>
+                {
+                    Data = userDtos,
+                    Count = pagedUsers.Count
+                });
             }
             catch (Exception ex)
             {
-                return Result<List<UserSummaryDto>>.Failure(
+                return Result<Paging<UserSummaryDto>>.Failure(
                     $"Error loading users: {ex.Message}"
                 );
             }
@@ -243,9 +251,9 @@ namespace HotelManagementIt008.Services.Implementations
                     Username = dto.Username,
                     Email = dto.Email,
                     UserTypeId = userTypeEntity.Id,
-                   // UserType = userTypeEntity,
+                    // UserType = userTypeEntity,
                     RoleId = roleEntity.Id,
-                   // Role = roleEntity,
+                    // Role = roleEntity,
                     Profile = new HotelManagementIt008.Models.Profile
                     {
                         FullName = dto.FullName,

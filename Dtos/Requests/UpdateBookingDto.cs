@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace HotelManagementIt008.Dtos.Requests
 {
     public class UpdateBookingDto

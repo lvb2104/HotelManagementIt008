@@ -1,6 +1,4 @@
-﻿using HotelManagementIt008.Types;
-
-namespace HotelManagementIt008.Dtos.Requests
+﻿namespace HotelManagementIt008.Dtos.Requests
 {
     public class UpdateUserDto
     {

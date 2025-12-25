@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace HotelManagementIt008.Core
 {
@@ -7,7 +6,7 @@ namespace HotelManagementIt008.Core
     {
         private readonly NotifyIcon _trayIcon;
         private readonly ContextMenuStrip _menuStrip;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IServiceProvider _serviceProvider; // Used for getting forms and services
         private Form? _currentForm;
         private bool _isExiting = false;
 
@@ -16,6 +15,7 @@ namespace HotelManagementIt008.Core
             _serviceProvider = serviceProvider;
             Application.ApplicationExit += ApplicationExitHanlder;
 
+            // Menu strip is used for right-click context menu on tray icon
             _menuStrip = new ContextMenuStrip();
             _menuStrip.Items.Add("Open", null, (s, e) => ShowCurrentForm());
             _menuStrip.Items.Add("Exit", null, ExitContextMenuClickHandler);

@@ -10,10 +10,10 @@
             _roomService = roomService;
             _userService = userService;
             InitializeComponent();
-            this.Load += async (s,e) => await LoadStatCards();
+            this.Load += async (s, e) => await LoadStatCards();
         }
 
-        private  async Task LoadStatCards()
+        private async Task LoadStatCards()
         {
             var totalRooms = _roomService.CountRoomsByStatus().Value;
             var occupiedRooms = _roomService.CountRoomsByStatus(RoomStatus.Occupied).Value;

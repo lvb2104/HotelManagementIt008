@@ -1,7 +1,3 @@
-using HotelManagementIt008.Dtos.Requests;
-using HotelManagementIt008.Dtos.Responses;
-using HotelManagementIt008.Services.Interfaces;
-using HotelManagementIt008.Types;
 using System.ComponentModel;
 
 namespace HotelManagementIt008.Forms
@@ -118,7 +114,7 @@ namespace HotelManagementIt008.Forms
                 if (result.IsSuccess && result.Value != null)
                 {
                     var booking = result.Value;
-                    
+
                     // Select room safely
                     if (booking.Room != null)
                     {
@@ -180,7 +176,7 @@ namespace HotelManagementIt008.Forms
                         itemsToRemove.Add(item);
                     }
                 }
-                
+
                 foreach (var item in itemsToRemove)
                 {
                     _participants.Remove(item);

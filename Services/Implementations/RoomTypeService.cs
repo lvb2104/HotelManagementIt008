@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 
-using HotelManagementIt008.Services.Interfaces;
-
 namespace HotelManagementIt008.Services.Implementations
 {
     public class RoomTypeService : IRoomTypeService

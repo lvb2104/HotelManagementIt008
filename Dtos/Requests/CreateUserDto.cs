@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using HotelManagementIt008.Types;
 
 namespace HotelManagementIt008.Dtos.Requests
 {

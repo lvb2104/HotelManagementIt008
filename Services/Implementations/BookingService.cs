@@ -1,5 +1,8 @@
 using AutoMapper;
 
+using Gridify;
+using Gridify.EntityFramework;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelManagementIt008.Services.Implementations
@@ -12,6 +15,7 @@ namespace HotelManagementIt008.Services.Implementations
         private readonly IRoomService _roomService;
         private readonly IInvoiceService _invoiceService;
         private readonly IParamService _paramService;
+        private readonly IGridifyMapper<Booking> _gridifyMapper;
 
         public BookingService(
             IUnitOfWork unitOfWork,
@@ -19,7 +23,8 @@ namespace HotelManagementIt008.Services.Implementations
             IUserService userService,
             IRoomService roomService,
             IInvoiceService invoiceService,
-            IParamService paramService)
+            IParamService paramService,
+            IGridifyMapper<Booking> gridifyMapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -27,23 +32,24 @@ namespace HotelManagementIt008.Services.Implementations
             _roomService = roomService;
             _invoiceService = invoiceService;
             _paramService = paramService;
+            _gridifyMapper = gridifyMapper;
         }
 
-        public async Task<Result<IEnumerable<BookingResponseDto>>> GetAllBookingsAsync(string userId)
+        public async Task<Result<Paging<BookingResponseDto>>> GetAllBookingsAsync(string userId, GridifyQuery query)
         {
             try
             {
                 if (!Guid.TryParse(userId, out var guidUserId))
-                    return Result<IEnumerable<BookingResponseDto>>.Failure("Invalid user ID");
+                    return Result<Paging<BookingResponseDto>>.Failure("Invalid user ID");
 
                 var user = await _unitOfWork.UserRepository.GetByIdAsync(guidUserId);
-                if (user == null) return Result<IEnumerable<BookingResponseDto>>.Failure("User not found");
+                if (user == null) return Result<Paging<BookingResponseDto>>.Failure("User not found");
 
                 // Check if admin
                 var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
                 bool isAdmin = role?.Type == RoleType.Admin;
 
-                var query = _unitOfWork.BookingRepository.GetAllQueryable()
+                var bookingsQuery = _unitOfWork.BookingRepository.GetAllQueryable()
                     .Include(b => b.Booker)
                         .ThenInclude(u => u.Role)
                     .Include(b => b.Room)
@@ -54,80 +60,82 @@ namespace HotelManagementIt008.Services.Implementations
                             .ThenInclude(u => u.Profile)
                     .Include(b => b.BookingDetails)
                         .ThenInclude(bd => bd.User)
-                            .ThenInclude(u => u.UserType);
+                            .ThenInclude(u => u.UserType)
+                    .AsQueryable(); // Cast back to IQueryable for Gridify
 
-                List<Booking> bookings;
-                if (isAdmin)
+                // Apply role-based filtering
+                if (!isAdmin)
                 {
-                    bookings = await query.ToListAsync();
-                }
-                else
-                {
-                    if (Guid.TryParse(userId, out var userGuid))
-                    {
-                        bookings = await query.Where(b => b.BookerId == userGuid).ToListAsync();
-                    }
-                    else
-                    {
-                        bookings = new List<Booking>();
-                    }
+                    bookingsQuery = bookingsQuery.Where(b => b.BookerId == guidUserId);
                 }
 
-                return Result<IEnumerable<BookingResponseDto>>.Success(_mapper.Map<IEnumerable<BookingResponseDto>>(bookings));
+                // Apply Gridify filtering, sorting, and paging
+                var pagedBookings = await bookingsQuery.GridifyAsync(query, _gridifyMapper);
+
+                // Map to DTOs
+                var bookingDtos = _mapper.Map<List<BookingResponseDto>>(pagedBookings.Data);
+
+                return Result<Paging<BookingResponseDto>>.Success(new Paging<BookingResponseDto>
+                {
+                    Data = bookingDtos,
+                    Count = pagedBookings.Count
+                });
             }
             catch (Exception ex)
             {
-                return Result<IEnumerable<BookingResponseDto>>.Failure($"Error retrieving bookings: {ex.Message}");
+                return Result<Paging<BookingResponseDto>>.Failure($"Error retrieving bookings: {ex.Message}");
             }
         }
 
-        public async Task<Result<IEnumerable<BookingSummaryDto>>> GetBookingSummariesAsync(string userId)
+        public async Task<Result<Paging<BookingSummaryDto>>> GetBookingSummariesAsync(string userId, GridifyQuery query)
         {
             try
             {
                 if (!Guid.TryParse(userId, out var guidUserId))
-                    return Result<IEnumerable<BookingSummaryDto>>.Failure("Invalid user ID");
+                    return Result<Paging<BookingSummaryDto>>.Failure("Invalid user ID");
 
                 var user = await _unitOfWork.UserRepository.GetByIdAsync(guidUserId);
-                if (user == null) return Result<IEnumerable<BookingSummaryDto>>.Failure("User not found");
+                if (user == null) return Result<Paging<BookingSummaryDto>>.Failure("User not found");
 
                 // Check if admin
                 var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
                 bool isAdmin = role?.Type == RoleType.Admin;
 
-                var query = _unitOfWork.BookingRepository.GetAllQueryable();
+                var bookingsQuery = _unitOfWork.BookingRepository.GetAllQueryable()
+                    .Include(b => b.Room)
+                    .Include(b => b.Booker)
+                    .AsQueryable();
 
+                // Apply role-based filtering
                 if (!isAdmin)
                 {
-                    if (Guid.TryParse(userId, out var userGuid))
-                    {
-                        query = query.Where(b => b.BookerId == userGuid);
-                    }
-                    else
-                    {
-                        return Result<IEnumerable<BookingSummaryDto>>.Success(new List<BookingSummaryDto>());
-                    }
+                    bookingsQuery = bookingsQuery.Where(b => b.BookerId == guidUserId);
                 }
 
-                var bookings = await query
-                    .Select(b => new BookingSummaryDto
-                    {
-                        Id = b.Id,
-                        RoomNumber = b.Room.RoomNumber,
-                        CheckInDate = b.CheckInDate,
-                        CheckOutDate = b.CheckOutDate,
-                        TotalPrice = b.TotalPrice,
-                        BookerEmail = b.Booker.Email ?? "",
-                        CreatedAt = b.CreatedAt
-                    })
-                    .OrderByDescending(b => b.CreatedAt)
-                    .ToListAsync();
+                // Apply Gridify filtering, sorting, and paging
+                var pagedBookings = await bookingsQuery.GridifyAsync(query, _gridifyMapper);
 
-                return Result<IEnumerable<BookingSummaryDto>>.Success(bookings);
+                // Project to DTOs
+                var summaryDtos = pagedBookings.Data.Select(b => new BookingSummaryDto
+                {
+                    Id = b.Id,
+                    RoomNumber = b.Room.RoomNumber,
+                    CheckInDate = b.CheckInDate,
+                    CheckOutDate = b.CheckOutDate,
+                    TotalPrice = b.TotalPrice,
+                    BookerEmail = b.Booker.Email ?? "",
+                    CreatedAt = b.CreatedAt
+                }).ToList();
+
+                return Result<Paging<BookingSummaryDto>>.Success(new Paging<BookingSummaryDto>
+                {
+                    Data = summaryDtos,
+                    Count = pagedBookings.Count
+                });
             }
             catch (Exception ex)
             {
-                return Result<IEnumerable<BookingSummaryDto>>.Failure($"Error retrieving bookings: {ex.Message}");
+                return Result<Paging<BookingSummaryDto>>.Failure($"Error retrieving bookings: {ex.Message}");
             }
         }
 
@@ -197,12 +205,12 @@ namespace HotelManagementIt008.Services.Implementations
                 if (room == null) return Result<BookingResponseDto>.Failure("Room not found");
                 if (room.Status == RoomStatus.OutOfService) return Result<BookingResponseDto>.Failure("Room is out of service");
 
-                // Convert to UTC for database consistency
-                dto.CheckInDate = dto.CheckInDate.ToUniversalTime();
-                dto.CheckOutDate = dto.CheckOutDate.ToUniversalTime();
+                // Convert to UTC for database consistency, but preserve the date
+                dto.CheckInDate = DateTime.SpecifyKind(dto.CheckInDate.Date, DateTimeKind.Utc);
+                dto.CheckOutDate = DateTime.SpecifyKind(dto.CheckOutDate.Date, DateTimeKind.Utc);
 
-                if (dto.CheckInDate >= dto.CheckOutDate) return Result<BookingResponseDto>.Failure("Check-out date must be after check-in date");
-                if (dto.CheckInDate.Date < DateTime.UtcNow.Date) return Result<BookingResponseDto>.Failure("Check-in date cannot be in the past");
+                if (dto.CheckInDate > dto.CheckOutDate) return Result<BookingResponseDto>.Failure("Check-out date must be after check-in date");
+                if (dto.CheckInDate.Date < DateTime.UtcNow.Date) return Result<BookingResponseDto>.Failure("Check-in date cannot be in the past"); // TODO: Fix can't choose check-in date is today
 
                 var overlapping = await _unitOfWork.BookingRepository
                     .FindOverlappingBookingsAsync(dto.RoomId, dto.CheckInDate, dto.CheckOutDate);
