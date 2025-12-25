@@ -77,12 +77,14 @@ namespace HotelManagementIt008.Forms
             // 
             // cboRooms
             // 
-            this.cboRooms.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboRooms.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
             this.cboRooms.FormattingEnabled = true;
             this.cboRooms.Location = new System.Drawing.Point(20, 50);
             this.cboRooms.Name = "cboRooms";
             this.cboRooms.Size = new System.Drawing.Size(200, 23);
             this.cboRooms.TabIndex = 1;
+            this.cboRooms.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.cboRooms.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             // 
             // lblCheckIn
             // 

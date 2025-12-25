@@ -1,8 +1,7 @@
-﻿using HotelManagementIt008.Dtos.Responses;
-using HotelManagementIt008.Services.Interfaces;
-using HotelManagementIt008.Types;
-using System.Data;
+﻿using System.Data;
 using System.Drawing.Printing;
+
+using Gridify;
 
 namespace HotelManagementIt008.Forms
 {
@@ -10,10 +9,10 @@ namespace HotelManagementIt008.Forms
     {
         private readonly IInvoiceService _invoiceService;
         private readonly ICurrentUserService _currentUserService;
-        private List<InvoiceResponseDto> _allInvoices = new();
         private int _currentPage = 1;
         private readonly int _pageSize = 20;
         private int _totalPages = 1;
+        private int _totalCount = 0;
 
         public InvoiceManagementForm(IInvoiceService invoiceService, ICurrentUserService currentUserService)
         {
@@ -130,13 +129,13 @@ namespace HotelManagementIt008.Forms
             bool hasSelection = dgvInvoices.SelectedRows.Count > 0;
             btnPrintInvoice.Enabled = hasSelection;
             btnMarkAsPaid.Enabled = hasSelection;
-            
+
             if (hasSelection)
             {
                 var row = dgvInvoices.SelectedRows[0];
                 if (row.DataBoundItem is InvoiceViewModel vm)
                 {
-                     btnMarkAsPaid.Enabled = vm.Status != InvoiceStatus.Paid && vm.Status != InvoiceStatus.Cancelled;
+                    btnMarkAsPaid.Enabled = vm.Status != InvoiceStatus.Paid && vm.Status != InvoiceStatus.Cancelled;
                 }
             }
         }
@@ -145,22 +144,39 @@ namespace HotelManagementIt008.Forms
         {
             try
             {
-                // Assuming we fetch all for the user/admin and filter client-side
-                // We don't have the role here, but maybe we can infer or pass it. 
-                // For now, let's pass empty role or handle it in service if possible.
-                // Actually, IInvoiceService.GetInvoicesAsync takes (role, userId).
-                // I'll assume "Admin" if I can't determine, or just pass userId and let service handle.
-                // But wait, I don't know the role. I'll pass "User" or "Admin" based on context if I had it.
-                // Let's try passing the userId and a placeholder role, or maybe the service ignores role if userId is admin?
-                // I'll pass "Admin" for now as this form seems to be for management. 
-                // TODO: Pass correct role.
-                
-                var result = await _invoiceService.GetInvoicesAsync(_currentUserService.Role.ToString(), _currentUserService.UserId.ToString());
+                var gridifyQuery = new GridifyQuery
+                {
+                    Page = _currentPage,
+                    PageSize = _pageSize,
+                    OrderBy = "createdAt desc"
+                };
+
+                var result = await _invoiceService.GetInvoicesAsync(_currentUserService.Role.ToString(), _currentUserService.UserId.ToString(), gridifyQuery);
 
                 if (result.IsSuccess && result.Value != null)
                 {
-                    _allInvoices = result.Value.ToList();
-                    ApplyFiltersAndBind();
+                    _totalCount = result.Value.Count;
+                    _totalPages = (int)Math.Ceiling((decimal)_totalCount / _pageSize);
+                    if (_totalPages == 0) _totalPages = 1;
+
+                    // Map to ViewModel for Display
+                    var viewModels = result.Value.Data.Select(i => new InvoiceViewModel
+                    {
+                        Id = i.Id,
+                        RoomNumber = i.Booking?.Room?.RoomNumber ?? "N/A",
+                        BookerEmail = i.Booking?.User?.Email ?? "Admin",
+                        BasePrice = i.BasePrice,
+                        TotalPrice = i.TotalPrice,
+                        DaysStayed = i.DaysStayed,
+                        Status = i.Status,
+                        CreatedAt = i.CreatedAt,
+                        UpdatedAt = i.UpdatedAt,
+                        DeletedAt = i.DeletedAt,
+                        OriginalDto = i
+                    }).ToList();
+
+                    dgvInvoices.DataSource = viewModels;
+                    UpdatePaginationControls();
                 }
                 else
                 {
@@ -173,53 +189,67 @@ namespace HotelManagementIt008.Forms
             }
         }
 
-        private void ApplyFiltersAndBind()
+        private async Task ApplyFiltersAndBind()
         {
-            var filtered = _allInvoices.AsEnumerable();
-
-            // Status Filter
-            if (cboFilterStatus.SelectedItem is string statusStr && statusStr != "All")
+            try
             {
-                if (Enum.TryParse<InvoiceStatus>(statusStr, out var status))
+                // Build filter string for Gridify
+                var filters = new List<string>();
+
+                // Status Filter
+                if (cboFilterStatus.SelectedItem is string statusStr && statusStr != "All")
                 {
-                    filtered = filtered.Where(i => i.Status == status);
+                    filters.Add($"status={statusStr}");
+                }
+
+                // Date Filter
+                if (dtpFilterDate.Checked)
+                {
+                    filters.Add($"createdAt>={dtpFilterDate.Value.Date:yyyy-MM-dd}");
+                }
+
+                var filterString = filters.Any() ? string.Join(",", filters) : string.Empty;
+
+                var gridifyQuery = new GridifyQuery
+                {
+                    Page = _currentPage,
+                    PageSize = _pageSize,
+                    Filter = filterString,
+                    OrderBy = "createdAt desc"
+                };
+
+                var result = await _invoiceService.GetInvoicesAsync(_currentUserService.Role.ToString(), _currentUserService.UserId.ToString(), gridifyQuery);
+
+                if (result.IsSuccess && result.Value != null)
+                {
+                    _totalCount = result.Value.Count;
+                    _totalPages = (int)Math.Ceiling((decimal)_totalCount / _pageSize);
+                    if (_totalPages == 0) _totalPages = 1;
+
+                    // Map to ViewModel for Display
+                    var viewModels = result.Value.Data.Select(i => new InvoiceViewModel
+                    {
+                        Id = i.Id,
+                        RoomNumber = i.Booking?.Room?.RoomNumber ?? "N/A",
+                        BookerEmail = i.Booking?.User?.Email ?? "Admin",
+                        BasePrice = i.BasePrice,
+                        TotalPrice = i.TotalPrice,
+                        DaysStayed = i.DaysStayed,
+                        Status = i.Status,
+                        CreatedAt = i.CreatedAt,
+                        UpdatedAt = i.UpdatedAt,
+                        DeletedAt = i.DeletedAt,
+                        OriginalDto = i
+                    }).ToList();
+
+                    dgvInvoices.DataSource = viewModels;
+                    UpdatePaginationControls();
                 }
             }
-
-            // Date Filter
-            if (dtpFilterDate.Checked)
+            catch (Exception ex)
             {
-                filtered = filtered.Where(i => i.CreatedAt.Date == dtpFilterDate.Value.Date);
+                MessageBox.Show("Error applying filters: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            // Map to ViewModel for Display
-            var viewModels = filtered.Select(i => new InvoiceViewModel
-            {
-                Id = i.Id,
-                RoomNumber = i.Booking?.Room?.RoomNumber ?? "N/A",
-                BookerEmail = i.Booking?.User?.Email ?? "Admin",
-                BasePrice = i.BasePrice,
-                TotalPrice = i.TotalPrice,
-                DaysStayed = i.DaysStayed,
-                Status = i.Status,
-                CreatedAt = i.CreatedAt,
-                UpdatedAt = i.UpdatedAt,
-                DeletedAt = i.DeletedAt,
-                OriginalDto = i
-            }).OrderByDescending(i => i.CreatedAt).ToList();
-
-            // Pagination
-            _totalPages = (int)Math.Ceiling((decimal)viewModels.Count / _pageSize);
-            if (_totalPages == 0) _totalPages = 1;
-            if (_currentPage > _totalPages) _currentPage = _totalPages;
-
-            var pagedList = viewModels
-                .Skip((_currentPage - 1) * _pageSize)
-                .Take(_pageSize)
-                .ToList();
-
-            dgvInvoices.DataSource = pagedList;
-            UpdatePaginationControls();
         }
 
         private void UpdatePaginationControls()
@@ -229,35 +259,35 @@ namespace HotelManagementIt008.Forms
             lblPageInfo.Text = $"Page {_currentPage} of {_totalPages}";
         }
 
-        private void btnSearch_Click(object sender, EventArgs e)
+        private async void btnSearch_Click(object sender, EventArgs e)
         {
             _currentPage = 1;
-            ApplyFiltersAndBind();
+            await ApplyFiltersAndBind();
         }
 
-        private void btnClearFilters_Click(object sender, EventArgs e)
+        private async void btnClearFilters_Click(object sender, EventArgs e)
         {
             cboFilterStatus.SelectedIndex = 0;
             dtpFilterDate.Checked = false;
             _currentPage = 1;
-            ApplyFiltersAndBind();
+            await ApplyFiltersAndBind();
         }
 
-        private void btnPrevious_Click(object sender, EventArgs e)
+        private async void btnPrevious_Click(object sender, EventArgs e)
         {
             if (_currentPage > 1)
             {
                 _currentPage--;
-                ApplyFiltersAndBind();
+                await ApplyFiltersAndBind();
             }
         }
 
-        private void btnNext_Click(object sender, EventArgs e)
+        private async void btnNext_Click(object sender, EventArgs e)
         {
             if (_currentPage < _totalPages)
             {
                 _currentPage++;
-                ApplyFiltersAndBind();
+                await ApplyFiltersAndBind();
             }
         }
 
@@ -338,7 +368,7 @@ namespace HotelManagementIt008.Forms
             DrawSummaryRow(g, "Invoice ID:", invoice.Id.ToString(), leftMargin, ref yPos, labelFont, valueFont);
             DrawSummaryRow(g, "Date:", invoice.CreatedAt.ToString("yyyy-MM-dd"), leftMargin, ref yPos, labelFont, valueFont);
             DrawSummaryRow(g, "Status:", invoice.Status.ToString(), leftMargin, ref yPos, labelFont, valueFont);
-            
+
             yPos += 20;
             g.DrawLine(Pens.Black, leftMargin, yPos, e.PageBounds.Width - 50, yPos);
             yPos += 20;
@@ -365,7 +395,7 @@ namespace HotelManagementIt008.Forms
 
             DrawSummaryRow(g, "Base Price:", invoice.BasePrice.ToString("C2"), leftMargin, ref yPos, labelFont, valueFont);
             DrawSummaryRow(g, "Days Stayed:", invoice.DaysStayed.ToString(), leftMargin, ref yPos, labelFont, valueFont);
-            
+
             yPos += 10;
             var totalFont = new Font("Arial", 14, FontStyle.Bold);
             g.DrawString($"Total: {invoice.TotalPrice:C2}", totalFont, brush, leftMargin, yPos);

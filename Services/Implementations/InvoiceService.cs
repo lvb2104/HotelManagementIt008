@@ -1,8 +1,9 @@
 using AutoMapper;
+
+using Gridify;
+using Gridify.EntityFramework;
+
 using Microsoft.EntityFrameworkCore;
-using HotelManagementIt008.Dtos.Requests;
-using HotelManagementIt008.Dtos.Responses;
-using HotelManagementIt008.Types;
 
 namespace HotelManagementIt008.Services.Implementations
 {
@@ -10,11 +11,13 @@ namespace HotelManagementIt008.Services.Implementations
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IGridifyMapper<Invoice> _gridifyMapper;
 
-        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper)
+        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, IGridifyMapper<Invoice> gridifyMapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _gridifyMapper = gridifyMapper;
         }
 
         public async Task<Result<InvoiceResponseDto>> CreateInvoiceAsync(CreateInvoiceDto dto)
@@ -177,27 +180,37 @@ namespace HotelManagementIt008.Services.Implementations
             }
         }
 
-        public async Task<Result<IEnumerable<InvoiceResponseDto>>> GetInvoicesAsync(string role, string userId)
+        public async Task<Result<Paging<InvoiceResponseDto>>> GetInvoicesAsync(string role, string userId, GridifyQuery query)
         {
             try
             {
-                IQueryable<Invoice> query = _unitOfWork.InvoiceRepository.GetAllQueryable()
+                IQueryable<Invoice> invoicesQuery = _unitOfWork.InvoiceRepository.GetAllQueryable()
                     .Include(i => i.Booking)
                         .ThenInclude(b => b.Booker)
                     .Include(i => i.Booking)
                         .ThenInclude(b => b.Room);
 
-                if (role != "admin") // Assuming "admin" is the role name
+                // Apply role-based filtering
+                if (role != "admin")
                 {
-                    query = query.Where(i => i.Booking.BookerId.ToString() == userId);
+                    invoicesQuery = invoicesQuery.Where(i => i.Booking.BookerId.ToString() == userId);
                 }
 
-                var invoices = await query.ToListAsync();
-                return Result<IEnumerable<InvoiceResponseDto>>.Success(_mapper.Map<IEnumerable<InvoiceResponseDto>>(invoices));
+                // Apply Gridify filtering, sorting, and paging
+                var pagedInvoices = await invoicesQuery.GridifyAsync(query, _gridifyMapper);
+
+                // Map to DTOs
+                var invoiceDtos = _mapper.Map<List<InvoiceResponseDto>>(pagedInvoices.Data);
+
+                return Result<Paging<InvoiceResponseDto>>.Success(new Paging<InvoiceResponseDto>
+                {
+                    Data = invoiceDtos,
+                    Count = pagedInvoices.Count
+                });
             }
             catch (Exception ex)
             {
-                return Result<IEnumerable<InvoiceResponseDto>>.Failure($"Error retrieving invoices: {ex.Message}");
+                return Result<Paging<InvoiceResponseDto>>.Failure($"Error retrieving invoices: {ex.Message}");
             }
         }
 

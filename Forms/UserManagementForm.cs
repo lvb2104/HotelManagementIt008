@@ -1,7 +1,8 @@
-﻿using HotelManagementIt008.Dtos.Responses;
-using HotelManagementIt008.Services.Interfaces;
+﻿using System.Text;
+
+using Gridify;
+
 using Microsoft.Extensions.DependencyInjection;
-using System.Text;
 
 namespace HotelManagementIt008.Forms
 {
@@ -9,9 +10,10 @@ namespace HotelManagementIt008.Forms
     {
         private readonly IUserService _userService;
         private readonly IServiceProvider _serviceProvider;
-        private int _currentPage = 1;      // trang hiện tại
-        private readonly int _pageSize = 20;        // số dòng mỗi trang
+        private int _currentPage = 1;
+        private readonly int _pageSize = 20;
         private int _totalPages = 1;
+        private int _totalCount = 0;
         public UserManagementForm(
            IUserService userService,
            IServiceProvider serviceProvider)
@@ -21,26 +23,25 @@ namespace HotelManagementIt008.Forms
             _serviceProvider = serviceProvider;
 
             ConfigureDataGridView();
-            _ = LoadUsersAsync();
         }
-        private void txtSearch_TextChanged(object sender, EventArgs e)
+        private async void txtSearch_TextChanged(object sender, EventArgs e)
         {
-            ApplyFilter();
+            await ApplyFilter();
         }
 
-        private void cboRole_SelectedIndexChanged(object sender, EventArgs e)
+        private async void cboRole_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ApplyFilter();
+            await ApplyFilter();
         }
-        private void btnSearch_Click(object sender, EventArgs e)
+        private async void btnSearch_Click(object sender, EventArgs e)
         {
-            ApplyFilter();
+            await ApplyFilter();
         }
-        private void cboUserType_SelectedIndexChanged(object sender, EventArgs e)
+        private async void cboUserType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ApplyFilter();
+            await ApplyFilter();
         }
-        private List<UserSummaryDto> _allUsers = new();
+
 
         private void ConfigureDataGridView()
         {
@@ -62,6 +63,14 @@ namespace HotelManagementIt008.Forms
                 Name = "colUsername",
                 DataPropertyName = "Username",
                 HeaderText = "Username",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            });
+
+            dgvUsers.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "colFullName",
+                DataPropertyName = "FullName",
+                HeaderText = "Full Name",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
 
@@ -117,15 +126,26 @@ namespace HotelManagementIt008.Forms
         }
         private async Task LoadUsersAsync()
         {
-            var result = await _userService.GetUserSummariesAsync();
+            var gridifyQuery = new GridifyQuery
+            {
+                Page = _currentPage,
+                PageSize = _pageSize,
+                OrderBy = "createdAt desc"
+            };
+
+            var result = await _userService.GetUserSummariesAsync(gridifyQuery);
             if (!result.IsSuccess)
             {
-                MessageBox.Show(result.ErrorMessage ?? "UnKnow error");
+                MessageBox.Show("Failed to load users: " + result.ErrorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            _allUsers = result.Value ?? new List<UserSummaryDto>();
-            dgvUsers.DataSource = _allUsers;
+            _totalCount = result.Value?.Count ?? 0;
+            _totalPages = (int)Math.Ceiling((decimal)_totalCount / _pageSize);
+            if (_totalPages == 0) _totalPages = 1;
+
+            dgvUsers.DataSource = result.Value?.Data;
+            UpdatePaginationControls();
         }
         protected override async void OnLoad(EventArgs e)
         {
@@ -146,43 +166,82 @@ namespace HotelManagementIt008.Forms
             cboUserType.Items.AddRange(Enum.GetNames(typeof(UserTypeType)));
             cboUserType.SelectedIndex = 0;
         }
-        private void ApplyFilter()
+        private async Task ApplyFilter()
         {
-            var username = txtUsername.Text.Trim().ToLower();
-            var email = txtEmail.Text.Trim().ToLower();
-            var role = cboRole.SelectedItem?.ToString();
-            var userType = cboUserType.SelectedItem?.ToString();
+            try
+            {
+                var username = txtUsername.Text.Trim();
+                var email = txtEmail.Text.Trim();
+                var role = cboRole.SelectedItem?.ToString();
+                var userType = cboUserType.SelectedItem?.ToString();
 
-            var filtered = _allUsers.Where(u =>
-                (string.IsNullOrEmpty(username) || (u.Username?.ToLower().Contains(username) ?? false)) &&
-                (string.IsNullOrEmpty(email) || (u.Email?.ToLower().Contains(email) ?? false)) &&
-                (role == "All" || u.Role == role) &&
-                (userType == "All" || u.UserType == userType)
-            ).ToList();
-            _totalPages = Math.Max(1,
-        (int)Math.Ceiling((double)filtered.Count / _pageSize));
-            if (_currentPage > _totalPages) _currentPage = _totalPages;
-            if (_currentPage < 1) _currentPage = 1;
+                // Build filter string for Gridify
+                var filters = new List<string>();
 
-            // Lấy dữ liệu trang hiện tại
-            var pageData = filtered.Skip((_currentPage - 1) * _pageSize)
-                                   .Take(_pageSize)
-                                   .ToList();
+                if (!string.IsNullOrWhiteSpace(username))
+                {
+                    filters.Add($"username=*{username}");
+                }
 
-            // pagination nếu có
-            dgvUsers.DataSource = pageData;
+                if (!string.IsNullOrWhiteSpace(email))
+                {
+                    filters.Add($"email=*{email}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(role) && role != "All")
+                {
+                    filters.Add($"role={role}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(userType) && userType != "All")
+                {
+                    filters.Add($"userType={userType}");
+                }
+
+                var filterString = filters.Any() ? string.Join(",", filters) : string.Empty;
+
+                var gridifyQuery = new GridifyQuery
+                {
+                    Page = _currentPage,
+                    PageSize = _pageSize,
+                    Filter = filterString,
+                    OrderBy = "createdAt desc"
+                };
+
+                var result = await _userService.GetUserSummariesAsync(gridifyQuery);
+                if (!result.IsSuccess)
+                {
+                    MessageBox.Show("Failed to filter users: " + result.ErrorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                _totalCount = result.Value?.Count ?? 0;
+                _totalPages = Math.Max(1, (int)Math.Ceiling((double)_totalCount / _pageSize));
+
+                dgvUsers.DataSource = result.Value?.Data;
+                UpdatePaginationControls();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error applying filter: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void UpdatePaginationControls()
+        {
             lblPageInfo.Text = $"Page {_currentPage} of {_totalPages}";
             btnPrevious.Enabled = _currentPage > 1;
             btnNext.Enabled = _currentPage < _totalPages;
         }
 
-        private void btnClearFilter_Click(object sender, EventArgs e)
+        private async void btnClearFilter_Click(object sender, EventArgs e)
         {
             txtUsername.Clear();
             txtEmail.Clear();
             cboRole.SelectedIndex = 0;
             cboUserType.SelectedIndex = 0;
-            dgvUsers.DataSource = _allUsers;
+            _currentPage = 1;
+            await ApplyFilter();
         }
         private async void btnAddUser_Click(object sender, EventArgs e)
         {
@@ -250,21 +309,21 @@ namespace HotelManagementIt008.Forms
             btnDeleteUser.Enabled = hasSelection;
             btnPrint.Enabled = hasSelection;
         }
-        private void btnPrevious_Click(object sender, EventArgs e)
+        private async void btnPrevious_Click(object sender, EventArgs e)
         {
             if (_currentPage <= 1)
                 return;
 
             _currentPage--;
-            ApplyFilter(); // ✅ giống Next
+            await ApplyFilter();
         }
 
-        private void btnNext_Click(object sender, EventArgs e)
+        private async void btnNext_Click(object sender, EventArgs e)
         {
             if (_currentPage < _totalPages)
             {
                 _currentPage++;
-                ApplyFilter();
+                await ApplyFilter();
             }
         }
 

@@ -22,19 +22,20 @@ namespace HotelManagementIt008
                 // Domain services
                 services.AddSingleton<ICurrentUserService, CurrentUserService>()
                     .AddScoped<DatabaseSeeder>()
-                    .AddTransient<IUserService, UserService>()
-                    .AddTransient<IRoomService, RoomService>()
-                    .AddTransient<IRoomTypeService, RoomTypeService>()
-                    .AddTransient<IParamService, ParamService>()
-                    .AddTransient<IInvoiceService, InvoiceService>()
-                    .AddTransient<IBookingService, BookingService>()
-                    .AddTransient<IUnitOfWork, UnitOfWork>();
+                    .AddScoped<IUserService, UserService>()
+                    .AddScoped<IRoomService, RoomService>()
+                    .AddScoped<IRoomTypeService, RoomTypeService>()
+                    .AddScoped<IParamService, ParamService>()
+                    .AddScoped<IInvoiceService, InvoiceService>()
+                    .AddScoped<IBookingService, BookingService>()
+                    .AddScoped<IUnitOfWork, UnitOfWork>();
 
                 // Forms
                 services.AddTransient<LoginForm>();
                 services.AddTransient<MainDashboardForm>();
                 services.AddTransient<DashboardForm>();
                 services.AddTransient<RoomManagementForm>();
+                services.AddTransient<RoomDetailForm>();
                 services.AddTransient<ParamForm>();
                 services.AddTransient<BookingManagementForm>();
                 services.AddTransient<BookingDetailForm>();

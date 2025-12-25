@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace HotelManagementIt008.Services.Implementations
 {
     public class ParamService : IParamService

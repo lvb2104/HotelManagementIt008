@@ -1,8 +1,4 @@
-﻿using HotelManagementIt008.Dtos.Requests;
-using HotelManagementIt008.Dtos.Responses;
-using HotelManagementIt008.Services.Interfaces;
-using HotelManagementIt008.Types;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace HotelManagementIt008.Forms
 {
@@ -13,7 +9,6 @@ namespace HotelManagementIt008.Forms
         public Guid? UserId { get; set; }
 
         private BindingList<CreateParticipantDto> _participants = new BindingList<CreateParticipantDto>();
-        private UserResponseDto? _user;
 
         private void BindUser(UserResponseDto user)
         {
@@ -23,10 +18,10 @@ namespace HotelManagementIt008.Forms
             txtAddress.Text = user.Address ?? string.Empty;
             txtIdentityNumber.Text = user.IdentityNumber ?? string.Empty;
 
-           // if (user.UserType != null)
-           // {
-                cboUserType.SelectedItem = user.UserType;
-           // }
+            // if (user.UserType != null)
+            // {
+            cboUserType.SelectedItem = user.UserType;
+            // }
 
         }
 
@@ -58,8 +53,8 @@ namespace HotelManagementIt008.Forms
         private void UserDetailForm_Load(object sender, EventArgs e)
         {
             // 1️⃣ Load enum vào ComboBox TRƯỚC
-         //   cboUserType.DataSource = Enum.GetValues(typeof(UserTypeType));
-         //   cboRole.DataSource = Enum.GetValues(typeof(RoleType));
+            //   cboUserType.DataSource = Enum.GetValues(typeof(UserTypeType));
+            //   cboRole.DataSource = Enum.GetValues(typeof(RoleType));
 
             if (UserId.HasValue)
             {

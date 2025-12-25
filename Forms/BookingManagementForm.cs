@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Gridify;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HotelManagementIt008.Forms
 {
@@ -7,10 +9,10 @@ namespace HotelManagementIt008.Forms
         private readonly IBookingService _bookingService;
         private readonly IServiceProvider _serviceProvider;
         private readonly ICurrentUserService _currentUserService;
-        private List<BookingSummaryDto> _allBookings = new();
         private int _currentPage = 1;
         private readonly int _pageSize = 20;
         private int _totalPages = 1;
+        private int _totalCount = 0;
 
         public BookingManagementForm(IBookingService bookingService, IServiceProvider serviceProvider, ICurrentUserService currentUserService)
         {
@@ -120,12 +122,23 @@ namespace HotelManagementIt008.Forms
         {
             try
             {
-                var result = await _bookingService.GetBookingSummariesAsync(_currentUserService.UserId.ToString());
+                var gridifyQuery = new GridifyQuery
+                {
+                    Page = _currentPage,
+                    PageSize = _pageSize,
+                    OrderBy = "createdAt desc" // Default sorting
+                };
+
+                var result = await _bookingService.GetBookingSummariesAsync(_currentUserService.UserId.ToString(), gridifyQuery);
 
                 if (result.IsSuccess && result.Value != null)
                 {
-                    _allBookings = result.Value.ToList();
-                    ApplyFiltersAndBind();
+                    _totalCount = result.Value.Count;
+                    _totalPages = (int)Math.Ceiling((decimal)_totalCount / _pageSize);
+                    if (_totalPages == 0) _totalPages = 1;
+
+                    dgvBookings.DataSource = result.Value.Data;
+                    UpdatePaginationControls();
                 }
                 else
                 {
@@ -138,42 +151,54 @@ namespace HotelManagementIt008.Forms
             }
         }
 
-        private void ApplyFiltersAndBind()
+        private async Task ApplyFiltersAndBind()
         {
-            var filtered = _allBookings.AsEnumerable();
-
-            // Filter by Room Number
-            if (!string.IsNullOrWhiteSpace(txtFilterRoomNumber.Text))
+            try
             {
-                filtered = filtered.Where(b => b.RoomNumber.Contains(txtFilterRoomNumber.Text.Trim(), StringComparison.OrdinalIgnoreCase));
-            }
+                // Build filter string for Gridify
+                var filters = new List<string>();
 
-            // Filter by Check In (Exact Match)
-            if (dtpFilterCheckIn.Checked)
+                if (!string.IsNullOrWhiteSpace(txtFilterRoomNumber.Text))
+                {
+                    filters.Add($"roomNumber=*{txtFilterRoomNumber.Text.Trim()}");
+                }
+
+                if (dtpFilterCheckIn.Checked)
+                {
+                    filters.Add($"checkInDate>={dtpFilterCheckIn.Value.Date:yyyy-MM-dd}");
+                }
+
+                if (dtpFilterCheckOut.Checked)
+                {
+                    filters.Add($"checkOutDate<={dtpFilterCheckOut.Value.Date:yyyy-MM-dd}");
+                }
+
+                var filterString = filters.Any() ? string.Join(",", filters) : string.Empty;
+
+                var gridifyQuery = new GridifyQuery
+                {
+                    Page = _currentPage,
+                    PageSize = _pageSize,
+                    Filter = filterString,
+                    OrderBy = "createdAt desc"
+                };
+
+                var result = await _bookingService.GetBookingSummariesAsync(_currentUserService.UserId.ToString(), gridifyQuery);
+
+                if (result.IsSuccess && result.Value != null)
+                {
+                    _totalCount = result.Value.Count;
+                    _totalPages = (int)Math.Ceiling((decimal)_totalCount / _pageSize);
+                    if (_totalPages == 0) _totalPages = 1;
+
+                    dgvBookings.DataSource = result.Value.Data;
+                    UpdatePaginationControls();
+                }
+            }
+            catch (Exception ex)
             {
-                filtered = filtered.Where(b => b.CheckInDate.Date == dtpFilterCheckIn.Value.Date);
+                MessageBox.Show("Error applying filters: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            // Filter by Check Out (Exact Match)
-            if (dtpFilterCheckOut.Checked)
-            {
-                filtered = filtered.Where(b => b.CheckOutDate.Date == dtpFilterCheckOut.Value.Date);
-            }
-
-            var filteredList = filtered.OrderByDescending(b => b.CreatedAt).ToList();
-
-            // Pagination
-            _totalPages = (int)Math.Ceiling((decimal)filteredList.Count / _pageSize);
-            if (_totalPages == 0) _totalPages = 1;
-            if (_currentPage > _totalPages) _currentPage = _totalPages;
-
-            var pagedList = filteredList
-                .Skip((_currentPage - 1) * _pageSize)
-                .Take(_pageSize)
-                .ToList();
-
-            dgvBookings.DataSource = pagedList;
-            UpdatePaginationControls();
         }
 
         private void UpdatePaginationControls()
@@ -183,36 +208,36 @@ namespace HotelManagementIt008.Forms
             lblPageInfo.Text = $"Page {_currentPage} of {_totalPages}";
         }
 
-        private void btnSearch_Click(object sender, EventArgs e)
+        private async void btnSearch_Click(object sender, EventArgs e)
         {
             _currentPage = 1;
-            ApplyFiltersAndBind();
+            await ApplyFiltersAndBind();
         }
 
-        private void btnClearFilters_Click(object sender, EventArgs e)
+        private async void btnClearFilters_Click(object sender, EventArgs e)
         {
             txtFilterRoomNumber.Clear();
             dtpFilterCheckIn.Checked = false;
             dtpFilterCheckOut.Checked = false;
             _currentPage = 1;
-            ApplyFiltersAndBind();
+            await ApplyFiltersAndBind();
         }
 
-        private void btnPrevious_Click(object sender, EventArgs e)
+        private async void btnPrevious_Click(object sender, EventArgs e)
         {
             if (_currentPage > 1)
             {
                 _currentPage--;
-                ApplyFiltersAndBind();
+                await ApplyFiltersAndBind();
             }
         }
 
-        private void btnNext_Click(object sender, EventArgs e)
+        private async void btnNext_Click(object sender, EventArgs e)
         {
             if (_currentPage < _totalPages)
             {
                 _currentPage++;
-                ApplyFiltersAndBind();
+                await ApplyFiltersAndBind();
             }
         }
 

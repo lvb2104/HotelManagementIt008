@@ -5,6 +5,7 @@ namespace HotelManagementIt008.Forms
     public partial class MainDashboardForm : BaseForm
     {
         private Form? _currentChildForm; // To keep track of the currently opened child form
+        private readonly List<IServiceScope> _scopes = []; // Track all scopes for disposal when form closes
         private readonly ICurrentUserService _currentUserService;
         private readonly IServiceProvider _serviceProvider;
         public event EventHandler? Logout;
@@ -31,8 +32,18 @@ namespace HotelManagementIt008.Forms
                 btnParams.Visible = false;
             }
 
+            // Dispose all scopes when this form closes
+            this.FormClosed += (s, e) =>
+            {
+                foreach (var scope in _scopes)
+                {
+                    scope?.Dispose();
+                }
+                _scopes.Clear();
+            };
+
             // Load dashboard by default
-            OpenChildForm(_serviceProvider.GetRequiredService<DashboardForm>(), btnDashboard);
+            OpenChildForm<DashboardForm>(btnDashboard);
         }
 
         private void SetupUserInfo()
@@ -43,15 +54,15 @@ namespace HotelManagementIt008.Forms
 
         private void SetupButtonEvents()
         {
-            btnDashboard.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<DashboardForm>(), s);
-            btnRooms.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<RoomManagementForm>(), s);
-            btnBookings.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<BookingManagementForm>(), s);
-            btnInvoices.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<InvoiceManagementForm>(), s);
-            btnPayments.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<PaymentManagementForm>(), s);
-            btnUsers.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<UserManagementForm>(), s);
-            btnReports.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<ReportsForm>(), s);
-            btnSettings.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<SettingsForm>(), s);
-            btnParams.Click += (s, e) => OpenChildForm(_serviceProvider.GetRequiredService<ParamForm>(), s);
+            btnDashboard.Click += (s, e) => OpenChildForm<DashboardForm>(s);
+            btnRooms.Click += (s, e) => OpenChildForm<RoomManagementForm>(s);
+            btnBookings.Click += (s, e) => OpenChildForm<BookingManagementForm>(s);
+            btnInvoices.Click += (s, e) => OpenChildForm<InvoiceManagementForm>(s);
+            btnPayments.Click += (s, e) => OpenChildForm<PaymentManagementForm>(s);
+            btnUsers.Click += (s, e) => OpenChildForm<UserManagementForm>(s);
+            btnReports.Click += (s, e) => OpenChildForm<ReportsForm>(s);
+            btnSettings.Click += (s, e) => OpenChildForm<SettingsForm>(s);
+            btnParams.Click += (s, e) => OpenChildForm<ParamForm>(s);
 
             btnLogout.Click += btnLogout_Click;
         }
@@ -79,9 +90,16 @@ namespace HotelManagementIt008.Forms
             }
         }
 
-        private void OpenChildForm(Form childForm, object? sender)
+        private void OpenChildForm<T>(object? sender) where T : Form
         {
-            _currentChildForm?.Close(); // Close existing child form
+            // Close existing child form
+            _currentChildForm?.Close();
+
+            // Create a new scope for the new form
+            var newScope = _serviceProvider.CreateScope();
+            _scopes.Add(newScope); // Track scope for disposal when MainDashboardForm closes
+
+            var childForm = newScope.ServiceProvider.GetRequiredService<T>();
             _currentChildForm = childForm; // Update current child form reference
 
             childForm.TopLevel = false; // Set as non-top-level form

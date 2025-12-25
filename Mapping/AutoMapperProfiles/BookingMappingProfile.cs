@@ -1,7 +1,3 @@
-using AutoMapper;
-using HotelManagementIt008.Dtos.Responses;
-using HotelManagementIt008.Models;
-
 namespace HotelManagementIt008.Mapping.AutoMapperProfiles
 {
     public class BookingMappingProfile : AutoMapper.Profile

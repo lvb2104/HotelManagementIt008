@@ -1,4 +1,8 @@
-﻿using Gridify;
+﻿using System.Text;
+
+using Gridify;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HotelManagementIt008.Forms
 {
@@ -7,16 +11,18 @@ namespace HotelManagementIt008.Forms
         private readonly IRoomTypeService _roomTypeService;
         private readonly IRoomService _roomService;
         private readonly IGridifyMapper<Room> _mapper;
+        private readonly IServiceProvider _serviceProvider;
         private int _currentPage = 1;
         private readonly int _pageSize = 20;
         private int _totalPages = 1;
 
-        public RoomManagementForm(IRoomTypeService roomTypeService, IRoomService roomService, IGridifyMapper<Room> mapper)
+        public RoomManagementForm(IRoomTypeService roomTypeService, IRoomService roomService, IGridifyMapper<Room> mapper, IServiceProvider serviceProvider)
         {
             InitializeComponent();
             _roomTypeService = roomTypeService;
             _roomService = roomService;
             _mapper = mapper;
+            _serviceProvider = serviceProvider;
             ConfigureDataGridView();
         }
 
@@ -70,6 +76,8 @@ namespace HotelManagementIt008.Forms
                 HeaderText = "Note",
             });
 
+            // Wire up event handler to enable/disable buttons based on selection
+            dgvRooms.SelectionChanged += DgvRooms_SelectionChanged;
         }
 
         private async Task LoadRooms()
@@ -215,8 +223,8 @@ namespace HotelManagementIt008.Forms
             txtFilterRoomNumber.Clear();
             cboFilterRoomType.SelectedIndex = 0;
             cboFilterStatus.SelectedIndex = 0;
-            nudPriceFrom.Value = 0;
-            nudPriceTo.Value = 1000000;
+            nudPriceFrom.Value = nudPriceFrom.Minimum;
+            nudPriceTo.Value = nudPriceTo.Maximum;
             _currentPage = 1;
             await LoadRooms();
         }
@@ -239,24 +247,114 @@ namespace HotelManagementIt008.Forms
             }
         }
 
-        private void btnAddRoom_Click(object sender, EventArgs e)
+        private async void btnAddRoom_Click(object sender, EventArgs e)
         {
-
+            using var scope = _serviceProvider.CreateScope();
+            var form = scope.ServiceProvider.GetRequiredService<RoomDetailForm>();
+            form.RoomId = null; // null means create new
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                await LoadRooms();
+            }
         }
 
-        private void btnEditRoom_Click(object sender, EventArgs e)
+        private async void btnEditRoom_Click(object sender, EventArgs e)
         {
+            if (dgvRooms.CurrentRow == null)
+            {
+                MessageBox.Show("Please select a room to edit", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
+            if (dgvRooms.CurrentRow.Cells["colRoomId"].Value is not Guid roomId)
+                return;
+
+            using var scope = _serviceProvider.CreateScope();
+            var form = scope.ServiceProvider.GetRequiredService<RoomDetailForm>();
+            form.RoomId = roomId;
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                await LoadRooms();
+            }
         }
 
-        private void btnDeleteRoom_Click(object sender, EventArgs e)
+        private async void btnDeleteRoom_Click(object sender, EventArgs e)
         {
+            if (dgvRooms.CurrentRow == null)
+            {
+                MessageBox.Show("Please select a room to delete", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
+            if (dgvRooms.CurrentRow.Cells["colRoomId"].Value is not Guid roomId)
+                return;
+
+            var roomNumber = dgvRooms.CurrentRow.Cells["colRoomNumber"].Value?.ToString() ?? "this room";
+
+            var confirmResult = MessageBox.Show(
+                $"Are you sure you want to delete {roomNumber}?",
+                "Confirm Delete",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (confirmResult != DialogResult.Yes)
+                return;
+
+            var result = await _roomService.DeleteRoomAsync(roomId);
+            if (result.IsSuccess)
+            {
+                MessageBox.Show("Room deleted successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                await LoadRooms();
+            }
+            else
+            {
+                MessageBox.Show(result.ErrorMessage ?? "Failed to delete room", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnExportPDF_Click(object sender, EventArgs e)
         {
+            try
+            {
+                var csv = new StringBuilder();
 
+                // Add headers
+                foreach (DataGridViewColumn col in dgvRooms.Columns)
+                {
+                    if (col.Visible)
+                        csv.Append(col.HeaderText + ",");
+                }
+                csv.AppendLine();
+
+                // Add rows
+                foreach (DataGridViewRow row in dgvRooms.Rows)
+                {
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+                        if (dgvRooms.Columns[cell.ColumnIndex].Visible)
+                        {
+                            var value = cell.Value?.ToString()?.Replace(",", ";") ?? string.Empty;
+                            csv.Append(value + ",");
+                        }
+                    }
+                    csv.AppendLine();
+                }
+
+                var fileName = $"Rooms_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                File.WriteAllText(fileName, csv.ToString());
+                MessageBox.Show($"Exported to {fileName}", "Export Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Export failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void DgvRooms_SelectionChanged(object? sender, EventArgs e)
+        {
+            bool hasSelection = dgvRooms.SelectedRows.Count > 0;
+            btnEditRoom.Enabled = hasSelection;
+            btnDeleteRoom.Enabled = hasSelection;
         }
     }
 }

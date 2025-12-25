@@ -28,11 +28,11 @@ namespace HotelManagementIt008.Data.Seeders
             // Wrap the whole seeding in a DB transaction for atomicity and speed
             await using var transaction = await _context.Database.BeginTransactionAsync();
 
-            // Improve performance for bulk inserts
-            var originalAutoDetect = _context.ChangeTracker.AutoDetectChangesEnabled;
+            // Improve performance for bulk inserts by disabling AutoDetectChanges (convenient but slow)
+            var originalAutoDetect = _context.ChangeTracker.AutoDetectChangesEnabled; // Store original setting (bool)
             try
             {
-                _context.ChangeTracker.AutoDetectChangesEnabled = false;
+                _context.ChangeTracker.AutoDetectChangesEnabled = false; // Disable during seeding
 
                 var salt = BCrypt.Net.BCrypt.GenerateSalt();
                 var passwordHash = BCrypt.Net.BCrypt.HashPassword("password123", salt);
@@ -48,14 +48,14 @@ namespace HotelManagementIt008.Data.Seeders
 
                 // Phase 3: Seed users and profiles
                 var admin = await SeedAdmin(roles, passwordHash);
-                var staffs = await SeedStaffs(roles, passwordHash);
+                var staff = await SeedStaff(roles, passwordHash);
                 var customers = await SeedCustomersAndProfiles(roles, userTypes);
 
                 // Phase 4: Seed system parameters (needed for booking calculations)
                 var systemParams = await SeedParams();
 
                 // Phase 5: Seed bookings, invoices, and booking details
-                await SeedBookingsInvoicesAndDetails(customers, rooms, payments, roomTypes, userTypes, systemParams);
+                await SeedBookingsInvoicesAndDetails(staff, rooms, payments, roomTypes, userTypes, systemParams);
 
                 // Commit transaction
                 await transaction.CommitAsync();
@@ -155,12 +155,14 @@ namespace HotelManagementIt008.Data.Seeders
                 ("Executive Room", "Business-class room with workspace", 130.0m)
             };
 
+            // Define a Faker for RoomType with default values
             var roomTypeFaker = new Faker<RoomType>()
                 .RuleFor(rt => rt.Id, f => Guid.NewGuid())
                 .RuleFor(rt => rt.Name, f => string.Empty)
                 .RuleFor(rt => rt.Description, f => string.Empty)
                 .RuleFor(rt => rt.PricePerNight, f => 0.0m);
 
+            // Generate RoomTypes with specific names, descriptions, and prices
             var roomTypes = roomTypeNames.Select((rt, index) =>
             {
                 var roomType = roomTypeFaker.UseSeed(index).Generate();
@@ -234,7 +236,7 @@ namespace HotelManagementIt008.Data.Seeders
             return admin;
         }
 
-        private async Task<List<User>> SeedStaffs(List<Role> roles, string passwordHash)
+        private async Task<List<User>> SeedStaff(List<Role> roles, string passwordHash)
         {
             var staffRole = roles.First(r => r.Type == RoleType.Staff);
             var staffFaker = new Faker<User>()
@@ -243,10 +245,10 @@ namespace HotelManagementIt008.Data.Seeders
                 .RuleFor(u => u.PasswordHash, f => passwordHash)
                 .RuleFor(u => u.RoleId, f => staffRole.Id);
             // 10% Staff (20 users)
-            var staffs = staffFaker.Generate(20);
-            await _context.Users.AddRangeAsync(staffs);
+            var staff = staffFaker.Generate(20);
+            await _context.Users.AddRangeAsync(staff);
             await _context.SaveChangesAsync();
-            return staffs;
+            return staff;
         }
 
         private async Task<List<User>> SeedCustomersAndProfiles(List<Role> roles, List<UserType> userTypes)
@@ -291,7 +293,7 @@ namespace HotelManagementIt008.Data.Seeders
             return customers;
         }
 
-        private async Task SeedBookingsInvoicesAndDetails(List<User> customers, List<Room> rooms, List<Payment> payments, List<RoomType> roomTypes, List<UserType> userTypes, Dictionary<string, string> systemParams)
+        private async Task SeedBookingsInvoicesAndDetails(List<User> staff, List<Room> rooms, List<Payment> payments, List<RoomType> roomTypes, List<UserType> userTypes, Dictionary<string, string> systemParams)
         {
             // Parse system parameters
             var taxRate = decimal.Parse(systemParams["TAX_RATE"]);
@@ -300,13 +302,13 @@ namespace HotelManagementIt008.Data.Seeders
             var extraGuestSurcharge = decimal.Parse(systemParams["EXTRA_GUEST_SURCHARGE"]);
 
             var availablePayments = payments.ToList();
-            var potentialGuests = customers.Take(50).ToList(); // Pool of potential guests
+            var potentialGuests = staff.Take(50).ToList(); // Pool of potential guests
 
             var bookingFaker = new Faker<Booking>()
                 .RuleFor(b => b.Id, f => Guid.NewGuid())
                 .RuleFor(b => b.CheckInDate, f => f.Date.Between(DateTime.UtcNow.AddMonths(-6), DateTime.UtcNow.AddMonths(3)))
                 .RuleFor(b => b.CheckOutDate, (f, b) => b.CheckInDate.AddDays(f.Random.Int(1, 14)))
-                .RuleFor(b => b.BookerId, f => f.PickRandom(customers).Id)
+                .RuleFor(b => b.BookerId, f => f.PickRandom(staff).Id)
                 .RuleFor(b => b.RoomId, f => f.PickRandom(rooms).Id)
                 .RuleFor(b => b.TotalPrice, f => 0.0m);
 
@@ -338,7 +340,7 @@ namespace HotelManagementIt008.Data.Seeders
             {
                 var room = rooms.First(r => r.Id == booking.RoomId);
                 var roomType = roomTypes.First(rt => rt.Id == room.RoomTypeId);
-                var booker = customers.First(u => u.Id == booking.BookerId);
+                var booker = staff.First(u => u.Id == booking.BookerId);
                 var userType = userTypes.First(ut => ut.Id == booker.UserTypeId);
 
                 var daysStayed = (booking.CheckOutDate - booking.CheckInDate).Days;
@@ -382,7 +384,7 @@ namespace HotelManagementIt008.Data.Seeders
                 var booking = bookings[i];
                 var room = rooms.First(r => r.Id == booking.RoomId);
                 var roomType = roomTypes.First(rt => rt.Id == room.RoomTypeId);
-                var booker = customers.First(u => u.Id == booking.BookerId);
+                var booker = staff.First(u => u.Id == booking.BookerId);
                 var userType = userTypes.First(ut => ut.Id == booker.UserTypeId);
 
                 var daysStayed = (booking.CheckOutDate - booking.CheckInDate).Days;

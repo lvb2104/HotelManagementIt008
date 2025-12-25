@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using HotelManagementIt008.Models;
-using HotelManagementIt008.Repositories.Interfaces;
 
 namespace HotelManagementIt008.Repositories.Implementations
 {

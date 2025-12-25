@@ -144,7 +144,7 @@ namespace HotelManagementIt008.Data
             }
         }
 
-        // Configure CreatedAt, UpdatedAt, DeletedAt properties
+        // Configure CreatedAt, UpdatedAt, DeletedAt properties to have default values
         private void ConfigureTimeStamps(ModelBuilder modelBuilder)
         {
             // detect provider (safer than Database.IsNpgsql() in some contexts)
@@ -212,14 +212,14 @@ namespace HotelManagementIt008.Data
                 var hasUpdatedAt = entry.Metadata.FindProperty("UpdatedAt") is not null;
                 var hasCreatedAt = entry.Metadata.FindProperty("CreatedAt") is not null;
 
-                // Handle soft delete
+                // Handle soft delete when deleted
                 if (entry.Entity is ISoftDeletable sd && entry.State == EntityState.Deleted)
                 {
                     entry.State = EntityState.Modified;
                     sd.DeletedAt ??= utcNow;
                 }
 
-                // Handle CreatedAt and UpdatedAt
+                // Handle CreatedAt when added
                 var currentValue = entry.Property("CreatedAt").CurrentValue;
                 if (entry.State == EntityState.Added)
                 {
@@ -232,6 +232,7 @@ namespace HotelManagementIt008.Data
                         entry.Property("UpdatedAt").CurrentValue = utcNow;
                     }
                 }
+                // Handle UpdatedAt when modified
                 else if (entry.State == EntityState.Modified)
                 {
                     if (hasUpdatedAt)
