@@ -12,7 +12,6 @@ namespace HotelManagementIt008.Services.Implementations
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
-        private readonly IRoomService _roomService;
         private readonly IInvoiceService _invoiceService;
         private readonly IParamService _paramService;
         private readonly IGridifyMapper<Booking> _gridifyMapper;
@@ -29,7 +28,6 @@ namespace HotelManagementIt008.Services.Implementations
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userService = userService;
-            _roomService = roomService;
             _invoiceService = invoiceService;
             _paramService = paramService;
             _gridifyMapper = gridifyMapper;
@@ -46,7 +44,7 @@ namespace HotelManagementIt008.Services.Implementations
                 if (user == null) return Result<Paging<BookingResponseDto>>.Failure("User not found");
 
                 // Check if admin
-                var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
+                var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId);
                 bool isAdmin = role?.Type == RoleType.Admin;
 
                 var bookingsQuery = _unitOfWork.BookingRepository.GetAllQueryable()
@@ -98,7 +96,7 @@ namespace HotelManagementIt008.Services.Implementations
                 if (user == null) return Result<Paging<BookingSummaryDto>>.Failure("User not found");
 
                 // Check if admin
-                var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
+                var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId);
                 bool isAdmin = role?.Type == RoleType.Admin;
 
                 var bookingsQuery = _unitOfWork.BookingRepository.GetAllQueryable()
@@ -164,7 +162,7 @@ namespace HotelManagementIt008.Services.Implementations
 
                 if (booking == null) return Result<BookingResponseDto>.Failure("Booking not found");
 
-                var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
+                var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId);
                 bool isAdmin = role?.Type == RoleType.Admin;
 
                 if (Guid.TryParse(userId, out var userGuid))
@@ -419,7 +417,7 @@ namespace HotelManagementIt008.Services.Implementations
 
                 if (booking == null) return Result<BookingResponseDto>.Failure("Booking not found");
 
-                var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
+                var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId);
                 bool isAdmin = role?.Type == RoleType.Admin;
 
                 if (Guid.TryParse(userId, out var userGuid))
@@ -597,7 +595,7 @@ namespace HotelManagementIt008.Services.Implementations
 
                 if (booking == null) return Result<bool>.Failure("Booking not found");
 
-                var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId.ToString());
+                var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId);
                 bool isAdmin = role?.Type == RoleType.Admin;
 
                 if (Guid.TryParse(userId, out var userGuid))

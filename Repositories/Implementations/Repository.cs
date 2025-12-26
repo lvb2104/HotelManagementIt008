@@ -33,23 +33,14 @@ namespace HotelManagementIt008.Repositories.Implementations
             return await _dbSet.AsNoTracking().ToListAsync();
         }
 
-        public virtual async Task<T?> GetByIdAsync(string id)
+        public virtual async Task<T?> GetByIdAsync(Guid id)
         {
-            if (Guid.TryParse(id, out var guidId))
-            {
-                return await _dbSet.FindAsync(guidId);
-            }
             return await _dbSet.FindAsync(id);
         }
 
-        public virtual async Task<bool> RemoveAsync(string id)
+        public virtual async Task<bool> RemoveAsync(Guid id)
         {
-            object key = id;
-            if (Guid.TryParse(id, out var guidId))
-            {
-                key = guidId;
-            }
-            var entityToDelete = await _dbSet.FindAsync(key);
+            var entityToDelete = await _dbSet.FindAsync(id);
             if (entityToDelete is null)
             {
                 return false;

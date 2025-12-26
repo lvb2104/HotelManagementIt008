@@ -101,8 +101,8 @@ namespace HotelManagementIt008.Data
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
-        // Configure global query filters for soft delete
-        private void ConfigureSoftDelete(ModelBuilder modelBuilder)
+        // Configure global query filters for soft delete to forget about "Where(Deleted == null)"
+        private static void ConfigureSoftDelete(ModelBuilder modelBuilder)
         {
             var softDeletableTypes = new Type[]
             {

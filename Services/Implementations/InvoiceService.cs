@@ -100,7 +100,10 @@ namespace HotelManagementIt008.Services.Implementations
         {
             try
             {
-                var invoice = await _unitOfWork.InvoiceRepository.GetByIdAsync(id);
+                if (!Guid.TryParse(id, out var guidId))
+                    return Result<InvoiceResponseDto>.Failure("Invalid invoice ID");
+
+                var invoice = await _unitOfWork.InvoiceRepository.GetByIdAsync(guidId);
                 if (invoice == null)
                 {
                     return Result<InvoiceResponseDto>.Failure($"Invoice with id {id} not found");
@@ -122,7 +125,10 @@ namespace HotelManagementIt008.Services.Implementations
         {
             try
             {
-                var invoice = await _unitOfWork.InvoiceRepository.GetByIdAsync(id);
+                if (!Guid.TryParse(id, out var guidId))
+                    return Result<InvoiceResponseDto>.Failure("Invalid invoice ID");
+
+                var invoice = await _unitOfWork.InvoiceRepository.GetByIdAsync(guidId);
                 if (invoice == null)
                 {
                     return Result<InvoiceResponseDto>.Failure($"Invoice with id {id} not found");
@@ -247,7 +253,10 @@ namespace HotelManagementIt008.Services.Implementations
         {
             try
             {
-                var success = await _unitOfWork.InvoiceRepository.RemoveAsync(id);
+                if (!Guid.TryParse(id, out var guidId))
+                    return Result<bool>.Failure("Invalid invoice ID");
+
+                var success = await _unitOfWork.InvoiceRepository.RemoveAsync(guidId);
                 if (!success)
                 {
                     return Result<bool>.Failure("Invoice not found.");

@@ -9,8 +9,8 @@ namespace HotelManagementIt008.Mapping.GridifyProfiles
             AddMap("bookingId", i => i.BookingId)
                 .AddMap("totalAmount", i => i.TotalPrice)
                 .AddMap("status", i => i.Status)
-                .AddMap("createdAt", i => i.CreatedAt.Date)
-                .AddMap("updatedAt", i => i.UpdatedAt.Date)
+                .AddMap("createdAt", i => i.CreatedAt)
+                .AddMap("updatedAt", i => i.UpdatedAt)
                 .AddMap("bookerEmail", i => i.Booking.Booker.Email);
         }
     }

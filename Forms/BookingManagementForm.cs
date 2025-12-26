@@ -165,12 +165,14 @@ namespace HotelManagementIt008.Forms
 
                 if (dtpFilterCheckIn.Checked)
                 {
-                    filters.Add($"checkInDate>={dtpFilterCheckIn.Value.Date:yyyy-MM-dd}");
+                    var checkInDate = DateTime.SpecifyKind(dtpFilterCheckIn.Value.Date, DateTimeKind.Utc);
+                    filters.Add($"checkInDate>={checkInDate:yyyy-MM-ddTHH:mm:ss}");
                 }
 
                 if (dtpFilterCheckOut.Checked)
                 {
-                    filters.Add($"checkOutDate<={dtpFilterCheckOut.Value.Date:yyyy-MM-dd}");
+                    var checkOutDate = DateTime.SpecifyKind(dtpFilterCheckOut.Value.Date.AddDays(1).AddSeconds(-1), DateTimeKind.Utc); // End of day
+                    filters.Add($"checkOutDate<={checkOutDate:yyyy-MM-ddTHH:mm:ss}");
                 }
 
                 var filterString = filters.Any() ? string.Join(",", filters) : string.Empty;
@@ -193,6 +195,12 @@ namespace HotelManagementIt008.Forms
 
                     dgvBookings.DataSource = result.Value.Data;
                     UpdatePaginationControls();
+                }
+                else
+                {
+                    // Debug: Show error message
+                    System.Diagnostics.Debug.WriteLine($"Filter failed: {result.ErrorMessage}");
+                    MessageBox.Show($"Filter error: {result.ErrorMessage}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
