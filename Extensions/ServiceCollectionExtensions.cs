@@ -87,6 +87,7 @@ namespace HotelManagementIt008.Extensions
             {
                 // Enable Entity Framework compatibility layer to optimize Gridify for EF Core
                 GridifyGlobalConfiguration.EnableEntityFrameworkCompatibilityLayer();
+                GridifyGlobalConfiguration.DefaultDateTimeKind = DateTimeKind.Utc;
                 services.AddGridifyMappers(typeof(Program).Assembly);
                 return services;
             }

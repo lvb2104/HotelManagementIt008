@@ -205,7 +205,8 @@ namespace HotelManagementIt008.Forms
                 // Date Filter
                 if (dtpFilterDate.Checked)
                 {
-                    filters.Add($"createdAt>={dtpFilterDate.Value.Date:yyyy-MM-dd}");
+                    var filterDate = DateTime.SpecifyKind(dtpFilterDate.Value.Date, DateTimeKind.Utc);
+                    filters.Add($"createdAt>={filterDate:yyyy-MM-ddTHH:mm:ss}");
                 }
 
                 var filterString = filters.Any() ? string.Join(",", filters) : string.Empty;

@@ -104,9 +104,6 @@ namespace HotelManagementIt008.Services.Implementations
         {
             var user = await _unitOfWork.UserRepository
                 .GetAllQueryable()
-                .Include(u => u.Profile)
-                .Include(u => u.Role)
-                .Include(u => u.UserType)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
@@ -120,7 +117,6 @@ namespace HotelManagementIt008.Services.Implementations
         {
             var user = await _unitOfWork.UserRepository
                 .GetAllQueryable()
-                .Include(u => u.Profile)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
@@ -174,9 +170,6 @@ namespace HotelManagementIt008.Services.Implementations
             {
                 var usersQuery = _unitOfWork.UserRepository
                     .GetAllQueryable()
-                    .Include(u => u.Role)
-                    .Include(u => u.UserType)
-                    .Include(u => u.Profile)
                     .AsNoTracking();
 
                 // Apply Gridify filtering, sorting, and paging

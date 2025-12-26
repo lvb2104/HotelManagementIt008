@@ -7,11 +7,11 @@ namespace HotelManagementIt008.Mapping.GridifyProfiles
         public BookingGridifyMapper()
         {
             AddMap("roomNumber", b => b.Room.RoomNumber)
-                .AddMap("checkInDate", b => b.CheckInDate.Date)
-                .AddMap("checkOutDate", b => b.CheckOutDate.Date)
+                .AddMap("checkInDate", b => b.CheckInDate)
+                .AddMap("checkOutDate", b => b.CheckOutDate)
                 .AddMap("totalPrice", b => b.TotalPrice)
                 .AddMap("bookerEmail", b => b.Booker.Email)
-                .AddMap("createdAt", b => b.CreatedAt.Date);
+                .AddMap("createdAt", b => b.CreatedAt);
         }
     }
 }
