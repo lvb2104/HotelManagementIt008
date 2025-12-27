@@ -8,6 +8,7 @@
         public string? FullName { get; set; }
         public string? Role { get; set; }
         public string? UserType { get; set; }
+        public string? Address { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

@@ -8,7 +8,12 @@ namespace HotelManagementIt008.Forms
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Guid? UserId { get; set; }
 
-        private BindingList<CreateParticipantDto> _participants = new BindingList<CreateParticipantDto>();
+        public UserDetailForm(IUserService userService)
+        {
+            InitializeComponent();
+            _userService = userService;
+            LoadUserTypes();
+        }
 
         private void BindUser(UserResponseDto user)
         {
@@ -21,134 +26,40 @@ namespace HotelManagementIt008.Forms
             // if (user.UserType != null)
             // {
             cboUserType.SelectedItem = user.UserType;
+            cboRole.SelectedItem = user.Role;
             // }
 
         }
 
-        public UserDetailForm(IUserService userService)
-        {
-            InitializeComponent();
-            _userService = userService;
-            ConfigureParticipantsGrid();
-            LoadUserTypes();
-        }
         protected override async void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
-            if (UserId == null) return;
-
-            var result = await _userService.GetUserByIdAsync(UserId.Value);
-
-            if (!result.IsSuccess || result.Value == null)
-            {
-                MessageBox.Show("Không thể tải thông tin người dùng");
-                Close();
-                return;
-            }
-
-            BindUser(result.Value);
-        }
-
-        private void UserDetailForm_Load(object sender, EventArgs e)
-        {
-            // 1️⃣ Load enum vào ComboBox TRƯỚC
-            //   cboUserType.DataSource = Enum.GetValues(typeof(UserTypeType));
-            //   cboRole.DataSource = Enum.GetValues(typeof(RoleType));
-
             if (UserId.HasValue)
             {
                 Text = "Edit User";
-                txtUsername.Enabled = false; // Username không đổi
-                LoadUserDetails();           // 2️⃣ Sau đó mới gán SelectedItem
+                txtUsername.Enabled = false;
+                lblPassword.Visible = false;
+                txtPassword.Visible = false;
+
+                var result = await _userService.GetUserByIdAsync(UserId.Value);
+
+                if (!result.IsSuccess || result.Value == null)
+                {
+                    MessageBox.Show("Không thể tải thông tin người dùng");
+                    Close();
+                    return;
+                }
+
+                BindUser(result.Value);
             }
             else
             {
                 Text = "Create User";
-            }
-        }
-
-        private void ConfigureParticipantsGrid()
-        {
-            dgvParticipants.AutoGenerateColumns = false;
-            dgvParticipants.DataSource = _participants;
-            dgvParticipants.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvParticipants.MultiSelect = false;
-            dgvParticipants.Columns.Clear();
-
-            dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Email",
-                HeaderText = "Email",
-                Width = 150
-            });
-            dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "FullName",
-                HeaderText = "Full Name",
-                Width = 150
-            });
-            dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Address",
-                HeaderText = "Address",
-                Width = 150
-            });
-            dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "IdentityNumber",
-                HeaderText = "Identity Number",
-                Width = 120
-            });
-
-            var userTypeColumn = new DataGridViewComboBoxColumn
-            {
-                DataPropertyName = "UserType",
-                HeaderText = "User Type",
-                DataSource = Enum.GetValues(typeof(UserTypeType)),
-                Width = 120
-            };
-            dgvParticipants.Columns.Add(userTypeColumn);
-        }
-
-        private async void LoadUserDetails()
-        {
-            if (!UserId.HasValue)
-                return;
-            var result = await _userService.GetUserByIdAsync(UserId.Value);
-
-            if (!result.IsSuccess)
-            {
-                MessageBox.Show(result.ErrorMessage);
-                return;
-            }
-
-            var user = result.Value!; // 👈 ĐÚNG
-
-            txtUsername.Text = user.Username;
-            txtEmail.Text = user.Email;
-            txtAddress.Text = user.Address;
-            txtFullName.Text = user.FullName;
-            txtIdentityNumber.Text = user.IdentityNumber;
-            cboUserType.SelectedItem = user.UserType;
-
-        }
-
-
-        private void btnAddParticipant_Click(object sender, EventArgs e)
-        {
-            _participants.Add(new CreateParticipantDto { UserType = UserTypeType.Local });
-        }
-
-        private void btnRemoveParticipant_Click(object sender, EventArgs e)
-        {
-            if (dgvParticipants.SelectedRows.Count > 0)
-            {
-                foreach (DataGridViewRow row in dgvParticipants.SelectedRows)
-                {
-                    if (row.DataBoundItem is CreateParticipantDto item)
-                        _participants.Remove(item);
-                }
+                // Ensure defaults for Create mode
+                txtUsername.Enabled = true;
+                lblPassword.Visible = true;
+                txtPassword.Visible = true;
             }
         }
 
@@ -164,7 +75,9 @@ namespace HotelManagementIt008.Forms
                     FullName = txtFullName.Text,
                     Address = txtAddress.Text,
                     IdentityNumber = txtIdentityNumber.Text,
-                    UserType = (UserTypeType?)cboUserType.SelectedItem
+                    UserType = (UserTypeType?)cboUserType.SelectedItem,
+                    Role = (RoleType?)cboRole.SelectedItem,
+                    Password = txtPassword.Text
                 };
 
                 var result = await _userService.UpdateUserAsync(UserId.Value, updateDto);
@@ -190,6 +103,8 @@ namespace HotelManagementIt008.Forms
                     IdentityNumber = txtIdentityNumber.Text,
                     //UserType = (UserTypeType)cboUserType.SelectedItem
                     UserType = cboUserType.SelectedItem as UserTypeType? ?? UserTypeType.Local,
+                    Role = (RoleType?)cboRole.SelectedItem ?? RoleType.Customer,
+                    Password = txtPassword.Text
                 };
 
                 var result = await _userService.CreateUserAsync(createDto);
@@ -209,6 +124,7 @@ namespace HotelManagementIt008.Forms
         {
             // Lấy tất cả giá trị từ enum UserTypeType
             cboUserType.DataSource = Enum.GetValues(typeof(UserTypeType));
+            cboRole.DataSource = Enum.GetValues(typeof(RoleType));
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

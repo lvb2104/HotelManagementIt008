@@ -132,20 +132,33 @@ namespace HotelManagementIt008.Services.Implementations
             {
                 var userType = await _unitOfWork.UserTypeRepository
                     .GetAllQueryable()
+                    .AsTracking()
                     .FirstOrDefaultAsync(x => x.Type == dto.UserType.Value);
 
                 if (userType != null)
+                {
                     user.UserTypeId = userType.Id;
+                    user.UserType = userType;
+                }
             }
 
             if (dto.Role.HasValue)
             {
                 var role = await _unitOfWork.RoleRepository
                     .GetAllQueryable()
+                    .AsTracking()
                     .FirstOrDefaultAsync(r => r.Type == dto.Role.Value);
 
                 if (role != null)
+                {
                     user.RoleId = role.Id;
+                    user.Role = role;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(dto.Password))
+            {
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
             }
 
             if (user.Profile != null)
@@ -184,6 +197,7 @@ namespace HotelManagementIt008.Services.Implementations
                     FullName = u.Profile != null ? u.Profile.FullName : string.Empty,
                     Role = u.Role.Type.ToString(),
                     UserType = u.UserType != null ? u.UserType.Type.ToString() : string.Empty,
+                    Address = u.Profile != null ? u.Profile.Address : string.Empty,
                     CreatedAt = u.CreatedAt
                 }).ToList();
 
@@ -243,6 +257,7 @@ namespace HotelManagementIt008.Services.Implementations
                 {
                     Username = dto.Username,
                     Email = dto.Email,
+                    PasswordHash = !string.IsNullOrEmpty(dto.Password) ? BCrypt.Net.BCrypt.HashPassword(dto.Password) : null,
                     UserTypeId = userTypeEntity.Id,
                     // UserType = userTypeEntity,
                     RoleId = roleEntity.Id,
