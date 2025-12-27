@@ -262,7 +262,7 @@
             lblLogo.Name = "lblLogo";
             lblLogo.Size = new Size(206, 30);
             lblLogo.TabIndex = 2;
-            lblLogo.Text = "🏨 Hotel Manager";
+            lblLogo.Text = "🏨 Hotel Management";
             lblLogo.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // pnlHeader
