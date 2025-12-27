@@ -9,6 +9,7 @@
         public string? IdentityNumber { get; set; }
         public UserTypeType? UserType { get; set; }
         public RoleType? Role { get; set; }
+        public string? Password { get; set; }
         public UpdateProfileDto? Profile { get; set; }
     }
     public class UpdateProfileDto

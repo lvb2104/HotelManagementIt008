@@ -10,17 +10,20 @@ namespace HotelManagementIt008.Forms
     {
         private readonly IUserService _userService;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ICurrentUserService _currentUserService;
         private int _currentPage = 1;
         private readonly int _pageSize = 20;
         private int _totalPages = 1;
         private int _totalCount = 0;
         public UserManagementForm(
            IUserService userService,
-           IServiceProvider serviceProvider)
+           IServiceProvider serviceProvider,
+           ICurrentUserService currentUserService)
         {
             InitializeComponent();
             _userService = userService;
             _serviceProvider = serviceProvider;
+            _currentUserService = currentUserService;
 
             ConfigureDataGridView();
         }
@@ -84,6 +87,14 @@ namespace HotelManagementIt008.Forms
 
             dgvUsers.Columns.Add(new DataGridViewTextBoxColumn
             {
+                Name = "colAddress",
+                DataPropertyName = "Address",
+                HeaderText = "Address",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            });
+
+            dgvUsers.Columns.Add(new DataGridViewTextBoxColumn
+            {
                 Name = "colRole",
                 DataPropertyName = "Role",
                 HeaderText = "Role",
@@ -117,12 +128,24 @@ namespace HotelManagementIt008.Forms
             // var userId = (Guid)row.Cells["colId"].Value;
             if (row.Cells["colId"].Value is not Guid userId)
                 return;
+
+            // Restrict Staff from editing Staff/Admin
+            if (_currentUserService.Role == RoleType.Staff)
+            {
+                var targetRole = row.Cells["colRole"].Value?.ToString();
+                if (targetRole == RoleType.Admin.ToString() || targetRole == RoleType.Staff.ToString())
+                {
+                    MessageBox.Show("You do not have permission to view or edit this user.", "Permission Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+
             using var scope = _serviceProvider.CreateScope();
             var form = scope.ServiceProvider.GetRequiredService<UserDetailForm>();
             form.UserId = userId;
             form.ShowDialog();
 
-            _ = LoadUsersAsync(); // reload sau khi đóng form
+            _ = LoadUsersAsync(); // reload after closing the form
         }
         private async Task LoadUsersAsync()
         {
@@ -171,6 +194,7 @@ namespace HotelManagementIt008.Forms
             try
             {
                 var username = txtUsername.Text.Trim();
+                var fullName = txtFullName.Text.Trim();
                 var email = txtEmail.Text.Trim();
                 var role = cboRole.SelectedItem?.ToString();
                 var userType = cboUserType.SelectedItem?.ToString();
@@ -181,6 +205,11 @@ namespace HotelManagementIt008.Forms
                 if (!string.IsNullOrWhiteSpace(username))
                 {
                     filters.Add($"username=*{username}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(fullName))
+                {
+                    filters.Add($"fullName=*{fullName}");
                 }
 
                 if (!string.IsNullOrWhiteSpace(email))
@@ -237,6 +266,7 @@ namespace HotelManagementIt008.Forms
         private async void btnClearFilter_Click(object sender, EventArgs e)
         {
             txtUsername.Clear();
+            txtFullName.Clear();
             txtEmail.Clear();
             cboRole.SelectedIndex = 0;
             cboUserType.SelectedIndex = 0;
@@ -247,7 +277,7 @@ namespace HotelManagementIt008.Forms
         {
             using var scope = _serviceProvider.CreateScope();
             var form = scope.ServiceProvider.GetRequiredService<UserDetailForm>();
-            form.UserId = null; // null nghĩa là tạo mới
+            form.UserId = null; // null means create new
             form.ShowDialog();
             await LoadUsersAsync();
         }
@@ -255,6 +285,17 @@ namespace HotelManagementIt008.Forms
         {
             if (dgvUsers.CurrentRow == null) return;
             if (dgvUsers.CurrentRow.Cells["colId"].Value is not Guid userId) return;
+
+            // Restrict Staff from editing Staff/Admin
+            if (_currentUserService.Role == RoleType.Staff)
+            {
+                var targetRole = dgvUsers.CurrentRow.Cells["colRole"].Value?.ToString();
+                if (targetRole == RoleType.Admin.ToString() || targetRole == RoleType.Staff.ToString())
+                {
+                    MessageBox.Show("You do not have permission to edit this user.", "Permission Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
 
             using var scope = _serviceProvider.CreateScope();
             var form = scope.ServiceProvider.GetRequiredService<UserDetailForm>();
@@ -268,11 +309,22 @@ namespace HotelManagementIt008.Forms
             if (dgvUsers.CurrentRow == null) return;
             if (dgvUsers.CurrentRow.Cells["colId"].Value is not Guid userId) return;
 
+            // Restrict Staff from deleting Staff/Admin
+            if (_currentUserService.Role == RoleType.Staff)
+            {
+                var targetRole = dgvUsers.CurrentRow.Cells["colRole"].Value?.ToString();
+                if (targetRole == RoleType.Admin.ToString() || targetRole == RoleType.Staff.ToString())
+                {
+                    MessageBox.Show("You do not have permission to delete this user.", "Permission Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+
             if (MessageBox.Show("Are you sure you want to delete this user?", "Confirm",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
                 return;
 
-            var result = await _userService.DeleteUserAsync(userId); // cần tạo method DeleteUserAsync trong IUserService
+            var result = await _userService.DeleteUserAsync(userId); 
             if (!result.IsSuccess)
             {
                 MessageBox.Show(result.ErrorMessage ?? "Delete failed");
@@ -283,8 +335,8 @@ namespace HotelManagementIt008.Forms
         }
         private void btnPrint_Click(object sender, EventArgs e)
         {
-            // TODO: xử lý in hoặc xuất dữ liệu
-            // Ví dụ đơn giản xuất DataGridView ra CSV
+            // TODO: handle printing or exporting data
+            // Simple example: export DataGridView to CSV
             StringBuilder csv = new StringBuilder();
 
             foreach (DataGridViewColumn col in dgvUsers.Columns)
@@ -304,7 +356,7 @@ namespace HotelManagementIt008.Forms
         private void DgvUsers_SelectionChanged(object? sender, EventArgs e)
         {
             bool hasSelection = dgvUsers.SelectedRows.Count > 0;
-
+            
             btnEditUser.Enabled = hasSelection;
             btnDeleteUser.Enabled = hasSelection;
             btnPrint.Enabled = hasSelection;

@@ -30,7 +30,7 @@
         {
             txtUsername = new TextBox();
             txtPassword = new TextBox();
-            chkShowPassword = new CheckBox();
+            btnShowPassword = new FontAwesome.Sharp.IconButton();
             btnLogin = new Button();
             logoPic = new PictureBox();
             title = new Label();
@@ -64,25 +64,26 @@
             txtPassword.Location = new Point(89, 291);
             txtPassword.Margin = new Padding(4, 2, 4, 2);
             txtPassword.Name = "txtPassword";
-            txtPassword.PasswordChar = '●';
+            txtPassword.PasswordChar = '*';
             txtPassword.PlaceholderText = "Password";
             txtPassword.Size = new Size(179, 17);
             txtPassword.TabIndex = 3;
             // 
-            // chkShowPassword
             // 
-            chkShowPassword.AutoSize = true;
-            chkShowPassword.Cursor = Cursors.Hand;
-            chkShowPassword.Font = new Font("Microsoft Sans Serif", 7.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            chkShowPassword.ForeColor = Color.FromArgb(70, 70, 70);
-            chkShowPassword.Location = new Point(35, 351);
-            chkShowPassword.Margin = new Padding(4, 2, 4, 2);
-            chkShowPassword.Name = "chkShowPassword";
-            chkShowPassword.Size = new Size(115, 17);
-            chkShowPassword.TabIndex = 4;
-            chkShowPassword.Text = "Show Password";
-            chkShowPassword.UseVisualStyleBackColor = true;
-            chkShowPassword.CheckedChanged += chkShowPassword_CheckedChanged;
+            // btnShowPassword
+            // 
+            this.btnShowPassword.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnShowPassword.FlatAppearance.BorderSize = 0;
+            this.btnShowPassword.IconChar = FontAwesome.Sharp.IconChar.Eye;
+            this.btnShowPassword.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(145)))), ((int)(((byte)(145)))), ((int)(((byte)(145)))));
+            this.btnShowPassword.IconFont = FontAwesome.Sharp.IconFont.Solid;
+            this.btnShowPassword.IconSize = 22;
+            this.btnShowPassword.Location = new System.Drawing.Point(270, 287);
+            this.btnShowPassword.Name = "btnShowPassword";
+            this.btnShowPassword.Size = new System.Drawing.Size(30, 25);
+            this.btnShowPassword.TabIndex = 4;
+            this.btnShowPassword.UseVisualStyleBackColor = true;
+            this.btnShowPassword.Click += new System.EventHandler(this.btnShowPassword_Click);
             // 
             // btnLogin
             // 
@@ -170,7 +171,7 @@
             chkRememberMe.Cursor = Cursors.Hand;
             chkRememberMe.Font = new Font("Microsoft Sans Serif", 7.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
             chkRememberMe.ForeColor = Color.FromArgb(70, 70, 70);
-            chkRememberMe.Location = new Point(180, 351);
+            chkRememberMe.Location = new Point(35, 351);
             chkRememberMe.Margin = new Padding(4, 2, 4, 2);
             chkRememberMe.Name = "chkRememberMe";
             chkRememberMe.Size = new Size(105, 17);
@@ -192,7 +193,7 @@
             Controls.Add(title);
             Controls.Add(logoPic);
             Controls.Add(btnLogin);
-            Controls.Add(chkShowPassword);
+            Controls.Add(btnShowPassword);
             Controls.Add(txtUsername);
             Controls.Add(txtPassword);
             Font = new Font("Microsoft Sans Serif", 10.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
@@ -213,7 +214,7 @@
         #endregion
         private TextBox txtUsername;
         private TextBox txtPassword;
-        private CheckBox chkShowPassword;
+        private FontAwesome.Sharp.IconButton btnShowPassword;
         private Button btnLogin;
         private PictureBox logoPic;
         private Label title;

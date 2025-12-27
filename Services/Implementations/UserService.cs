@@ -132,20 +132,33 @@ namespace HotelManagementIt008.Services.Implementations
             {
                 var userType = await _unitOfWork.UserTypeRepository
                     .GetAllQueryable()
+                    .AsTracking()
                     .FirstOrDefaultAsync(x => x.Type == dto.UserType.Value);
 
                 if (userType != null)
+                {
                     user.UserTypeId = userType.Id;
+                    user.UserType = userType;
+                }
             }
 
             if (dto.Role.HasValue)
             {
                 var role = await _unitOfWork.RoleRepository
                     .GetAllQueryable()
+                    .AsTracking()
                     .FirstOrDefaultAsync(r => r.Type == dto.Role.Value);
 
                 if (role != null)
+                {
                     user.RoleId = role.Id;
+                    user.Role = role;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(dto.Password))
+            {
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
             }
 
             if (user.Profile != null)
@@ -184,6 +197,7 @@ namespace HotelManagementIt008.Services.Implementations
                     FullName = u.Profile != null ? u.Profile.FullName : string.Empty,
                     Role = u.Role.Type.ToString(),
                     UserType = u.UserType != null ? u.UserType.Type.ToString() : string.Empty,
+                    Address = u.Profile != null ? u.Profile.Address : string.Empty,
                     CreatedAt = u.CreatedAt
                 }).ToList();
 
@@ -214,7 +228,7 @@ namespace HotelManagementIt008.Services.Implementations
         {
             try
             {
-                // Lấy UserType entity từ DB
+                // Get UserType entity from DB
                 var userTypeEntity = await _unitOfWork.UserTypeRepository
                     .GetAllQueryable()
                     .FirstOrDefaultAsync(ut => ut.Type == dto.UserType);
@@ -222,12 +236,12 @@ namespace HotelManagementIt008.Services.Implementations
                 if (userTypeEntity == null)
                     return Result<UserResponseDto>.Failure($"UserType {dto.UserType} not found.");
 
-                // Lấy Role entity từ DB
+                // Get Role entity from DB
                 var roleEntity = await _unitOfWork.RoleRepository
                     .GetAllQueryable()
                     .FirstOrDefaultAsync(r => r.Type == dto.Role);
 
-                // Nếu không tìm thấy, lấy Role mặc định Customer
+                // If not found, get default Role: Customer
                 if (roleEntity == null)
                 {
                     roleEntity = await _unitOfWork.RoleRepository
@@ -238,11 +252,12 @@ namespace HotelManagementIt008.Services.Implementations
                         return Result<UserResponseDto>.Failure("Role 'Customer' not found in database.");
                 }
 
-                // Tạo User mới
+                // Create new User
                 var user = new User
                 {
                     Username = dto.Username,
                     Email = dto.Email,
+                    PasswordHash = !string.IsNullOrEmpty(dto.Password) ? BCrypt.Net.BCrypt.HashPassword(dto.Password) : null,
                     UserTypeId = userTypeEntity.Id,
                     // UserType = userTypeEntity,
                     RoleId = roleEntity.Id,
@@ -282,5 +297,29 @@ namespace HotelManagementIt008.Services.Implementations
         }
 
 
+        public async Task<Result<bool>> ChangePasswordAsync(Guid userId, ChangePasswordRequestDto dto)
+        {
+            try
+            {
+                var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+                if (user == null)
+                    return Result<bool>.Failure("User not found.");
+
+                bool isOldPasswordValid = BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash);
+                if (!isOldPasswordValid)
+                    return Result<bool>.Failure("Incorrect old password.");
+
+                string newPasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+                user.PasswordHash = newPasswordHash;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                await _unitOfWork.SaveAsync();
+                return Result<bool>.Success(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Error changing password: {ex.Message}");
+            }
+        }
     }
 }

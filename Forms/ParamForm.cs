@@ -37,6 +37,10 @@ namespace HotelManagementIt008.Forms
                     dgvParams.Columns["Key"]?.ReadOnly = true;
 
                     dgvParams.Columns["Description"]?.ReadOnly = true;
+
+                    if (dgvParams.Columns["Key"] != null) dgvParams.Columns["Key"].FillWeight = 20;
+                    if (dgvParams.Columns["Value"] != null) dgvParams.Columns["Value"].FillWeight = 20;
+                    if (dgvParams.Columns["Description"] != null) dgvParams.Columns["Description"].FillWeight = 60;
                 }
                 else
                 {

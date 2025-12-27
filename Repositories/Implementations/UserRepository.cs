@@ -8,7 +8,7 @@ namespace HotelManagementIt008.Repositories.Implementations
         {
         }
 
-        public new IQueryable<User> GetAllQueryable()
+        public override IQueryable<User> GetAllQueryable()
         {
             return Context.Users
                 .Include(u => u.Profile)

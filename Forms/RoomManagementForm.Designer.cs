@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            pnlTop = new Panel();
+            lblTitle = new Label();
             pnlFilters = new Panel();
             grpFilters = new GroupBox();
             label3 = new Label();
@@ -57,11 +59,34 @@
             ((System.ComponentModel.ISupportInitialize)nudPriceFrom).BeginInit();
             pnlActions.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvRooms).BeginInit();
+            pnlTop.SuspendLayout();
             SuspendLayout();
+            // 
+            // pnlTop
+            // 
+            pnlTop.BackColor = Color.White;
+            pnlTop.Controls.Add(lblTitle);
+            pnlTop.Dock = DockStyle.Top;
+            pnlTop.Location = new Point(0, 0);
+            pnlTop.Name = "pnlTop";
+            pnlTop.Size = new Size(1110, 60);
+            pnlTop.TabIndex = 0;
+            // 
+            // lblTitle
+            // 
+            lblTitle.AutoSize = true;
+            lblTitle.Font = new Font("Segoe UI", 20F, FontStyle.Bold);
+            lblTitle.ForeColor = Color.FromArgb(63, 81, 181);
+            lblTitle.Location = new Point(20, 10);
+            lblTitle.Name = "lblTitle";
+            lblTitle.Size = new Size(269, 37);
+            lblTitle.TabIndex = 0;
+            lblTitle.Text = "Room Management";
             // 
             // pnlFilters
             // 
             pnlFilters.BackColor = Color.FromArgb(240, 244, 248);
+            pnlFilters.Controls.Add(grpFilters);
             pnlFilters.Dock = DockStyle.Top;
             pnlFilters.Location = new Point(0, 0);
             pnlFilters.Name = "pnlFilters";
@@ -350,8 +375,8 @@
             ClientSize = new Size(1110, 660);
             Controls.Add(dgvRooms);
             Controls.Add(pnlActions);
-            Controls.Add(grpFilters);
             Controls.Add(pnlFilters);
+            Controls.Add(pnlTop);
             FormBorderStyle = FormBorderStyle.None;
             Name = "RoomManagementForm";
             StartPosition = FormStartPosition.CenterScreen;
@@ -364,6 +389,8 @@
             pnlActions.ResumeLayout(false);
             pnlActions.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvRooms).EndInit();
+            pnlTop.ResumeLayout(false);
+            pnlTop.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -392,5 +419,7 @@
         private Label label3;
         private Label lblFilterRoomType;
         private Label lblFilterRoomNumber;
+        private Panel pnlTop;
+        private Label lblTitle;
     }
 }

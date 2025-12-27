@@ -13,5 +13,6 @@ namespace HotelManagementIt008.Services.Interfaces
         Task<Result<Paging<UserSummaryDto>>> GetUserSummariesAsync(GridifyQuery query);
         Task<Result<bool>> DeleteUserAsync(Guid id);
         Task<Result<UserResponseDto>> CreateUserAsync(CreateUserDto dto);
+        Task<Result<bool>> ChangePasswordAsync(Guid userId, ChangePasswordRequestDto dto);
     }
 }
