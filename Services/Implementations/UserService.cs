@@ -228,7 +228,7 @@ namespace HotelManagementIt008.Services.Implementations
         {
             try
             {
-                // Lấy UserType entity từ DB
+                // Get UserType entity from DB
                 var userTypeEntity = await _unitOfWork.UserTypeRepository
                     .GetAllQueryable()
                     .FirstOrDefaultAsync(ut => ut.Type == dto.UserType);
@@ -236,12 +236,12 @@ namespace HotelManagementIt008.Services.Implementations
                 if (userTypeEntity == null)
                     return Result<UserResponseDto>.Failure($"UserType {dto.UserType} not found.");
 
-                // Lấy Role entity từ DB
+                // Get Role entity from DB
                 var roleEntity = await _unitOfWork.RoleRepository
                     .GetAllQueryable()
                     .FirstOrDefaultAsync(r => r.Type == dto.Role);
 
-                // Nếu không tìm thấy, lấy Role mặc định Customer
+                // If not found, get default Role: Customer
                 if (roleEntity == null)
                 {
                     roleEntity = await _unitOfWork.RoleRepository
@@ -252,7 +252,7 @@ namespace HotelManagementIt008.Services.Implementations
                         return Result<UserResponseDto>.Failure("Role 'Customer' not found in database.");
                 }
 
-                // Tạo User mới
+                // Create new User
                 var user = new User
                 {
                     Username = dto.Username,

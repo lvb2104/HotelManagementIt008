@@ -228,7 +228,7 @@ namespace HotelManagementIt008.Services.Implementations
 
                         if (participantUser == null)
                         {
-                            // Tạo user mặc định
+                            // Create default user
                             var createUserResult = await _userService.CreateDefaultUserAsync(pDto);
                             if (!createUserResult.IsSuccess)
                             {
@@ -238,7 +238,7 @@ namespace HotelManagementIt008.Services.Implementations
                         }
                         else
                         {
-                            // Cập nhật profile
+                            // Update profile
                             if (participantUser.Profile != null)
                             {
                                 if (!string.IsNullOrWhiteSpace(pDto.FullName))
@@ -247,10 +247,10 @@ namespace HotelManagementIt008.Services.Implementations
                                 }
                                 participantUser.Profile.Address = pDto.Address;
                                 participantUser.Profile.IdentityCardNumber = pDto.IdentityNumber;
-                                // EF đang tracking nên không cần gọi Update
+                                // EF is tracking, so no need to call Update
                             }
 
-                            // Cập nhật UserType nếu khác
+                            // Update UserType if different
                             if (participantUser.UserType?.Type != pDto.UserType)
                             {
                                 var newUserType = await _unitOfWork.UserTypeRepository.GetAllQueryable()
@@ -264,7 +264,7 @@ namespace HotelManagementIt008.Services.Implementations
                             }
                         }
 
-                        // Check overlap cho participant (không truyền bookingId vì là booking mới)
+                        // Check overlap for participant (bookingId is null for new booking)
                         var userOverlapping = await _unitOfWork.BookingRepository
                             .FindUserOverlappingBookingsAsync(participantUser!.Id, dto.CheckInDate, dto.CheckOutDate);
                         if (userOverlapping.Any())
@@ -272,7 +272,7 @@ namespace HotelManagementIt008.Services.Implementations
                             return Result<BookingResponseDto>.Failure($"User {pDto.Email} is already booked for these dates");
                         }
 
-                        // Nhớ add vào list để tính giá & tạo BookingDetails
+                        // Add to list to calculate price & create BookingDetails
                         participants.Add(participantUser);
                     }
                 }
@@ -380,7 +380,7 @@ namespace HotelManagementIt008.Services.Implementations
                 }
 
                 // Update Room Status if check-in is today
-                if (dto.CheckInDate.Date == DateTime.UtcNow.Date) // nên dùng Utc cho đồng bộ
+                if (dto.CheckInDate.Date == DateTime.UtcNow.Date) // use Utc for synchronization
                 {
                     room.Status = RoomStatus.Occupied;
                     await _unitOfWork.RoomRepository.UpdateAsync(room);
