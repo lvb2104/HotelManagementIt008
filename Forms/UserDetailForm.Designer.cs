@@ -46,6 +46,7 @@
             this.cboUserType = new System.Windows.Forms.ComboBox();
             this.lblRole = new System.Windows.Forms.Label();
             this.cboRole = new System.Windows.Forms.ComboBox();
+            this.btnShowPassword = new FontAwesome.Sharp.IconButton();
             this.pnlActions = new System.Windows.Forms.Panel();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
@@ -71,6 +72,7 @@
             this.grpUserDetails.Controls.Add(this.cboUserType);
             this.grpUserDetails.Controls.Add(this.lblRole);
             this.grpUserDetails.Controls.Add(this.cboRole);
+            this.grpUserDetails.Controls.Add(this.btnShowPassword);
 
             this.grpUserDetails.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grpUserDetails.Location = new System.Drawing.Point(10, 10);
@@ -126,8 +128,23 @@
             this.txtPassword.Location = new System.Drawing.Point(410, 275);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '*';
-            this.txtPassword.Size = new System.Drawing.Size(340, 23);
+            this.txtPassword.Size = new System.Drawing.Size(305, 23);
             this.txtPassword.TabIndex = 21;
+            // 
+            // btnShowPassword
+            // 
+            this.btnShowPassword.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnShowPassword.FlatAppearance.BorderSize = 0;
+            this.btnShowPassword.IconChar = FontAwesome.Sharp.IconChar.Eye;
+            this.btnShowPassword.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(145)))), ((int)(((byte)(145)))), ((int)(((byte)(145)))));
+            this.btnShowPassword.IconFont = FontAwesome.Sharp.IconFont.Solid;
+            this.btnShowPassword.IconSize = 22;
+            this.btnShowPassword.Location = new System.Drawing.Point(720, 274);
+            this.btnShowPassword.Name = "btnShowPassword";
+            this.btnShowPassword.Size = new System.Drawing.Size(30, 25);
+            this.btnShowPassword.TabIndex = 22;
+            this.btnShowPassword.UseVisualStyleBackColor = true;
+            this.btnShowPassword.Click += new System.EventHandler(this.btnShowPassword_Click);
             // 
             // lblFullName
             // 
@@ -298,5 +315,6 @@
         private System.Windows.Forms.Panel pnlActions;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnCancel;
+        private FontAwesome.Sharp.IconButton btnShowPassword;
     }
 }

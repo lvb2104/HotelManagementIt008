@@ -5,13 +5,15 @@ namespace HotelManagementIt008.Forms
     public partial class UserDetailForm : Form
     {
         private readonly IUserService _userService;
+        private readonly ICurrentUserService _currentUserService;
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Guid? UserId { get; set; }
 
-        public UserDetailForm(IUserService userService)
+        public UserDetailForm(IUserService userService, ICurrentUserService currentUserService)
         {
             InitializeComponent();
             _userService = userService;
+            _currentUserService = currentUserService;
             LoadUserTypes();
         }
 
@@ -41,17 +43,26 @@ namespace HotelManagementIt008.Forms
                 txtUsername.Enabled = false;
                 lblPassword.Visible = false;
                 txtPassword.Visible = false;
+                btnShowPassword.Visible = false;
 
                 var result = await _userService.GetUserByIdAsync(UserId.Value);
 
                 if (!result.IsSuccess || result.Value == null)
                 {
-                    MessageBox.Show("Không thể tải thông tin người dùng");
+                    MessageBox.Show("Could not load user information.");
                     Close();
                     return;
                 }
 
                 BindUser(result.Value);
+
+                // Security check for Staff
+                if (_currentUserService.Role == RoleType.Staff && (result.Value.Role == RoleType.Admin || result.Value.Role == RoleType.Staff))
+                {
+                    MessageBox.Show("You do not have permission to edit this user.");
+                    Close();
+                    return;
+                }
             }
             else
             {
@@ -60,8 +71,24 @@ namespace HotelManagementIt008.Forms
                 txtUsername.Enabled = true;
                 lblPassword.Visible = true;
                 txtPassword.Visible = true;
+                btnShowPassword.Visible = true;
             }
         }
+
+        private void btnShowPassword_Click(object sender, EventArgs e)
+        {
+            if (txtPassword.PasswordChar == '*')
+            {
+                txtPassword.PasswordChar = '\0';
+                btnShowPassword.IconChar = FontAwesome.Sharp.IconChar.EyeSlash;
+            }
+            else
+            {
+                txtPassword.PasswordChar = '*';
+                btnShowPassword.IconChar = FontAwesome.Sharp.IconChar.Eye;
+            }
+        }
+
 
         private async void btnSave_Click(object sender, EventArgs e)
         {
@@ -122,9 +149,18 @@ namespace HotelManagementIt008.Forms
 
         private void LoadUserTypes()
         {
-            // Lấy tất cả giá trị từ enum UserTypeType
+            // Get all values from UserTypeType enum
             cboUserType.DataSource = Enum.GetValues(typeof(UserTypeType));
-            cboRole.DataSource = Enum.GetValues(typeof(RoleType));
+
+            if (_currentUserService.Role == RoleType.Staff)
+            {
+                // Staff can only create/manage Customers
+                cboRole.DataSource = new List<RoleType> { RoleType.Customer };
+            }
+            else
+            {
+                cboRole.DataSource = Enum.GetValues(typeof(RoleType));
+            }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

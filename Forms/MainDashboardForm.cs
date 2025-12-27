@@ -24,12 +24,28 @@ namespace HotelManagementIt008.Forms
             SetupButtonEvents();
             SetupButtonHoverEffects();
 
-            // Hide admin-only buttons if not admin
-            if (_currentUserService.Role != RoleType.Admin)
+            // Apply Role-Based Access Control (RBAC)
+            switch (_currentUserService.Role)
             {
-                btnUsers.Visible = false;
-                btnSettings.Visible = false;
-                btnParams.Visible = false;
+                case RoleType.Admin:
+                    // Admin has full access
+                    break;
+                case RoleType.Staff:
+                    // Staff has everything except Params
+                    btnParams.Visible = false;
+                    break;
+                case RoleType.Customer:
+                default:
+                    // Customer only sees Dashboard
+                    btnRooms.Visible = false;
+                    btnBookings.Visible = false;
+                    btnInvoices.Visible = false;
+                    btnPayments.Visible = false;
+                    btnUsers.Visible = false;
+                    btnReports.Visible = false;
+                    btnSettings.Visible = false;
+                    btnParams.Visible = false;
+                    break;
             }
 
             // Dispose all scopes when this form closes
