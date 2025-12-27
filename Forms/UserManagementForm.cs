@@ -84,6 +84,14 @@ namespace HotelManagementIt008.Forms
 
             dgvUsers.Columns.Add(new DataGridViewTextBoxColumn
             {
+                Name = "colAddress",
+                DataPropertyName = "Address",
+                HeaderText = "Address",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            });
+
+            dgvUsers.Columns.Add(new DataGridViewTextBoxColumn
+            {
                 Name = "colRole",
                 DataPropertyName = "Role",
                 HeaderText = "Role",
@@ -171,6 +179,7 @@ namespace HotelManagementIt008.Forms
             try
             {
                 var username = txtUsername.Text.Trim();
+                var fullName = txtFullName.Text.Trim();
                 var email = txtEmail.Text.Trim();
                 var role = cboRole.SelectedItem?.ToString();
                 var userType = cboUserType.SelectedItem?.ToString();
@@ -181,6 +190,11 @@ namespace HotelManagementIt008.Forms
                 if (!string.IsNullOrWhiteSpace(username))
                 {
                     filters.Add($"username=*{username}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(fullName))
+                {
+                    filters.Add($"fullName=*{fullName}");
                 }
 
                 if (!string.IsNullOrWhiteSpace(email))
@@ -237,6 +251,7 @@ namespace HotelManagementIt008.Forms
         private async void btnClearFilter_Click(object sender, EventArgs e)
         {
             txtUsername.Clear();
+            txtFullName.Clear();
             txtEmail.Clear();
             cboRole.SelectedIndex = 0;
             cboUserType.SelectedIndex = 0;
