@@ -10,7 +10,7 @@ namespace HotelManagementIt008.Mapping.GridifyProfiles
                 .AddMap("email", u => u.Email)
                 .AddMap("fullName", u => u.Profile != null ? u.Profile.FullName : string.Empty)
                 .AddMap("role", u => u.Role.Type)
-                .AddMap("userType", u => u.Role.Type == RoleType.Customer && u.UserType != null ? u.UserType.Type : (UserTypeType?)null)
+                .AddMap("userType", u => u.UserType != null ? u.UserType.Type : (UserTypeType?)null)
                 .AddMap("createdAt", u => u.CreatedAt.Date);
         }
     }
