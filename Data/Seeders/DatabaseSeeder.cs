@@ -41,21 +41,21 @@ namespace HotelManagementIt008.Data.Seeders
                 var roles = await SeedRoles();
                 var userTypes = await SeedUserTypes();
                 var roomTypes = await SeedRoomTypes();
-                var payments = await SeedPayments();
+                //var payments = await SeedPayments();
 
                 // Phase 2: Seed rooms
-                var rooms = await SeedRooms(roomTypes);
+                //var rooms = await SeedRooms(roomTypes);
 
                 // Phase 3: Seed users and profiles
                 var admin = await SeedAdmin(roles, passwordHash);
                 var staff = await SeedStaff(roles, passwordHash);
-                var customers = await SeedCustomersAndProfiles(roles, userTypes);
+                //var customers = await SeedCustomersAndProfiles(roles, userTypes);
 
                 // Phase 4: Seed system parameters (needed for booking calculations)
                 var systemParams = await SeedParams();
 
                 // Phase 5: Seed bookings, invoices, and booking details
-                await SeedBookingsInvoicesAndDetails(staff, rooms, payments, roomTypes, userTypes, systemParams);
+                //await SeedBookingsInvoicesAndDetails(customers, staff, rooms, payments, roomTypes, userTypes, systemParams);
 
                 // Commit transaction
                 await transaction.CommitAsync();
@@ -125,14 +125,12 @@ namespace HotelManagementIt008.Data.Seeders
                     Id = Guid.NewGuid(),
                     Type = UserTypeType.Local,
                     Description = "Local customer",
-                    SurchargeRate = 1.0m
                 },
                 new UserType
                 {
                     Id = Guid.NewGuid(),
                     Type = UserTypeType.Foreign,
                     Description = "Foreign customer",
-                    SurchargeRate = 2.5m
                 }
             };
 
@@ -293,7 +291,7 @@ namespace HotelManagementIt008.Data.Seeders
             return customers;
         }
 
-        private async Task SeedBookingsInvoicesAndDetails(List<User> staff, List<Room> rooms, List<Payment> payments, List<RoomType> roomTypes, List<UserType> userTypes, Dictionary<string, string> systemParams)
+        private async Task SeedBookingsInvoicesAndDetails(List<User> customers, List<User> staff, List<Room> rooms, List<Payment> payments, List<RoomType> roomTypes, List<UserType> userTypes, Dictionary<string, string> systemParams)
         {
             // Parse system parameters
             var taxRate = decimal.Parse(systemParams["TAX_RATE"]);
@@ -302,7 +300,7 @@ namespace HotelManagementIt008.Data.Seeders
             var extraGuestSurcharge = decimal.Parse(systemParams["EXTRA_GUEST_SURCHARGE"]);
 
             var availablePayments = payments.ToList();
-            var potentialGuests = staff.Take(50).ToList(); // Pool of potential guests
+            var potentialGuests = customers.Take(50).ToList(); // Pool of potential guests
 
             var bookingFaker = new Faker<Booking>()
                 .RuleFor(b => b.Id, f => Guid.NewGuid())
@@ -340,8 +338,19 @@ namespace HotelManagementIt008.Data.Seeders
             {
                 var room = rooms.First(r => r.Id == booking.RoomId);
                 var roomType = roomTypes.First(rt => rt.Id == room.RoomTypeId);
-                var booker = staff.First(u => u.Id == booking.BookerId);
-                var userType = userTypes.First(ut => ut.Id == booker.UserTypeId);
+
+                // Get participants (guests) for this booking
+                var participants = bookingDetails
+                    .Where(bd => bd.BookingId == booking.Id)
+                    .Select(bd => customers.First(c => c.Id == bd.UserId))
+                    .ToList();
+
+                // Check if any participant is a foreign customer
+                var hasForeignGuest = participants.Any(p =>
+                {
+                    var guestUserType = userTypes.FirstOrDefault(ut => ut.Id == p.UserTypeId);
+                    return guestUserType?.Type == UserTypeType.Foreign;
+                });
 
                 var daysStayed = (booking.CheckOutDate - booking.CheckInDate).Days;
                 var guestCount = bookingGuestCounts[booking.Id];
@@ -352,21 +361,21 @@ namespace HotelManagementIt008.Data.Seeders
                 // Calculate surcharges separately
                 var subtotal = basePrice;
 
-                // Apply foreign surcharge if customer is foreign
-                if (userType.Type == UserTypeType.Foreign)
+                // Apply foreign surcharge if any guest is foreign
+                if (hasForeignGuest)
                 {
-                    subtotal *= foreignSurchargeRate;
+                    subtotal *= foreignSurchargeRate; // Multiplied by foreign surcharge rate
                 }
 
                 // Apply extra guest surcharge if exceeding max guests
                 if (guestCount > maxGuestsPerRoom)
                 {
                     var extraGuests = guestCount - maxGuestsPerRoom;
-                    subtotal += subtotal * extraGuestSurcharge * extraGuests;
+                    subtotal += subtotal * extraGuestSurcharge * extraGuests; // Each guest is charged extra
                 }
 
                 subtotal = Math.Round(subtotal, 2);
-                var taxPrice = Math.Round(subtotal * taxRate, 2);
+                var taxPrice = Math.Round(subtotal * taxRate, 2); // Multiplied by tax rate
                 booking.TotalPrice = subtotal + taxPrice;
             }
 
@@ -384,8 +393,19 @@ namespace HotelManagementIt008.Data.Seeders
                 var booking = bookings[i];
                 var room = rooms.First(r => r.Id == booking.RoomId);
                 var roomType = roomTypes.First(rt => rt.Id == room.RoomTypeId);
-                var booker = staff.First(u => u.Id == booking.BookerId);
-                var userType = userTypes.First(ut => ut.Id == booker.UserTypeId);
+
+                // Get participants (guests) for this booking
+                var participants = bookingDetails
+                    .Where(bd => bd.BookingId == booking.Id)
+                    .Select(bd => customers.First(c => c.Id == bd.UserId))
+                    .ToList();
+
+                // Check if any participant is a foreign customer
+                var hasForeignGuest = participants.Any(p =>
+                {
+                    var guestUserType = userTypes.FirstOrDefault(ut => ut.Id == p.UserTypeId);
+                    return guestUserType?.Type == UserTypeType.Foreign;
+                });
 
                 var daysStayed = (booking.CheckOutDate - booking.CheckInDate).Days;
                 var guestCount = bookingGuestCounts[booking.Id];
@@ -396,8 +416,8 @@ namespace HotelManagementIt008.Data.Seeders
                 // Calculate surcharges separately
                 var subtotal = basePrice;
 
-                // Apply foreign surcharge if customer is foreign
-                if (userType.Type == UserTypeType.Foreign)
+                // Apply foreign surcharge if any guest is foreign
+                if (hasForeignGuest)
                 {
                     subtotal *= foreignSurchargeRate;
                 }
@@ -448,22 +468,22 @@ namespace HotelManagementIt008.Data.Seeders
                 {
                     Id = Guid.NewGuid(),
                     Key = "MAX_GUESTS_PER_ROOM",
-                    Value = "3",
+                    Value = "4",
                     Description = "Maximum number of guests allowed per room before surcharge"
                 },
                 new Params
                 {
                     Id = Guid.NewGuid(),
                     Key = "FOREIGN_SURCHARGE_RATE",
-                    Value = "1.5",
+                    Value = "1.15",
                     Description = "Surcharge multiplier for foreign customers"
                 },
                 new Params
                 {
                     Id = Guid.NewGuid(),
                     Key = "EXTRA_GUEST_SURCHARGE",
-                    Value = "0.25",
-                    Description = "Surcharge rate per extra guest exceeding MAX_GUESTS_PER_ROOM (25%)"
+                    Value = "0.15",
+                    Description = "Surcharge rate per extra guest exceeding MAX_GUESTS_PER_ROOM"
                 },
             };
 

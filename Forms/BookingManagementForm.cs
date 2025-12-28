@@ -85,7 +85,7 @@ namespace HotelManagementIt008.Forms
             dgvBookings.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "colBooker",
-                DataPropertyName = "BookerEmail",
+                DataPropertyName = "BookerUsername",
                 HeaderText = "Booker",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
@@ -343,6 +343,55 @@ namespace HotelManagementIt008.Forms
             }
         }
 
+        private void btnExportCSV_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using var saveFileDialog = new SaveFileDialog
+                {
+                    Filter = "CSV Files (*.csv)|*.csv|All Files (*.*)|*.*",
+                    FilterIndex = 1,
+                    FileName = $"Bookings_{DateTime.Now:yyyyMMdd_HHmmss}.csv",
+                    Title = "Export Bookings to CSV",
+                    DefaultExt = "csv"
+                };
+
+                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                    return;
+
+                var csv = new System.Text.StringBuilder();
+
+                // Add headers
+                foreach (DataGridViewColumn col in dgvBookings.Columns)
+                {
+                    if (col.Visible)
+                        csv.Append(col.HeaderText + ",");
+                }
+                csv.AppendLine();
+
+                // Add rows
+                foreach (DataGridViewRow row in dgvBookings.Rows)
+                {
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+                        if (dgvBookings.Columns[cell.ColumnIndex].Visible)
+                        {
+                            var value = cell.Value?.ToString()?.Replace(",", ";") ?? string.Empty;
+                            csv.Append(value + ",");
+                        }
+                    }
+                    csv.AppendLine();
+                }
+
+                File.WriteAllText(saveFileDialog.FileName, csv.ToString());
+                MessageBox.Show($"Successfully exported to:\n{saveFileDialog.FileName}", "Export Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Export failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void PrintBookingDetails(BookingResponseDto booking)
         {
             var printDoc = new System.Drawing.Printing.PrintDocument();
@@ -390,7 +439,7 @@ namespace HotelManagementIt008.Forms
             DrawSummaryRow(g, "Room Number:", booking.RoomNumber, leftMargin, ref yPos, labelFont, valueFont);
             DrawSummaryRow(g, "Check In Date:", booking.CheckInDate.ToString("yyyy-MM-dd"), leftMargin, ref yPos, labelFont, valueFont);
             DrawSummaryRow(g, "Check Out Date:", booking.CheckOutDate.ToString("yyyy-MM-dd"), leftMargin, ref yPos, labelFont, valueFont);
-            DrawSummaryRow(g, "Booker Email:", booking.User?.Email ?? "N/A", leftMargin, ref yPos, labelFont, valueFont);
+            DrawSummaryRow(g, "Booker Username:", booking.User?.Username ?? "N/A", leftMargin, ref yPos, labelFont, valueFont);
             DrawSummaryRow(g, "Created At:", booking.CreatedAt.ToString("yyyy-MM-dd"), leftMargin, ref yPos, labelFont, valueFont);
             DrawSummaryRow(g, "Updated At:", booking.UpdatedAt.ToString("yyyy-MM-dd"), leftMargin, ref yPos, labelFont, valueFont);
 

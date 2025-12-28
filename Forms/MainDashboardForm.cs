@@ -38,6 +38,7 @@ namespace HotelManagementIt008.Forms
                 default:
                     // Customer only sees Dashboard
                     btnRooms.Visible = false;
+                    btnRoomTypes.Visible = false;
                     btnBookings.Visible = false;
                     btnInvoices.Visible = false;
                     btnPayments.Visible = false;
@@ -72,6 +73,7 @@ namespace HotelManagementIt008.Forms
         {
             btnDashboard.Click += (s, e) => OpenChildForm<DashboardForm>(s);
             btnRooms.Click += (s, e) => OpenChildForm<RoomManagementForm>(s);
+            btnRoomTypes.Click += (s, e) => OpenChildForm<RoomTypeManagementForm>(s);
             btnBookings.Click += (s, e) => OpenChildForm<BookingManagementForm>(s);
             btnInvoices.Click += (s, e) => OpenChildForm<InvoiceManagementForm>(s);
             btnPayments.Click += (s, e) => OpenChildForm<PaymentManagementForm>(s);
@@ -85,7 +87,7 @@ namespace HotelManagementIt008.Forms
 
         private void SetupButtonHoverEffects()
         {
-            var sidebarButtons = new[] { btnDashboard, btnRooms, btnBookings, btnInvoices, btnPayments, btnUsers, btnReports, btnSettings, btnParams };
+            var sidebarButtons = new[] { btnDashboard, btnRooms, btnRoomTypes, btnBookings, btnInvoices, btnPayments, btnUsers, btnReports, btnSettings, btnParams };
 
             foreach (var btn in sidebarButtons)
             {
@@ -151,7 +153,7 @@ namespace HotelManagementIt008.Forms
 
         private void ResetSidebarButtonStates()
         {
-            var sidebarButtons = new[] { btnDashboard, btnRooms, btnBookings, btnInvoices, btnPayments, btnUsers, btnReports, btnSettings, btnParams };
+            var sidebarButtons = new[] { btnDashboard, btnRooms, btnRoomTypes, btnBookings, btnInvoices, btnPayments, btnUsers, btnReports, btnSettings, btnParams };
 
             foreach (var btn in sidebarButtons)
             {

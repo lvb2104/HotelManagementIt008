@@ -107,6 +107,7 @@
             this.grpFilters.Controls.Add(this.txtUsername);
             this.grpFilters.Controls.Add(this.cboUserType);
             this.grpFilters.Controls.Add(this.cboRole);
+            this.grpFilters.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             this.grpFilters.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.grpFilters.Location = new System.Drawing.Point(10, 10);
             this.grpFilters.Name = "grpFilters";
@@ -162,6 +163,7 @@
             // 
             // btnClearFilter
             // 
+            this.btnClearFilter.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             this.btnClearFilter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(158)))), ((int)(((byte)(158)))));
             this.btnClearFilter.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnClearFilter.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -176,6 +178,7 @@
             // 
             // btnSearch
             // 
+            this.btnSearch.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             this.btnSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(150)))), ((int)(((byte)(243)))));
             this.btnSearch.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -284,7 +287,7 @@
             this.btnPrint.Name = "btnPrint";
             this.btnPrint.Size = new System.Drawing.Size(120, 35);
             this.btnPrint.TabIndex = 3;
-            this.btnPrint.Text = "📄 Print";
+            this.btnPrint.Text = "📊 Export CSV";
             this.btnPrint.UseVisualStyleBackColor = false;
             this.btnPrint.Click += new System.EventHandler(this.btnPrint_Click);
             // 

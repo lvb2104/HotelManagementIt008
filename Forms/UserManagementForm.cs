@@ -334,25 +334,53 @@ namespace HotelManagementIt008.Forms
             await LoadUsersAsync();
         }
         private void btnPrint_Click(object sender, EventArgs e)
+    {
+        try
         {
-            // TODO: handle printing or exporting data
-            // Simple example: export DataGridView to CSV
-            StringBuilder csv = new StringBuilder();
+            using var saveFileDialog = new SaveFileDialog
+            {
+                Filter = "CSV Files (*.csv)|*.csv|All Files (*.*)|*.*",
+                FilterIndex = 1,
+                FileName = $"Users_{DateTime.Now:yyyyMMdd_HHmmss}.csv",
+                Title = "Export Users to CSV",
+                DefaultExt = "csv"
+            };
 
+            if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                return;
+
+            var csv = new StringBuilder();
+
+            // Add headers
             foreach (DataGridViewColumn col in dgvUsers.Columns)
-                csv.Append(col.HeaderText + ",");
+            {
+                if (col.Visible)
+                    csv.Append(col.HeaderText + ",");
+            }
             csv.AppendLine();
 
+            // Add rows
             foreach (DataGridViewRow row in dgvUsers.Rows)
             {
                 foreach (DataGridViewCell cell in row.Cells)
-                    csv.Append(cell.Value + ",");
+                {
+                    if (dgvUsers.Columns[cell.ColumnIndex].Visible)
+                    {
+                        var value = cell.Value?.ToString()?.Replace(",", ";") ?? string.Empty;
+                        csv.Append(value + ",");
+                    }
+                }
                 csv.AppendLine();
             }
 
-            File.WriteAllText("Users.csv", csv.ToString());
-            MessageBox.Show("Exported to Users.csv");
+            File.WriteAllText(saveFileDialog.FileName, csv.ToString());
+            MessageBox.Show($"Successfully exported to:\n{saveFileDialog.FileName}", "Export Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Export failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
         private void DgvUsers_SelectionChanged(object? sender, EventArgs e)
         {
             bool hasSelection = dgvUsers.SelectedRows.Count > 0;

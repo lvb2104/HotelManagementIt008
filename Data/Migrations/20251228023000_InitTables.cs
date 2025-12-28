@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -83,7 +84,6 @@ namespace HotelManagementIt008.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Type = table.Column<int>(type: "integer", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    SurchargeRate = table.Column<decimal>(type: "numeric", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)

@@ -330,6 +330,55 @@ namespace HotelManagementIt008.Forms
             }
         }
 
+        private void btnExportCSV_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using var saveFileDialog = new SaveFileDialog
+                {
+                    Filter = "CSV Files (*.csv)|*.csv|All Files (*.*)|*.*",
+                    FilterIndex = 1,
+                    FileName = $"Invoices_{DateTime.Now:yyyyMMdd_HHmmss}.csv",
+                    Title = "Export Invoices to CSV",
+                    DefaultExt = "csv"
+                };
+
+                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                    return;
+
+                var csv = new System.Text.StringBuilder();
+
+                // Add headers
+                foreach (DataGridViewColumn col in dgvInvoices.Columns)
+                {
+                    if (col.Visible)
+                        csv.Append(col.HeaderText + ",");
+                }
+                csv.AppendLine();
+
+                // Add rows
+                foreach (DataGridViewRow row in dgvInvoices.Rows)
+                {
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+                        if (dgvInvoices.Columns[cell.ColumnIndex].Visible)
+                        {
+                            var value = cell.Value?.ToString()?.Replace(",", ";") ?? string.Empty;
+                            csv.Append(value + ",");
+                        }
+                    }
+                    csv.AppendLine();
+                }
+
+                File.WriteAllText(saveFileDialog.FileName, csv.ToString());
+                MessageBox.Show($"Successfully exported to:\n{saveFileDialog.FileName}", "Export Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Export failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void PrintInvoiceDetails(InvoiceResponseDto invoice)
         {
             var printDoc = new PrintDocument();
@@ -350,56 +399,133 @@ namespace HotelManagementIt008.Forms
             if (g == null) return;
 
             // Styles
+            var hotelNameFont = new Font("Arial", 28, FontStyle.Bold);
+            var hotelInfoFont = new Font("Arial", 10, FontStyle.Regular);
             var titleFont = new Font("Arial", 24, FontStyle.Bold);
-            var sectionFont = new Font("Arial", 18, FontStyle.Bold);
-            var labelFont = new Font("Arial", 12, FontStyle.Bold);
-            var valueFont = new Font("Arial", 12, FontStyle.Regular);
+            var sectionFont = new Font("Arial", 16, FontStyle.Bold);
+            var labelFont = new Font("Arial", 11, FontStyle.Bold);
+            var valueFont = new Font("Arial", 11, FontStyle.Regular);
+            var totalFont = new Font("Arial", 16, FontStyle.Bold);
 
             var brush = Brushes.Black;
-            float yPos = 50;
-            float leftMargin = 50;
+            var grayBrush = Brushes.Gray;
+            float yPos = 40;
+            float leftMargin = 60;
+            float rightMargin = e.PageBounds.Width - 60;
+
+            // Hotel Header Section
+            g.DrawString("GRAND HOTEL", hotelNameFont, brush, leftMargin, yPos);
+            yPos += 40;
+            g.DrawString("123 Main Street, City, Country", hotelInfoFont, grayBrush, leftMargin, yPos);
+            yPos += 18;
+            g.DrawString("Tel: +84 123 456 789 | Email: info@grandhotel.com", hotelInfoFont, grayBrush, leftMargin, yPos);
+            yPos += 30;
 
             // Title
             var title = "INVOICE";
             var titleSize = g.MeasureString(title, titleFont);
             g.DrawString(title, titleFont, brush, (e.PageBounds.Width - titleSize.Width) / 2, yPos);
-            yPos += 60;
+            yPos += 50;
 
-            // Invoice Info
-            DrawSummaryRow(g, "Invoice ID:", invoice.Id.ToString(), leftMargin, ref yPos, labelFont, valueFont);
-            DrawSummaryRow(g, "Date:", invoice.CreatedAt.ToString("yyyy-MM-dd"), leftMargin, ref yPos, labelFont, valueFont);
-            DrawSummaryRow(g, "Status:", invoice.Status.ToString(), leftMargin, ref yPos, labelFont, valueFont);
+            // Invoice Info (Left) and Date (Right)
+            float columnWidth = (rightMargin - leftMargin) / 2;
+            
+            g.DrawString("Invoice Details", sectionFont, brush, leftMargin, yPos);
+            yPos += 35;
 
-            yPos += 20;
-            g.DrawLine(Pens.Black, leftMargin, yPos, e.PageBounds.Width - 50, yPos);
-            yPos += 20;
+            DrawSummaryRow(g, "Invoice No:", $"INV-{invoice.Id.ToString().Substring(0, 8).ToUpper()}", leftMargin, ref yPos, labelFont, valueFont);
+            var tempY = yPos;
+            yPos -= 25; // Reset to previous line for right column
+            DrawSummaryRow(g, "Date Issued:", invoice.CreatedAt.ToString("MMM dd, yyyy"), leftMargin + columnWidth, ref yPos, labelFont, valueFont);
+            yPos = Math.Max(yPos, tempY); // Use the larger yPos
+            DrawSummaryRow(g, "Status:", GetStatusWithColor(g, invoice.Status, leftMargin + 150, yPos - 25), leftMargin, ref yPos, labelFont, valueFont);
+            yPos -= 25; // Compensate for the color status
 
-            // Booking Info
-            g.DrawString("Booking Details", sectionFont, brush, leftMargin, yPos);
-            yPos += 30;
+            yPos += 15;
+            g.DrawLine(Pens.LightGray, leftMargin, yPos, rightMargin, yPos);
+            yPos += 25;
+
+            // Booking & Customer Information
+            g.DrawString("Booking Information", sectionFont, brush, leftMargin, yPos);
+            yPos += 35;
 
             if (invoice.Booking != null)
             {
-                DrawSummaryRow(g, "Room:", invoice.Booking.Room?.RoomNumber ?? "N/A", leftMargin, ref yPos, labelFont, valueFont);
-                DrawSummaryRow(g, "Check In:", invoice.Booking.CheckInDate.ToString("yyyy-MM-dd"), leftMargin, ref yPos, labelFont, valueFont);
-                DrawSummaryRow(g, "Check Out:", invoice.Booking.CheckOutDate.ToString("yyyy-MM-dd"), leftMargin, ref yPos, labelFont, valueFont);
-                DrawSummaryRow(g, "Booker:", invoice.Booking.User?.Email ?? "N/A", leftMargin, ref yPos, labelFont, valueFont);
+                DrawSummaryRow(g, "Room Number:", invoice.Booking.Room?.RoomNumber ?? "N/A", leftMargin, ref yPos, labelFont, valueFont);
+                DrawSummaryRow(g, "Room Type:", invoice.Booking.Room?.RoomType?.Name ?? "N/A", leftMargin, ref yPos, labelFont, valueFont);
+                DrawSummaryRow(g, "Price/Night:", (invoice.Booking.Room?.RoomType?.PricePerNight ?? 0).ToString("C2"), leftMargin, ref yPos, labelFont, valueFont);
+                yPos += 10;
+                DrawSummaryRow(g, "Check-In:", invoice.Booking.CheckInDate.ToString("MMM dd, yyyy"), leftMargin, ref yPos, labelFont, valueFont);
+                DrawSummaryRow(g, "Check-Out:", invoice.Booking.CheckOutDate.ToString("MMM dd, yyyy"), leftMargin, ref yPos, labelFont, valueFont);
+                DrawSummaryRow(g, "Nights Stayed:", invoice.DaysStayed.ToString(), leftMargin, ref yPos, labelFont, valueFont);
+                yPos += 10;
+                DrawSummaryRow(g, "Booked By:", invoice.Booking.User?.Username ?? "N/A", leftMargin, ref yPos, labelFont, valueFont);
+                DrawSummaryRow(g, "Contact:", invoice.Booking.User?.Email ?? "N/A", leftMargin, ref yPos, labelFont, valueFont);
             }
 
-            yPos += 20;
-            g.DrawLine(Pens.Black, leftMargin, yPos, e.PageBounds.Width - 50, yPos);
-            yPos += 20;
+            yPos += 15;
+            g.DrawLine(Pens.LightGray, leftMargin, yPos, rightMargin, yPos);
+            yPos += 25;
 
-            // Payment Info
+            // Payment Summary Section
             g.DrawString("Payment Summary", sectionFont, brush, leftMargin, yPos);
-            yPos += 30;
+            yPos += 35;
 
-            DrawSummaryRow(g, "Base Price:", invoice.BasePrice.ToString("C2"), leftMargin, ref yPos, labelFont, valueFont);
-            DrawSummaryRow(g, "Days Stayed:", invoice.DaysStayed.ToString(), leftMargin, ref yPos, labelFont, valueFont);
+            // Itemized breakdown
+            DrawSummaryRow(g, "Room Charges:", $"{invoice.DaysStayed} nights × {(invoice.BasePrice / invoice.DaysStayed):C2}", leftMargin, ref yPos, labelFont, valueFont);
+            var baseAmount = invoice.BasePrice;
+            g.DrawString(baseAmount.ToString("C2"), valueFont, brush, rightMargin - 100, yPos - 25);
+            
+            DrawSummaryRow(g, "Tax & Service:", $"{((invoice.TaxPrice / invoice.BasePrice) * 100):F1}%", leftMargin, ref yPos, labelFont, valueFont);
+            g.DrawString(invoice.TaxPrice.ToString("C2"), valueFont, brush, rightMargin - 100, yPos - 25);
 
             yPos += 10;
-            var totalFont = new Font("Arial", 14, FontStyle.Bold);
-            g.DrawString($"Total: {invoice.TotalPrice:C2}", totalFont, brush, leftMargin, yPos);
+            g.DrawLine(Pens.Black, leftMargin, yPos, rightMargin, yPos);
+            yPos += 15;
+
+            // Total
+            g.DrawString("TOTAL AMOUNT:", totalFont, brush, leftMargin, yPos);
+            g.DrawString(invoice.TotalPrice.ToString("C2"), totalFont, brush, rightMargin - 120, yPos);
+            yPos += 40;
+
+            // Payment Information
+            if (invoice.Payment != null)
+            {
+                g.DrawLine(Pens.LightGray, leftMargin, yPos, rightMargin, yPos);
+                yPos += 25;
+                
+                g.DrawString("Payment Information", sectionFont, brush, leftMargin, yPos);
+                yPos += 35;
+
+                DrawSummaryRow(g, "Payment Method:", invoice.Payment.Method.ToString(), leftMargin, ref yPos, labelFont, valueFont);
+                DrawSummaryRow(g, "Payment Status:", invoice.Payment.Status.ToString(), leftMargin, ref yPos, labelFont, valueFont);
+                DrawSummaryRow(g, "Amount Paid:", invoice.Payment.Amount.ToString("C2"), leftMargin, ref yPos, labelFont, valueFont);
+                DrawSummaryRow(g, "Payment Date:", invoice.Payment.CreatedAt.ToString("MMM dd, yyyy HH:mm"), leftMargin, ref yPos, labelFont, valueFont);
+            }
+
+            // Footer
+            yPos = e.PageBounds.Height - 100;
+            g.DrawLine(Pens.LightGray, leftMargin, yPos, rightMargin, yPos);
+            yPos += 15;
+            var footerFont = new Font("Arial", 9, FontStyle.Italic);
+            g.DrawString("Thank you for choosing Grand Hotel!", footerFont, grayBrush, leftMargin, yPos);
+            yPos += 15;
+            g.DrawString("For any inquiries, please contact our front desk.", footerFont, grayBrush, leftMargin, yPos);
+        }
+
+        private string GetStatusWithColor(Graphics g, InvoiceStatus status, float x, float y)
+        {
+            var statusFont = new Font("Arial", 11, FontStyle.Bold);
+            var brush = status switch
+            {
+                InvoiceStatus.Paid => Brushes.Green,
+                InvoiceStatus.Pending => Brushes.Orange,
+                InvoiceStatus.Cancelled => Brushes.Red,
+                _ => Brushes.Black
+            };
+            
+            g.DrawString(status.ToString(), statusFont, brush, x, y);
+            return ""; // Return empty since we drew it directly
         }
 
         private void DrawSummaryRow(Graphics g, string label, string value, float x, ref float y, Font labelFont, Font valueFont)

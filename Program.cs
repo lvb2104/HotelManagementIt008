@@ -27,7 +27,9 @@ namespace HotelManagementIt008
                     .AddScoped<IRoomTypeService, RoomTypeService>()
                     .AddScoped<IParamService, ParamService>()
                     .AddScoped<IInvoiceService, InvoiceService>()
+                    .AddScoped<IPaymentService, PaymentService>()
                     .AddScoped<IBookingService, BookingService>()
+                    .AddScoped<IReportService, ReportService>()
                     .AddScoped<IUnitOfWork, UnitOfWork>();
 
                 // Forms
@@ -41,10 +43,14 @@ namespace HotelManagementIt008
                 services.AddTransient<BookingDetailForm>();
                 services.AddTransient<InvoiceManagementForm>();
                 services.AddTransient<PaymentManagementForm>();
+                services.AddTransient<PaymentDetailForm>();
+                services.AddTransient<PaymentMergeForm>();
                 services.AddTransient<UserManagementForm>();
                 services.AddTransient<ReportsForm>();
                 services.AddTransient<SettingsForm>();
                 services.AddTransient<UserDetailForm>();
+                services.AddTransient<RoomTypeManagementForm>();
+                services.AddTransient<RoomTypeDetailForm>();
             }).Build();
 
             // Seed database using a scope

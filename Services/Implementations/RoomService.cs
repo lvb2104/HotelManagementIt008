@@ -148,8 +148,8 @@ namespace HotelManagementIt008.Services.Implementations
                 if (room == null)
                     return Result<bool>.Failure("Room not found");
 
-                // Soft delete - EF will track changes
-                room.DeletedAt = DateTime.UtcNow;
+                // Use Remove to mark entity as Deleted, which triggers DbContext's soft delete handler
+                await _unitOfWork.RoomRepository.RemoveAsync(room);
                 await _unitOfWork.SaveAsync();
 
                 return Result<bool>.Success(true);

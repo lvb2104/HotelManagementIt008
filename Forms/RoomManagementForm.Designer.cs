@@ -54,12 +54,13 @@
             btnEditRoom = new Button();
             btnAddRoom = new Button();
             dgvRooms = new DataGridView();
+            pnlTop.SuspendLayout();
+            pnlFilters.SuspendLayout();
             grpFilters.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudPriceTo).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudPriceFrom).BeginInit();
             pnlActions.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvRooms).BeginInit();
-            pnlTop.SuspendLayout();
             SuspendLayout();
             // 
             // pnlTop
@@ -79,7 +80,7 @@
             lblTitle.ForeColor = Color.FromArgb(63, 81, 181);
             lblTitle.Location = new Point(20, 10);
             lblTitle.Name = "lblTitle";
-            lblTitle.Size = new Size(269, 37);
+            lblTitle.Size = new Size(271, 37);
             lblTitle.TabIndex = 0;
             lblTitle.Text = "Room Management";
             // 
@@ -88,7 +89,7 @@
             pnlFilters.BackColor = Color.FromArgb(240, 244, 248);
             pnlFilters.Controls.Add(grpFilters);
             pnlFilters.Dock = DockStyle.Top;
-            pnlFilters.Location = new Point(0, 0);
+            pnlFilters.Location = new Point(0, 60);
             pnlFilters.Name = "pnlFilters";
             pnlFilters.Padding = new Padding(10);
             pnlFilters.Size = new Size(1110, 120);
@@ -108,6 +109,7 @@
             grpFilters.Controls.Add(cboFilterStatus);
             grpFilters.Controls.Add(cboFilterRoomType);
             grpFilters.Controls.Add(txtFilterRoomNumber);
+            this.grpFilters.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             grpFilters.Font = new Font("Segoe UI", 10F);
             grpFilters.Location = new Point(10, 10);
             grpFilters.Name = "grpFilters";
@@ -119,7 +121,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(335, 30);
+            label3.Location = new Point(335, 35);
             label3.Name = "label3";
             label3.Size = new Size(47, 19);
             label3.TabIndex = 11;
@@ -191,6 +193,7 @@
             // 
             // btnClearFilters
             // 
+            this.btnClearFilters.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             btnClearFilters.BackColor = Color.FromArgb(158, 158, 158);
             btnClearFilters.Cursor = Cursors.Hand;
             btnClearFilters.FlatStyle = FlatStyle.Flat;
@@ -205,6 +208,7 @@
             // 
             // btnSearch
             // 
+            this.btnSearch.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             btnSearch.BackColor = Color.FromArgb(33, 150, 243);
             btnSearch.Cursor = Cursors.Hand;
             btnSearch.FlatStyle = FlatStyle.Flat;
@@ -255,7 +259,7 @@
             pnlActions.Controls.Add(btnEditRoom);
             pnlActions.Controls.Add(btnAddRoom);
             pnlActions.Dock = DockStyle.Top;
-            pnlActions.Location = new Point(0, 120);
+            pnlActions.Location = new Point(0, 180);
             pnlActions.Name = "pnlActions";
             pnlActions.Padding = new Padding(10);
             pnlActions.Size = new Size(1110, 60);
@@ -301,7 +305,7 @@
             btnExportPDF.Name = "btnExportPDF";
             btnExportPDF.Size = new Size(120, 35);
             btnExportPDF.TabIndex = 3;
-            btnExportPDF.Text = "📄 Export PDF";
+            btnExportPDF.Text = "📄 Export CSV";
             btnExportPDF.UseVisualStyleBackColor = false;
             btnExportPDF.Click += btnExportPDF_Click;
             // 
@@ -358,13 +362,13 @@
             dgvRooms.BorderStyle = BorderStyle.None;
             dgvRooms.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvRooms.Dock = DockStyle.Fill;
-            dgvRooms.Location = new Point(0, 180);
+            dgvRooms.Location = new Point(0, 240);
             dgvRooms.MultiSelect = false;
             dgvRooms.Name = "dgvRooms";
             dgvRooms.ReadOnly = true;
             dgvRooms.RowHeadersVisible = false;
             dgvRooms.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvRooms.Size = new Size(1110, 480);
+            dgvRooms.Size = new Size(1110, 420);
             dgvRooms.TabIndex = 3;
             // 
             // RoomManagementForm
@@ -379,9 +383,11 @@
             Controls.Add(pnlTop);
             FormBorderStyle = FormBorderStyle.None;
             Name = "RoomManagementForm";
-            StartPosition = FormStartPosition.CenterScreen;
             Text = "Room Management";
             Load += RoomManagementForm_Load;
+            pnlTop.ResumeLayout(false);
+            pnlTop.PerformLayout();
+            pnlFilters.ResumeLayout(false);
             grpFilters.ResumeLayout(false);
             grpFilters.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)nudPriceTo).EndInit();
@@ -389,8 +395,6 @@
             pnlActions.ResumeLayout(false);
             pnlActions.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvRooms).EndInit();
-            pnlTop.ResumeLayout(false);
-            pnlTop.PerformLayout();
             ResumeLayout(false);
         }
 

@@ -28,217 +28,267 @@ namespace HotelManagementIt008.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.grpBookingDetails = new System.Windows.Forms.GroupBox();
-            this.lblRoom = new System.Windows.Forms.Label();
-            this.cboRooms = new System.Windows.Forms.ComboBox();
-            this.lblCheckIn = new System.Windows.Forms.Label();
-            this.dtpCheckIn = new System.Windows.Forms.DateTimePicker();
-            this.lblCheckOut = new System.Windows.Forms.Label();
-            this.dtpCheckOut = new System.Windows.Forms.DateTimePicker();
-            this.grpParticipants = new System.Windows.Forms.GroupBox();
-            this.dgvParticipants = new System.Windows.Forms.DataGridView();
-            this.pnlParticipantActions = new System.Windows.Forms.Panel();
-            this.btnAddParticipant = new System.Windows.Forms.Button();
-            this.btnRemoveParticipant = new System.Windows.Forms.Button();
-            this.pnlActions = new System.Windows.Forms.Panel();
-            this.btnSave = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.grpBookingDetails.SuspendLayout();
-            this.grpParticipants.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvParticipants)).BeginInit();
-            this.pnlParticipantActions.SuspendLayout();
-            this.pnlActions.SuspendLayout();
-            this.SuspendLayout();
+            grpBookingDetails = new GroupBox();
+            lblRoom = new Label();
+            cboRooms = new ComboBox();
+            lblCheckIn = new Label();
+            dtpCheckIn = new DateTimePicker();
+            lblCheckOut = new Label();
+            dtpCheckOut = new DateTimePicker();
+            grpParticipants = new GroupBox();
+            dgvParticipants = new DataGridView();
+            pnlParticipantActions = new Panel();
+            rbSelectExisting = new RadioButton();
+            rbCreateNew = new RadioButton();
+            lblCustomer = new Label();
+            cboCustomers = new ComboBox();
+            btnAddParticipant = new Button();
+            btnRemoveParticipant = new Button();
+            pnlActions = new Panel();
+            btnSave = new Button();
+            btnCancel = new Button();
+            grpBookingDetails.SuspendLayout();
+            grpParticipants.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvParticipants).BeginInit();
+            pnlParticipantActions.SuspendLayout();
+            pnlActions.SuspendLayout();
+            SuspendLayout();
             // 
             // grpBookingDetails
             // 
-            this.grpBookingDetails.Controls.Add(this.lblRoom);
-            this.grpBookingDetails.Controls.Add(this.cboRooms);
-            this.grpBookingDetails.Controls.Add(this.lblCheckIn);
-            this.grpBookingDetails.Controls.Add(this.dtpCheckIn);
-            this.grpBookingDetails.Controls.Add(this.lblCheckOut);
-            this.grpBookingDetails.Controls.Add(this.dtpCheckOut);
-            this.grpBookingDetails.Dock = System.Windows.Forms.DockStyle.Top;
-            this.grpBookingDetails.Location = new System.Drawing.Point(10, 10);
-            this.grpBookingDetails.Name = "grpBookingDetails";
-            this.grpBookingDetails.Size = new System.Drawing.Size(780, 100);
-            this.grpBookingDetails.TabIndex = 0;
-            this.grpBookingDetails.TabStop = false;
-            this.grpBookingDetails.Text = "Booking Details";
+            grpBookingDetails.Controls.Add(lblRoom);
+            grpBookingDetails.Controls.Add(cboRooms);
+            grpBookingDetails.Controls.Add(lblCheckIn);
+            grpBookingDetails.Controls.Add(dtpCheckIn);
+            grpBookingDetails.Controls.Add(lblCheckOut);
+            grpBookingDetails.Controls.Add(dtpCheckOut);
+            grpBookingDetails.Dock = DockStyle.Top;
+            grpBookingDetails.Location = new Point(10, 10);
+            grpBookingDetails.Name = "grpBookingDetails";
+            grpBookingDetails.Size = new Size(780, 100);
+            grpBookingDetails.TabIndex = 0;
+            grpBookingDetails.TabStop = false;
+            grpBookingDetails.Text = "Booking Details";
             // 
             // lblRoom
             // 
-            this.lblRoom.AutoSize = true;
-            this.lblRoom.Location = new System.Drawing.Point(20, 30);
-            this.lblRoom.Name = "lblRoom";
-            this.lblRoom.Size = new System.Drawing.Size(39, 15);
-            this.lblRoom.TabIndex = 0;
-            this.lblRoom.Text = "Room";
+            lblRoom.AutoSize = true;
+            lblRoom.Location = new Point(20, 30);
+            lblRoom.Name = "lblRoom";
+            lblRoom.Size = new Size(39, 15);
+            lblRoom.TabIndex = 0;
+            lblRoom.Text = "Room";
             // 
             // cboRooms
             // 
-            this.cboRooms.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
-            this.cboRooms.FormattingEnabled = true;
-            this.cboRooms.Location = new System.Drawing.Point(20, 50);
-            this.cboRooms.Name = "cboRooms";
-            this.cboRooms.Size = new System.Drawing.Size(200, 23);
-            this.cboRooms.TabIndex = 1;
-            this.cboRooms.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.cboRooms.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            cboRooms.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cboRooms.AutoCompleteSource = AutoCompleteSource.ListItems;
+            cboRooms.FormattingEnabled = true;
+            cboRooms.Location = new Point(20, 50);
+            cboRooms.Name = "cboRooms";
+            cboRooms.Size = new Size(200, 23);
+            cboRooms.TabIndex = 1;
             // 
             // lblCheckIn
             // 
-            this.lblCheckIn.AutoSize = true;
-            this.lblCheckIn.Location = new System.Drawing.Point(250, 30);
-            this.lblCheckIn.Name = "lblCheckIn";
-            this.lblCheckIn.Size = new System.Drawing.Size(53, 15);
-            this.lblCheckIn.TabIndex = 2;
-            this.lblCheckIn.Text = "Check In";
+            lblCheckIn.AutoSize = true;
+            lblCheckIn.Location = new Point(250, 30);
+            lblCheckIn.Name = "lblCheckIn";
+            lblCheckIn.Size = new Size(53, 15);
+            lblCheckIn.TabIndex = 2;
+            lblCheckIn.Text = "Check In";
             // 
             // dtpCheckIn
             // 
-            this.dtpCheckIn.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpCheckIn.Location = new System.Drawing.Point(250, 50);
-            this.dtpCheckIn.Name = "dtpCheckIn";
-            this.dtpCheckIn.Size = new System.Drawing.Size(120, 23);
-            this.dtpCheckIn.TabIndex = 3;
+            dtpCheckIn.Format = DateTimePickerFormat.Short;
+            dtpCheckIn.Location = new Point(250, 50);
+            dtpCheckIn.Name = "dtpCheckIn";
+            dtpCheckIn.Size = new Size(120, 23);
+            dtpCheckIn.TabIndex = 3;
             // 
             // lblCheckOut
             // 
-            this.lblCheckOut.AutoSize = true;
-            this.lblCheckOut.Location = new System.Drawing.Point(400, 30);
-            this.lblCheckOut.Name = "lblCheckOut";
-            this.lblCheckOut.Size = new System.Drawing.Size(63, 15);
-            this.lblCheckOut.TabIndex = 4;
-            this.lblCheckOut.Text = "Check Out";
+            lblCheckOut.AutoSize = true;
+            lblCheckOut.Location = new Point(400, 30);
+            lblCheckOut.Name = "lblCheckOut";
+            lblCheckOut.Size = new Size(63, 15);
+            lblCheckOut.TabIndex = 4;
+            lblCheckOut.Text = "Check Out";
             // 
             // dtpCheckOut
             // 
-            this.dtpCheckOut.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpCheckOut.Location = new System.Drawing.Point(400, 50);
-            this.dtpCheckOut.Name = "dtpCheckOut";
-            this.dtpCheckOut.Size = new System.Drawing.Size(120, 23);
-            this.dtpCheckOut.TabIndex = 5;
+            dtpCheckOut.Format = DateTimePickerFormat.Short;
+            dtpCheckOut.Location = new Point(400, 50);
+            dtpCheckOut.Name = "dtpCheckOut";
+            dtpCheckOut.Size = new Size(120, 23);
+            dtpCheckOut.TabIndex = 5;
             // 
             // grpParticipants
             // 
-            this.grpParticipants.Controls.Add(this.dgvParticipants);
-            this.grpParticipants.Controls.Add(this.pnlParticipantActions);
-            this.grpParticipants.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpParticipants.Location = new System.Drawing.Point(10, 110);
-            this.grpParticipants.Name = "grpParticipants";
-            this.grpParticipants.Size = new System.Drawing.Size(780, 280);
-            this.grpParticipants.TabIndex = 1;
-            this.grpParticipants.TabStop = false;
-            this.grpParticipants.Text = "Participants";
+            grpParticipants.Controls.Add(dgvParticipants);
+            grpParticipants.Controls.Add(pnlParticipantActions);
+            grpParticipants.Dock = DockStyle.Fill;
+            grpParticipants.Location = new Point(10, 110);
+            grpParticipants.Name = "grpParticipants";
+            grpParticipants.Size = new Size(780, 280);
+            grpParticipants.TabIndex = 1;
+            grpParticipants.TabStop = false;
+            grpParticipants.Text = "Participants";
             // 
             // dgvParticipants
             // 
-            this.dgvParticipants.AllowUserToAddRows = false;
-            this.dgvParticipants.AllowUserToDeleteRows = false;
-            this.dgvParticipants.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvParticipants.BackgroundColor = System.Drawing.Color.White;
-            this.dgvParticipants.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvParticipants.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvParticipants.Location = new System.Drawing.Point(3, 19);
-            this.dgvParticipants.Name = "dgvParticipants";
-            this.dgvParticipants.RowHeadersVisible = false;
-            this.dgvParticipants.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvParticipants.Size = new System.Drawing.Size(774, 218);
-            this.dgvParticipants.TabIndex = 0;
+            dgvParticipants.AllowUserToAddRows = false;
+            dgvParticipants.AllowUserToDeleteRows = false;
+            dgvParticipants.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvParticipants.BackgroundColor = Color.White;
+            dgvParticipants.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvParticipants.Dock = DockStyle.Fill;
+            dgvParticipants.Location = new Point(3, 19);
+            dgvParticipants.Name = "dgvParticipants";
+            dgvParticipants.RowHeadersVisible = false;
+            dgvParticipants.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvParticipants.Size = new Size(774, 178);
+            dgvParticipants.TabIndex = 0;
             // 
             // pnlParticipantActions
             // 
-            this.pnlParticipantActions.Controls.Add(this.btnAddParticipant);
-            this.pnlParticipantActions.Controls.Add(this.btnRemoveParticipant);
-            this.pnlParticipantActions.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlParticipantActions.Location = new System.Drawing.Point(3, 237);
-            this.pnlParticipantActions.Name = "pnlParticipantActions";
-            this.pnlParticipantActions.Size = new System.Drawing.Size(774, 40);
-            this.pnlParticipantActions.TabIndex = 1;
+            pnlParticipantActions.Controls.Add(rbSelectExisting);
+            pnlParticipantActions.Controls.Add(rbCreateNew);
+            pnlParticipantActions.Controls.Add(lblCustomer);
+            pnlParticipantActions.Controls.Add(cboCustomers);
+            pnlParticipantActions.Controls.Add(btnAddParticipant);
+            pnlParticipantActions.Controls.Add(btnRemoveParticipant);
+            pnlParticipantActions.Dock = DockStyle.Bottom;
+            pnlParticipantActions.Location = new Point(3, 197);
+            pnlParticipantActions.Name = "pnlParticipantActions";
+            pnlParticipantActions.Size = new Size(774, 80);
+            pnlParticipantActions.TabIndex = 1;
+            // 
+            // rbSelectExisting
+            // 
+            rbSelectExisting.AutoSize = true;
+            rbSelectExisting.Checked = true;
+            rbSelectExisting.Location = new Point(10, 10);
+            rbSelectExisting.Name = "rbSelectExisting";
+            rbSelectExisting.Size = new Size(154, 19);
+            rbSelectExisting.TabIndex = 0;
+            rbSelectExisting.TabStop = true;
+            rbSelectExisting.Text = "Select Existing Customer";
+            rbSelectExisting.UseVisualStyleBackColor = true;
+            rbSelectExisting.CheckedChanged += rbSelectExisting_CheckedChanged;
+            // 
+            // rbCreateNew
+            // 
+            rbCreateNew.AutoSize = true;
+            rbCreateNew.Location = new Point(182, 10);
+            rbCreateNew.Name = "rbCreateNew";
+            rbCreateNew.Size = new Size(141, 19);
+            rbCreateNew.TabIndex = 1;
+            rbCreateNew.Text = "Create New Customer";
+            rbCreateNew.UseVisualStyleBackColor = true;
+            // 
+            // lblCustomer
+            // 
+            lblCustomer.AutoSize = true;
+            lblCustomer.Location = new Point(10, 35);
+            lblCustomer.Name = "lblCustomer";
+            lblCustomer.Size = new Size(59, 15);
+            lblCustomer.TabIndex = 2;
+            lblCustomer.Text = "Customer";
+            // 
+            // cboCustomers
+            // 
+            cboCustomers.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cboCustomers.AutoCompleteSource = AutoCompleteSource.ListItems;
+            cboCustomers.FormattingEnabled = true;
+            cboCustomers.Location = new Point(75, 32);
+            cboCustomers.Name = "cboCustomers";
+            cboCustomers.Size = new Size(350, 23);
+            cboCustomers.TabIndex = 3;
             // 
             // btnAddParticipant
             // 
-            this.btnAddParticipant.Location = new System.Drawing.Point(5, 5);
-            this.btnAddParticipant.Name = "btnAddParticipant";
-            this.btnAddParticipant.Size = new System.Drawing.Size(120, 30);
-            this.btnAddParticipant.TabIndex = 0;
-            this.btnAddParticipant.Text = "Add Participant";
-            this.btnAddParticipant.UseVisualStyleBackColor = true;
-            this.btnAddParticipant.Click += new System.EventHandler(this.btnAddParticipant_Click);
+            btnAddParticipant.Location = new Point(435, 30);
+            btnAddParticipant.Name = "btnAddParticipant";
+            btnAddParticipant.Size = new Size(120, 30);
+            btnAddParticipant.TabIndex = 4;
+            btnAddParticipant.Text = "Add Participant";
+            btnAddParticipant.UseVisualStyleBackColor = true;
+            btnAddParticipant.Click += btnAddParticipant_Click;
             // 
             // btnRemoveParticipant
             // 
-            this.btnRemoveParticipant.Location = new System.Drawing.Point(135, 5);
-            this.btnRemoveParticipant.Name = "btnRemoveParticipant";
-            this.btnRemoveParticipant.Size = new System.Drawing.Size(120, 30);
-            this.btnRemoveParticipant.TabIndex = 1;
-            this.btnRemoveParticipant.Text = "Remove Selected";
-            this.btnRemoveParticipant.UseVisualStyleBackColor = true;
-            this.btnRemoveParticipant.Click += new System.EventHandler(this.btnRemoveParticipant_Click);
+            btnRemoveParticipant.Location = new Point(565, 30);
+            btnRemoveParticipant.Name = "btnRemoveParticipant";
+            btnRemoveParticipant.Size = new Size(120, 30);
+            btnRemoveParticipant.TabIndex = 5;
+            btnRemoveParticipant.Text = "Remove Selected";
+            btnRemoveParticipant.UseVisualStyleBackColor = true;
+            btnRemoveParticipant.Click += btnRemoveParticipant_Click;
             // 
             // pnlActions
             // 
-            this.pnlActions.Controls.Add(this.btnSave);
-            this.pnlActions.Controls.Add(this.btnCancel);
-            this.pnlActions.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlActions.Location = new System.Drawing.Point(10, 390);
-            this.pnlActions.Name = "pnlActions";
-            this.pnlActions.Size = new System.Drawing.Size(780, 50);
-            this.pnlActions.TabIndex = 2;
+            pnlActions.Controls.Add(btnSave);
+            pnlActions.Controls.Add(btnCancel);
+            pnlActions.Dock = DockStyle.Bottom;
+            pnlActions.Location = new Point(10, 390);
+            pnlActions.Name = "pnlActions";
+            pnlActions.Size = new Size(780, 50);
+            pnlActions.TabIndex = 2;
             // 
             // btnSave
             // 
-            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
-            this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSave.ForeColor = System.Drawing.Color.White;
-            this.btnSave.Location = new System.Drawing.Point(610, 10);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(80, 30);
-            this.btnSave.TabIndex = 0;
-            this.btnSave.Text = "Save";
-            this.btnSave.UseVisualStyleBackColor = false;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            btnSave.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnSave.BackColor = Color.FromArgb(76, 175, 80);
+            btnSave.FlatStyle = FlatStyle.Flat;
+            btnSave.ForeColor = Color.White;
+            btnSave.Location = new Point(610, 10);
+            btnSave.Name = "btnSave";
+            btnSave.Size = new Size(80, 30);
+            btnSave.TabIndex = 0;
+            btnSave.Text = "Save";
+            btnSave.UseVisualStyleBackColor = false;
+            btnSave.Click += btnSave_Click;
             // 
             // btnCancel
             // 
-            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(158)))), ((int)(((byte)(158)))));
-            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancel.ForeColor = System.Drawing.Color.White;
-            this.btnCancel.Location = new System.Drawing.Point(700, 10);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(80, 30);
-            this.btnCancel.TabIndex = 1;
-            this.btnCancel.Text = "Cancel";
-            this.btnCancel.UseVisualStyleBackColor = false;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnCancel.BackColor = Color.FromArgb(158, 158, 158);
+            btnCancel.FlatStyle = FlatStyle.Flat;
+            btnCancel.ForeColor = Color.White;
+            btnCancel.Location = new Point(700, 10);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(80, 30);
+            btnCancel.TabIndex = 1;
+            btnCancel.Text = "Cancel";
+            btnCancel.UseVisualStyleBackColor = false;
+            btnCancel.Click += btnCancel_Click;
             // 
             // BookingDetailForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.grpParticipants);
-            this.Controls.Add(this.pnlActions);
-            this.Controls.Add(this.grpBookingDetails);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "BookingDetailForm";
-            this.Padding = new System.Windows.Forms.Padding(10);
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Booking Detail";
-            this.Load += new System.EventHandler(this.BookingDetailForm_Load);
-            this.grpBookingDetails.ResumeLayout(false);
-            this.grpBookingDetails.PerformLayout();
-            this.grpParticipants.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dgvParticipants)).EndInit();
-            this.pnlParticipantActions.ResumeLayout(false);
-            this.pnlActions.ResumeLayout(false);
-            this.ResumeLayout(false);
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.White;
+            ClientSize = new Size(800, 450);
+            Controls.Add(grpParticipants);
+            Controls.Add(pnlActions);
+            Controls.Add(grpBookingDetails);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "BookingDetailForm";
+            Padding = new Padding(10);
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "Booking Detail";
+            Load += BookingDetailForm_Load;
+            grpBookingDetails.ResumeLayout(false);
+            grpBookingDetails.PerformLayout();
+            grpParticipants.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvParticipants).EndInit();
+            pnlParticipantActions.ResumeLayout(false);
+            pnlParticipantActions.PerformLayout();
+            pnlActions.ResumeLayout(false);
+            ResumeLayout(false);
 
         }
 
@@ -254,6 +304,10 @@ namespace HotelManagementIt008.Forms
         private System.Windows.Forms.GroupBox grpParticipants;
         private System.Windows.Forms.DataGridView dgvParticipants;
         private System.Windows.Forms.Panel pnlParticipantActions;
+        private System.Windows.Forms.RadioButton rbSelectExisting;
+        private System.Windows.Forms.RadioButton rbCreateNew;
+        private System.Windows.Forms.Label lblCustomer;
+        private System.Windows.Forms.ComboBox cboCustomers;
         private System.Windows.Forms.Button btnAddParticipant;
         private System.Windows.Forms.Button btnRemoveParticipant;
         private System.Windows.Forms.Panel pnlActions;
