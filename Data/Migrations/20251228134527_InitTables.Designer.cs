@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HotelManagementIt008.Data.Migrations
 {
     [DbContext(typeof(HotelManagementDbContext))]
-    [Migration("20251228023000_InitTables")]
+    [Migration("20251228134527_InitTables")]
     partial class InitTables
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace HotelManagementIt008.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.10")
+                .HasAnnotation("ProductVersion", "10.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);

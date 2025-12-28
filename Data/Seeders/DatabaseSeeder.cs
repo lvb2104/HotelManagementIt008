@@ -41,21 +41,21 @@ namespace HotelManagementIt008.Data.Seeders
                 var roles = await SeedRoles();
                 var userTypes = await SeedUserTypes();
                 var roomTypes = await SeedRoomTypes();
-                //var payments = await SeedPayments();
+                var payments = await SeedPayments();
 
                 // Phase 2: Seed rooms
-                //var rooms = await SeedRooms(roomTypes);
+                var rooms = await SeedRooms(roomTypes);
 
                 // Phase 3: Seed users and profiles
                 var admin = await SeedAdmin(roles, passwordHash);
                 var staff = await SeedStaff(roles, passwordHash);
-                //var customers = await SeedCustomersAndProfiles(roles, userTypes);
+                var customers = await SeedCustomersAndProfiles(roles, userTypes);
 
                 // Phase 4: Seed system parameters (needed for booking calculations)
                 var systemParams = await SeedParams();
 
                 // Phase 5: Seed bookings, invoices, and booking details
-                //await SeedBookingsInvoicesAndDetails(customers, staff, rooms, payments, roomTypes, userTypes, systemParams);
+                await SeedBookingsInvoicesAndDetails(customers, staff, rooms, payments, roomTypes, userTypes, systemParams);
 
                 // Commit transaction
                 await transaction.CommitAsync();
