@@ -330,6 +330,55 @@ namespace HotelManagementIt008.Forms
             }
         }
 
+        private void btnExportCSV_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using var saveFileDialog = new SaveFileDialog
+                {
+                    Filter = "CSV Files (*.csv)|*.csv|All Files (*.*)|*.*",
+                    FilterIndex = 1,
+                    FileName = $"Invoices_{DateTime.Now:yyyyMMdd_HHmmss}.csv",
+                    Title = "Export Invoices to CSV",
+                    DefaultExt = "csv"
+                };
+
+                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                    return;
+
+                var csv = new System.Text.StringBuilder();
+
+                // Add headers
+                foreach (DataGridViewColumn col in dgvInvoices.Columns)
+                {
+                    if (col.Visible)
+                        csv.Append(col.HeaderText + ",");
+                }
+                csv.AppendLine();
+
+                // Add rows
+                foreach (DataGridViewRow row in dgvInvoices.Rows)
+                {
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+                        if (dgvInvoices.Columns[cell.ColumnIndex].Visible)
+                        {
+                            var value = cell.Value?.ToString()?.Replace(",", ";") ?? string.Empty;
+                            csv.Append(value + ",");
+                        }
+                    }
+                    csv.AppendLine();
+                }
+
+                File.WriteAllText(saveFileDialog.FileName, csv.ToString());
+                MessageBox.Show($"Successfully exported to:\n{saveFileDialog.FileName}", "Export Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Export failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void PrintInvoiceDetails(InvoiceResponseDto invoice)
         {
             var printDoc = new PrintDocument();

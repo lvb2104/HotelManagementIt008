@@ -7,7 +7,7 @@ namespace HotelManagementIt008.Dtos.Responses
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }
         public decimal TotalPrice { get; set; }
-        public string BookerEmail { get; set; } = string.Empty;
+        public string BookerUsername { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
     }
 }

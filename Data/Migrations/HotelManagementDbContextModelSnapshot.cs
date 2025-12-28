@@ -429,9 +429,6 @@ namespace HotelManagementIt008.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<decimal>("SurchargeRate")
-                        .HasColumnType("numeric");
-
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 

@@ -44,6 +44,7 @@
             lblPageInfo = new Label();
             btnPrevious = new Button();
             btnPrintInvoice = new Button();
+            btnExportCSV = new Button();
             btnMarkAsPaid = new Button();
             dgvInvoices = new DataGridView();
             pnlTop.SuspendLayout();
@@ -178,6 +179,7 @@
             pnlActions.Controls.Add(btnNext);
             pnlActions.Controls.Add(lblPageInfo);
             pnlActions.Controls.Add(btnPrevious);
+            pnlActions.Controls.Add(btnExportCSV);
             pnlActions.Controls.Add(btnPrintInvoice);
             pnlActions.Controls.Add(btnMarkAsPaid);
             pnlActions.Dock = DockStyle.Top;
@@ -232,6 +234,19 @@
             btnPrintInvoice.Text = "📄 Print";
             btnPrintInvoice.UseVisualStyleBackColor = false;
             btnPrintInvoice.Click += btnPrintInvoice_Click;
+            // 
+            // btnExportCSV
+            // 
+            btnExportCSV.BackColor = Color.FromArgb(63, 81, 181);
+            btnExportCSV.FlatStyle = FlatStyle.Flat;
+            btnExportCSV.ForeColor = Color.White;
+            btnExportCSV.Location = new Point(280, 15);
+            btnExportCSV.Name = "btnExportCSV";
+            btnExportCSV.Size = new Size(120, 35);
+            btnExportCSV.TabIndex = 4;
+            btnExportCSV.Text = "📊 Export CSV";
+            btnExportCSV.UseVisualStyleBackColor = false;
+            btnExportCSV.Click += btnExportCSV_Click;
             // 
             // btnMarkAsPaid
             // 
@@ -305,6 +320,7 @@
         private DataGridView dgvInvoices;
         private Panel pnlActions;
         private Button btnPrintInvoice;
+        private Button btnExportCSV;
         private Button btnMarkAsPaid;
         private Button btnNext;
         private Button btnPrevious;

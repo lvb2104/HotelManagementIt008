@@ -142,5 +142,17 @@ namespace HotelManagementIt008.Forms
             DialogResult = DialogResult.Cancel;
             Close();
         }
+
+        private void cboRoomType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cboRoomType.SelectedItem is RoomTypeResponseDto selectedRoomType)
+            {
+                txtPrice.Text = selectedRoomType.PricePerNight.ToString("N2"); // Format as currency with 2 decimals
+            }
+            else
+            {
+                txtPrice.Text = "0.00";
+            }
+        }
     }
 }

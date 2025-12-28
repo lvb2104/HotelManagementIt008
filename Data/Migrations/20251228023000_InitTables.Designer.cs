@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HotelManagementIt008.Data.Migrations
 {
     [DbContext(typeof(HotelManagementDbContext))]
-    [Migration("20251217074954_InitTables")]
+    [Migration("20251228023000_InitTables")]
     partial class InitTables
     {
         /// <inheritdoc />
@@ -431,9 +431,6 @@ namespace HotelManagementIt008.Data.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
-
-                    b.Property<decimal>("SurchargeRate")
-                        .HasColumnType("numeric");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");

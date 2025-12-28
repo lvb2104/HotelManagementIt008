@@ -121,7 +121,7 @@ namespace HotelManagementIt008.Services.Implementations
                     CheckInDate = b.CheckInDate,
                     CheckOutDate = b.CheckOutDate,
                     TotalPrice = b.TotalPrice,
-                    BookerEmail = b.Booker.Email ?? "",
+                    BookerUsername = b.Booker.Username ?? "",
                     CreatedAt = b.CreatedAt
                 }).ToList();
 
@@ -208,7 +208,7 @@ namespace HotelManagementIt008.Services.Implementations
                 dto.CheckOutDate = DateTime.SpecifyKind(dto.CheckOutDate.Date, DateTimeKind.Utc);
 
                 if (dto.CheckInDate > dto.CheckOutDate) return Result<BookingResponseDto>.Failure("Check-out date must be after check-in date");
-                if (dto.CheckInDate.Date < DateTime.UtcNow.Date) return Result<BookingResponseDto>.Failure("Check-in date cannot be in the past"); // TODO: Fix can't choose check-in date is today
+                if (dto.CheckInDate.Date < DateTime.UtcNow.Date) return Result<BookingResponseDto>.Failure("Check-in date cannot be in the past");
 
                 var overlapping = await _unitOfWork.BookingRepository
                     .FindOverlappingBookingsAsync(dto.RoomId, dto.CheckInDate, dto.CheckOutDate);

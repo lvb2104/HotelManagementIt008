@@ -28,166 +28,191 @@ namespace HotelManagementIt008.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.grpRoomDetails = new System.Windows.Forms.GroupBox();
-            this.lblRoomNumber = new System.Windows.Forms.Label();
-            this.txtRoomNumber = new System.Windows.Forms.TextBox();
-            this.lblNote = new System.Windows.Forms.Label();
-            this.txtNote = new System.Windows.Forms.TextBox();
-            this.lblStatus = new System.Windows.Forms.Label();
-            this.cboStatus = new System.Windows.Forms.ComboBox();
-            this.lblRoomType = new System.Windows.Forms.Label();
-            this.cboRoomType = new System.Windows.Forms.ComboBox();
-            this.pnlActions = new System.Windows.Forms.Panel();
-            this.btnSave = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.grpRoomDetails.SuspendLayout();
-            this.pnlActions.SuspendLayout();
-            this.SuspendLayout();
+            grpRoomDetails = new GroupBox();
+            lblRoomNumber = new Label();
+            txtRoomNumber = new TextBox();
+            lblNote = new Label();
+            txtNote = new TextBox();
+            lblStatus = new Label();
+            cboStatus = new ComboBox();
+            lblRoomType = new Label();
+            cboRoomType = new ComboBox();
+            lblPrice = new Label();
+            txtPrice = new TextBox();
+            pnlActions = new Panel();
+            btnSave = new Button();
+            btnCancel = new Button();
+            grpRoomDetails.SuspendLayout();
+            pnlActions.SuspendLayout();
+            SuspendLayout();
             // 
             // grpRoomDetails
             // 
-            this.grpRoomDetails.Controls.Add(this.lblRoomNumber);
-            this.grpRoomDetails.Controls.Add(this.txtRoomNumber);
-            this.grpRoomDetails.Controls.Add(this.lblNote);
-            this.grpRoomDetails.Controls.Add(this.txtNote);
-            this.grpRoomDetails.Controls.Add(this.lblStatus);
-            this.grpRoomDetails.Controls.Add(this.cboStatus);
-            this.grpRoomDetails.Controls.Add(this.lblRoomType);
-            this.grpRoomDetails.Controls.Add(this.cboRoomType);
-            this.grpRoomDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpRoomDetails.Location = new System.Drawing.Point(10, 10);
-            this.grpRoomDetails.Name = "grpRoomDetails";
-            this.grpRoomDetails.Size = new System.Drawing.Size(480, 200);
-            this.grpRoomDetails.TabIndex = 0;
-            this.grpRoomDetails.TabStop = false;
-            this.grpRoomDetails.Text = "Room Details";
+            grpRoomDetails.Controls.Add(lblRoomNumber);
+            grpRoomDetails.Controls.Add(txtRoomNumber);
+            grpRoomDetails.Controls.Add(lblNote);
+            grpRoomDetails.Controls.Add(txtNote);
+            grpRoomDetails.Controls.Add(lblStatus);
+            grpRoomDetails.Controls.Add(cboStatus);
+            grpRoomDetails.Controls.Add(lblRoomType);
+            grpRoomDetails.Controls.Add(cboRoomType);
+            grpRoomDetails.Controls.Add(lblPrice);
+            grpRoomDetails.Controls.Add(txtPrice);
+            grpRoomDetails.Dock = DockStyle.Fill;
+            grpRoomDetails.Location = new Point(10, 10);
+            grpRoomDetails.Name = "grpRoomDetails";
+            grpRoomDetails.Size = new Size(480, 200);
+            grpRoomDetails.TabIndex = 0;
+            grpRoomDetails.TabStop = false;
+            grpRoomDetails.Text = "Room Details";
             // 
             // lblRoomNumber
             // 
-            this.lblRoomNumber.AutoSize = true;
-            this.lblRoomNumber.Location = new System.Drawing.Point(20, 30);
-            this.lblRoomNumber.Name = "lblRoomNumber";
-            this.lblRoomNumber.Size = new System.Drawing.Size(88, 15);
-            this.lblRoomNumber.TabIndex = 0;
-            this.lblRoomNumber.Text = "Room Number";
+            lblRoomNumber.AutoSize = true;
+            lblRoomNumber.Location = new Point(20, 30);
+            lblRoomNumber.Name = "lblRoomNumber";
+            lblRoomNumber.Size = new Size(86, 15);
+            lblRoomNumber.TabIndex = 0;
+            lblRoomNumber.Text = "Room Number";
             // 
             // txtRoomNumber
             // 
-            this.txtRoomNumber.Location = new System.Drawing.Point(20, 50);
-            this.txtRoomNumber.Name = "txtRoomNumber";
-            this.txtRoomNumber.Size = new System.Drawing.Size(200, 23);
-            this.txtRoomNumber.TabIndex = 1;
+            txtRoomNumber.Location = new Point(20, 50);
+            txtRoomNumber.Name = "txtRoomNumber";
+            txtRoomNumber.Size = new Size(200, 23);
+            txtRoomNumber.TabIndex = 1;
             // 
             // lblNote
             // 
-            this.lblNote.AutoSize = true;
-            this.lblNote.Location = new System.Drawing.Point(250, 30);
-            this.lblNote.Name = "lblNote";
-            this.lblNote.Size = new System.Drawing.Size(33, 15);
-            this.lblNote.TabIndex = 2;
-            this.lblNote.Text = "Note";
+            lblNote.AutoSize = true;
+            lblNote.Location = new Point(250, 30);
+            lblNote.Name = "lblNote";
+            lblNote.Size = new Size(33, 15);
+            lblNote.TabIndex = 2;
+            lblNote.Text = "Note";
             // 
             // txtNote
             // 
-            this.txtNote.Location = new System.Drawing.Point(250, 50);
-            this.txtNote.Multiline = true;
-            this.txtNote.Name = "txtNote";
-            this.txtNote.Size = new System.Drawing.Size(210, 60);
-            this.txtNote.TabIndex = 3;
+            txtNote.Location = new Point(250, 50);
+            txtNote.Multiline = true;
+            txtNote.Name = "txtNote";
+            txtNote.Size = new Size(210, 60);
+            txtNote.TabIndex = 3;
             // 
             // lblStatus
             // 
-            this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(20, 90);
-            this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(39, 15);
-            this.lblStatus.TabIndex = 4;
-            this.lblStatus.Text = "Status";
+            lblStatus.AutoSize = true;
+            lblStatus.Location = new Point(20, 90);
+            lblStatus.Name = "lblStatus";
+            lblStatus.Size = new Size(39, 15);
+            lblStatus.TabIndex = 4;
+            lblStatus.Text = "Status";
             // 
             // cboStatus
             // 
-            this.cboStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboStatus.FormattingEnabled = true;
-            this.cboStatus.Location = new System.Drawing.Point(20, 110);
-            this.cboStatus.Name = "cboStatus";
-            this.cboStatus.Size = new System.Drawing.Size(200, 23);
-            this.cboStatus.TabIndex = 5;
+            cboStatus.DropDownStyle = ComboBoxStyle.DropDownList;
+            cboStatus.FormattingEnabled = true;
+            cboStatus.Location = new Point(20, 110);
+            cboStatus.Name = "cboStatus";
+            cboStatus.Size = new Size(200, 23);
+            cboStatus.TabIndex = 5;
             // 
             // lblRoomType
             // 
-            this.lblRoomType.AutoSize = true;
-            this.lblRoomType.Location = new System.Drawing.Point(20, 150);
-            this.lblRoomType.Name = "lblRoomType";
-            this.lblRoomType.Size = new System.Drawing.Size(68, 15);
-            this.lblRoomType.TabIndex = 6;
-            this.lblRoomType.Text = "Room Type";
+            lblRoomType.AutoSize = true;
+            lblRoomType.Location = new Point(20, 150);
+            lblRoomType.Name = "lblRoomType";
+            lblRoomType.Size = new Size(67, 15);
+            lblRoomType.TabIndex = 6;
+            lblRoomType.Text = "Room Type";
             // 
             // cboRoomType
             // 
-            this.cboRoomType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboRoomType.FormattingEnabled = true;
-            this.cboRoomType.Location = new System.Drawing.Point(20, 170);
-            this.cboRoomType.Name = "cboRoomType";
-            this.cboRoomType.Size = new System.Drawing.Size(200, 23);
-            this.cboRoomType.TabIndex = 7;
+            cboRoomType.DropDownStyle = ComboBoxStyle.DropDownList;
+            cboRoomType.FormattingEnabled = true;
+            cboRoomType.Location = new Point(20, 170);
+            cboRoomType.Name = "cboRoomType";
+            cboRoomType.Size = new Size(200, 23);
+            cboRoomType.TabIndex = 7;
+            cboRoomType.SelectedIndexChanged += cboRoomType_SelectedIndexChanged;
+            // 
+            // lblPrice
+            // 
+            lblPrice.AutoSize = true;
+            lblPrice.Location = new Point(250, 150);
+            lblPrice.Name = "lblPrice";
+            lblPrice.Size = new Size(86, 15);
+            lblPrice.TabIndex = 8;
+            lblPrice.Text = "Price Per Night";
+            // 
+            // txtPrice
+            // 
+            txtPrice.BackColor = Color.WhiteSmoke;
+            txtPrice.Enabled = false;
+            txtPrice.Location = new Point(250, 170);
+            txtPrice.Name = "txtPrice";
+            txtPrice.ReadOnly = true;
+            txtPrice.Size = new Size(210, 23);
+            txtPrice.TabIndex = 9;
+            txtPrice.Text = "0.00";
             // 
             // pnlActions
             // 
-            this.pnlActions.Controls.Add(this.btnSave);
-            this.pnlActions.Controls.Add(this.btnCancel);
-            this.pnlActions.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlActions.Location = new System.Drawing.Point(10, 210);
-            this.pnlActions.Name = "pnlActions";
-            this.pnlActions.Size = new System.Drawing.Size(480, 50);
-            this.pnlActions.TabIndex = 1;
+            pnlActions.Controls.Add(btnSave);
+            pnlActions.Controls.Add(btnCancel);
+            pnlActions.Dock = DockStyle.Bottom;
+            pnlActions.Location = new Point(10, 210);
+            pnlActions.Name = "pnlActions";
+            pnlActions.Size = new Size(480, 50);
+            pnlActions.TabIndex = 1;
             // 
             // btnSave
             // 
-            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
-            this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSave.ForeColor = System.Drawing.Color.White;
-            this.btnSave.Location = new System.Drawing.Point(310, 10);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(80, 30);
-            this.btnSave.TabIndex = 0;
-            this.btnSave.Text = "Save";
-            this.btnSave.UseVisualStyleBackColor = false;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            btnSave.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnSave.BackColor = Color.FromArgb(76, 175, 80);
+            btnSave.FlatStyle = FlatStyle.Flat;
+            btnSave.ForeColor = Color.White;
+            btnSave.Location = new Point(310, 10);
+            btnSave.Name = "btnSave";
+            btnSave.Size = new Size(80, 30);
+            btnSave.TabIndex = 0;
+            btnSave.Text = "Save";
+            btnSave.UseVisualStyleBackColor = false;
+            btnSave.Click += btnSave_Click;
             // 
             // btnCancel
             // 
-            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(158)))), ((int)(((byte)(158)))));
-            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancel.ForeColor = System.Drawing.Color.White;
-            this.btnCancel.Location = new System.Drawing.Point(400, 10);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(80, 30);
-            this.btnCancel.TabIndex = 1;
-            this.btnCancel.Text = "Cancel";
-            this.btnCancel.UseVisualStyleBackColor = false;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnCancel.BackColor = Color.FromArgb(158, 158, 158);
+            btnCancel.FlatStyle = FlatStyle.Flat;
+            btnCancel.ForeColor = Color.White;
+            btnCancel.Location = new Point(400, 10);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(80, 30);
+            btnCancel.TabIndex = 1;
+            btnCancel.Text = "Cancel";
+            btnCancel.UseVisualStyleBackColor = false;
+            btnCancel.Click += btnCancel_Click;
             // 
             // RoomDetailForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(500, 270);
-            this.Controls.Add(this.grpRoomDetails);
-            this.Controls.Add(this.pnlActions);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "RoomDetailForm";
-            this.Padding = new System.Windows.Forms.Padding(10);
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Room Detail";
-            this.grpRoomDetails.ResumeLayout(false);
-            this.grpRoomDetails.PerformLayout();
-            this.pnlActions.ResumeLayout(false);
-            this.ResumeLayout(false);
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.White;
+            ClientSize = new Size(500, 270);
+            Controls.Add(grpRoomDetails);
+            Controls.Add(pnlActions);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "RoomDetailForm";
+            Padding = new Padding(10);
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "Room Detail";
+            grpRoomDetails.ResumeLayout(false);
+            grpRoomDetails.PerformLayout();
+            pnlActions.ResumeLayout(false);
+            ResumeLayout(false);
 
         }
 
@@ -202,6 +227,8 @@ namespace HotelManagementIt008.Forms
         private System.Windows.Forms.ComboBox cboStatus;
         private System.Windows.Forms.Label lblRoomType;
         private System.Windows.Forms.ComboBox cboRoomType;
+        private System.Windows.Forms.Label lblPrice;
+        private System.Windows.Forms.TextBox txtPrice;
         private System.Windows.Forms.Panel pnlActions;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnCancel;

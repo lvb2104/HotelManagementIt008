@@ -316,6 +316,18 @@ namespace HotelManagementIt008.Forms
         {
             try
             {
+                using var saveFileDialog = new SaveFileDialog
+                {
+                    Filter = "CSV Files (*.csv)|*.csv|All Files (*.*)|*.*",
+                    FilterIndex = 1,
+                    FileName = $"Rooms_{DateTime.Now:yyyyMMdd_HHmmss}.csv",
+                    Title = "Export Rooms to CSV",
+                    DefaultExt = "csv"
+                };
+
+                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                    return;
+
                 var csv = new StringBuilder();
 
                 // Add headers
@@ -340,9 +352,8 @@ namespace HotelManagementIt008.Forms
                     csv.AppendLine();
                 }
 
-                var fileName = $"Rooms_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
-                File.WriteAllText(fileName, csv.ToString());
-                MessageBox.Show($"Exported to {fileName}", "Export Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                File.WriteAllText(saveFileDialog.FileName, csv.ToString());
+                MessageBox.Show($"Successfully exported to:\n{saveFileDialog.FileName}", "Export Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {

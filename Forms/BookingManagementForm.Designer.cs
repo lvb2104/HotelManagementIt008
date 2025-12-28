@@ -46,6 +46,7 @@
             this.lblPageInfo = new System.Windows.Forms.Label();
             this.btnPrevious = new System.Windows.Forms.Button();
             this.btnPrintBooking = new System.Windows.Forms.Button();
+            this.btnExportCSV = new System.Windows.Forms.Button();
             this.btnDeleteBooking = new System.Windows.Forms.Button();
             this.btnEditBooking = new System.Windows.Forms.Button();
             this.btnAddBooking = new System.Windows.Forms.Button();
@@ -193,6 +194,7 @@
             this.pnlActions.Controls.Add(this.btnNext);
             this.pnlActions.Controls.Add(this.lblPageInfo);
             this.pnlActions.Controls.Add(this.btnPrevious);
+            this.pnlActions.Controls.Add(this.btnExportCSV);
             this.pnlActions.Controls.Add(this.btnPrintBooking);
             this.pnlActions.Controls.Add(this.btnDeleteBooking);
             this.pnlActions.Controls.Add(this.btnEditBooking);
@@ -247,6 +249,19 @@
             this.btnPrintBooking.Text = "📄 Print";
             this.btnPrintBooking.UseVisualStyleBackColor = false;
             this.btnPrintBooking.Click += new System.EventHandler(this.btnPrintBooking_Click);
+            // 
+            // btnExportCSV
+            // 
+            this.btnExportCSV.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(81)))), ((int)(((byte)(181)))));
+            this.btnExportCSV.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnExportCSV.ForeColor = System.Drawing.Color.White;
+            this.btnExportCSV.Location = new System.Drawing.Point(540, 15);
+            this.btnExportCSV.Name = "btnExportCSV";
+            this.btnExportCSV.Size = new System.Drawing.Size(120, 35);
+            this.btnExportCSV.TabIndex = 4;
+            this.btnExportCSV.Text = "📊 Export CSV";
+            this.btnExportCSV.UseVisualStyleBackColor = false;
+            this.btnExportCSV.Click += new System.EventHandler(this.btnExportCSV_Click);
             // 
             // btnDeleteBooking
             // 
@@ -348,6 +363,7 @@
         private System.Windows.Forms.Button btnEditBooking;
         private System.Windows.Forms.Button btnAddBooking;
         private System.Windows.Forms.Button btnPrintBooking;
+        private System.Windows.Forms.Button btnExportCSV;
         private System.Windows.Forms.Button btnDeleteBooking;
         private System.Windows.Forms.DataGridView dgvBookings;
         private System.Windows.Forms.Button btnPrevious;

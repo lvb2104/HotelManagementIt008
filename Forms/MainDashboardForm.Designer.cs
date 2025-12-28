@@ -36,6 +36,7 @@
             btnPayments = new Button();
             btnInvoices = new Button();
             btnBookings = new Button();
+            btnRoomTypes = new Button();
             btnRooms = new Button();
             btnDashboard = new Button();
             pnlLogo = new Panel();
@@ -62,6 +63,7 @@
             pnlSidebar.Controls.Add(btnPayments);
             pnlSidebar.Controls.Add(btnInvoices);
             pnlSidebar.Controls.Add(btnBookings);
+            pnlSidebar.Controls.Add(btnRoomTypes);
             pnlSidebar.Controls.Add(btnRooms);
             pnlSidebar.Controls.Add(btnDashboard);
             pnlSidebar.Controls.Add(pnlLogo);
@@ -81,7 +83,7 @@
             btnSettings.FlatStyle = FlatStyle.Flat;
             btnSettings.Font = new Font("Segoe UI", 11F);
             btnSettings.ForeColor = Color.FromArgb(209, 213, 219);
-            btnSettings.Location = new Point(0, 480);
+            btnSettings.Location = new Point(0, 530);
             btnSettings.Name = "btnSettings";
             btnSettings.Padding = new Padding(20, 0, 0, 0);
             btnSettings.Size = new Size(250, 50);
@@ -100,7 +102,7 @@
             btnParams.FlatStyle = FlatStyle.Flat;
             btnParams.Font = new Font("Segoe UI", 11F);
             btnParams.ForeColor = Color.FromArgb(209, 213, 219);
-            btnParams.Location = new Point(0, 430);
+            btnParams.Location = new Point(0, 480);
             btnParams.Name = "btnParams";
             btnParams.Padding = new Padding(20, 0, 0, 0);
             btnParams.Size = new Size(250, 50);
@@ -119,7 +121,7 @@
             btnReports.FlatStyle = FlatStyle.Flat;
             btnReports.Font = new Font("Segoe UI", 11F);
             btnReports.ForeColor = Color.FromArgb(209, 213, 219);
-            btnReports.Location = new Point(0, 380);
+            btnReports.Location = new Point(0, 430);
             btnReports.Name = "btnReports";
             btnReports.Padding = new Padding(20, 0, 0, 0);
             btnReports.Size = new Size(250, 50);
@@ -138,7 +140,7 @@
             btnUsers.FlatStyle = FlatStyle.Flat;
             btnUsers.Font = new Font("Segoe UI", 11F);
             btnUsers.ForeColor = Color.FromArgb(209, 213, 219);
-            btnUsers.Location = new Point(0, 330);
+            btnUsers.Location = new Point(0, 380);
             btnUsers.Name = "btnUsers";
             btnUsers.Padding = new Padding(20, 0, 0, 0);
             btnUsers.Size = new Size(250, 50);
@@ -157,7 +159,7 @@
             btnPayments.FlatStyle = FlatStyle.Flat;
             btnPayments.Font = new Font("Segoe UI", 11F);
             btnPayments.ForeColor = Color.FromArgb(209, 213, 219);
-            btnPayments.Location = new Point(0, 280);
+            btnPayments.Location = new Point(0, 330);
             btnPayments.Name = "btnPayments";
             btnPayments.Padding = new Padding(20, 0, 0, 0);
             btnPayments.Size = new Size(250, 50);
@@ -176,7 +178,7 @@
             btnInvoices.FlatStyle = FlatStyle.Flat;
             btnInvoices.Font = new Font("Segoe UI", 11F);
             btnInvoices.ForeColor = Color.FromArgb(209, 213, 219);
-            btnInvoices.Location = new Point(0, 230);
+            btnInvoices.Location = new Point(0, 280);
             btnInvoices.Name = "btnInvoices";
             btnInvoices.Padding = new Padding(20, 0, 0, 0);
             btnInvoices.Size = new Size(250, 50);
@@ -195,7 +197,7 @@
             btnBookings.FlatStyle = FlatStyle.Flat;
             btnBookings.Font = new Font("Segoe UI", 11F);
             btnBookings.ForeColor = Color.FromArgb(209, 213, 219);
-            btnBookings.Location = new Point(0, 180);
+            btnBookings.Location = new Point(0, 230);
             btnBookings.Name = "btnBookings";
             btnBookings.Padding = new Padding(20, 0, 0, 0);
             btnBookings.Size = new Size(250, 50);
@@ -203,6 +205,25 @@
             btnBookings.Text = "📅 Bookings";
             btnBookings.TextAlign = ContentAlignment.MiddleLeft;
             btnBookings.UseVisualStyleBackColor = false;
+            // 
+            // btnRoomTypes
+            // 
+            btnRoomTypes.BackColor = Color.Transparent;
+            btnRoomTypes.Cursor = Cursors.Hand;
+            btnRoomTypes.Dock = DockStyle.Top;
+            btnRoomTypes.FlatAppearance.BorderSize = 0;
+            btnRoomTypes.FlatAppearance.MouseDownBackColor = Color.FromArgb(55, 65, 81);
+            btnRoomTypes.FlatStyle = FlatStyle.Flat;
+            btnRoomTypes.Font = new Font("Segoe UI", 11F);
+            btnRoomTypes.ForeColor = Color.FromArgb(209, 213, 219);
+            btnRoomTypes.Location = new Point(0, 180);
+            btnRoomTypes.Name = "btnRoomTypes";
+            btnRoomTypes.Padding = new Padding(20, 0, 0, 0);
+            btnRoomTypes.Size = new Size(250, 50);
+            btnRoomTypes.TabIndex = 11;
+            btnRoomTypes.Text = "🏷️ Room Types";
+            btnRoomTypes.TextAlign = ContentAlignment.MiddleLeft;
+            btnRoomTypes.UseVisualStyleBackColor = false;
             // 
             // btnRooms
             // 
@@ -256,11 +277,11 @@
             // 
             lblLogo.AutoSize = true;
             lblLogo.Dock = DockStyle.Fill;
-            lblLogo.Font = new Font("Segoe UI", 16.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblLogo.Font = new Font("Segoe UI", 15F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblLogo.ForeColor = Color.White;
             lblLogo.Location = new Point(0, 0);
             lblLogo.Name = "lblLogo";
-            lblLogo.Size = new Size(206, 30);
+            lblLogo.Size = new Size(229, 28);
             lblLogo.TabIndex = 2;
             lblLogo.Text = "🏨 Hotel Management";
             lblLogo.TextAlign = ContentAlignment.MiddleCenter;
@@ -371,6 +392,7 @@
         private Button btnUsers;
         private Button btnPayments;
         private Button btnInvoices;
+        private Button btnRoomTypes;
         private Panel pnlHeader;
         private Panel pnlUserInfo;
         private Button btnLogout;

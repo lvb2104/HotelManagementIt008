@@ -6,17 +6,19 @@ namespace HotelManagementIt008.Forms
     {
         private readonly IBookingService _bookingService;
         private readonly IRoomService _roomService;
+        private readonly IUserService _userService;
         private readonly ICurrentUserService _currentUserService;
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Guid? BookingId { get; set; }
 
         private BindingList<CreateParticipantDto> _participants = new BindingList<CreateParticipantDto>();
 
-        public BookingDetailForm(IBookingService bookingService, IRoomService roomService, ICurrentUserService currentUserService)
+        public BookingDetailForm(IBookingService bookingService, IRoomService roomService, IUserService userService, ICurrentUserService currentUserService)
         {
             InitializeComponent();
             _bookingService = bookingService;
             _roomService = roomService;
+            _userService = userService;
             _currentUserService = currentUserService;
             ConfigureParticipantsGrid();
         }
@@ -24,6 +26,7 @@ namespace HotelManagementIt008.Forms
         private async void BookingDetailForm_Load(object sender, EventArgs e)
         {
             await LoadRooms();
+            await LoadCustomers();
 
             if (BookingId.HasValue)
             {
@@ -51,6 +54,12 @@ namespace HotelManagementIt008.Forms
             dgvParticipants.Columns.Clear();
 
 
+            dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "FullName",
+                HeaderText = "Full Name",
+                Width = 150
+            });
             dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Email",
@@ -101,6 +110,33 @@ namespace HotelManagementIt008.Forms
             catch (Exception ex)
             {
                 MessageBox.Show("An error occurred while loading rooms: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async Task LoadCustomers()
+        {
+            try
+            {
+                // Load all users (customers). Filter to only customers (non-staff) if needed.
+                var result = await _userService.GetUserSummariesAsync(new Gridify.GridifyQuery { PageSize = 1000 });
+                if (result.IsSuccess && result.Value != null)
+                {
+                    cboCustomers.DataSource = result.Value.Data;
+                    cboCustomers.DisplayMember = "Email"; // Display email, could also show FullName
+                    cboCustomers.ValueMember = "Id";
+                    if (cboCustomers.Items.Count > 0)
+                    {
+                        cboCustomers.SelectedIndex = -1; // No selection by default
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Failed to load customers: " + (result.ErrorMessage ?? "Unknown error"), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error occurred while loading customers: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -159,9 +195,50 @@ namespace HotelManagementIt008.Forms
             }
         }
 
+        private void rbSelectExisting_CheckedChanged(object sender, EventArgs e)
+        {
+            // Toggle visibility based on mode
+            bool selectExisting = rbSelectExisting.Checked;
+            lblCustomer.Visible = selectExisting;
+            cboCustomers.Visible = selectExisting;
+        }
+
         private void btnAddParticipant_Click(object sender, EventArgs e)
         {
-            _participants.Add(new CreateParticipantDto { UserType = UserTypeType.Local }); // Default
+            if (rbSelectExisting.Checked)
+            {
+                // Mode: Select existing customer
+                if (cboCustomers.SelectedItem is UserSummaryDto selectedUser)
+                {
+                    // Convert UserSummaryDto to CreateParticipantDto
+                    UserTypeType userType = UserTypeType.Local;
+                    if (!string.IsNullOrEmpty(selectedUser.UserType))
+                    {
+                        Enum.TryParse(selectedUser.UserType, true, out userType);
+                    }
+
+                    var participant = new CreateParticipantDto
+                    {
+                        Email = selectedUser.Email ?? string.Empty,
+                        FullName = selectedUser.FullName ?? string.Empty,
+                        Address = selectedUser.Address ?? string.Empty,
+                        IdentityNumber = string.Empty, // UserSummaryDto doesn't have IdentityNumber, user may need to fill it
+                        UserType = userType
+                    };
+
+                    _participants.Add(participant);
+                    cboCustomers.SelectedIndex = -1; // Clear selection
+                }
+                else
+                {
+                    MessageBox.Show("Please select a customer from the list.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            else
+            {
+                // Mode: Create new customer
+                _participants.Add(new CreateParticipantDto { UserType = UserTypeType.Local }); // Default
+            }
         }
 
         private void btnRemoveParticipant_Click(object sender, EventArgs e)
