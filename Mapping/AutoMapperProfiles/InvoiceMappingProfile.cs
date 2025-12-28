@@ -19,6 +19,7 @@ namespace HotelManagementIt008.Mapping.AutoMapperProfiles
             CreateMap<Booking, BookingInvoiceResponseDto>()
                 .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.Booker)); // Booking has Booker, not User
             CreateMap<User, UserInvoiceResponseDto>();
+            CreateMap<Payment, PaymentInvoiceResponseDto>();
         }
     }
 }

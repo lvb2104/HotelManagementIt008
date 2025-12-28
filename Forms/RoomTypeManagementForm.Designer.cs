@@ -101,6 +101,7 @@
             grpFilters.Controls.Add(nudPriceTo);
             grpFilters.Controls.Add(btnSearch);
             grpFilters.Controls.Add(btnClearFilters);
+            grpFilters.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             grpFilters.Font = new Font("Segoe UI", 10F);
             grpFilters.Location = new Point(10, 10);
             grpFilters.Name = "grpFilters";
@@ -174,6 +175,7 @@
             // 
             // btnSearch
             // 
+            btnSearch.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnSearch.BackColor = Color.FromArgb(33, 150, 243);
             btnSearch.Cursor = Cursors.Hand;
             btnSearch.FlatStyle = FlatStyle.Flat;
@@ -188,6 +190,7 @@
             // 
             // btnClearFilters
             // 
+            btnClearFilters.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnClearFilters.BackColor = Color.FromArgb(158, 158, 158);
             btnClearFilters.Cursor = Cursors.Hand;
             btnClearFilters.FlatStyle = FlatStyle.Flat;

@@ -100,6 +100,7 @@
             this.grpFilters.Controls.Add(this.btnClearFilters);
             this.grpFilters.Controls.Add(this.btnSearch);
             this.grpFilters.Controls.Add(this.txtFilterRoomNumber);
+            this.grpFilters.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             this.grpFilters.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.grpFilters.Location = new System.Drawing.Point(10, 10);
             this.grpFilters.Name = "grpFilters";
@@ -155,6 +156,7 @@
             // 
             // btnClearFilters
             // 
+            this.btnClearFilters.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             this.btnClearFilters.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(158)))), ((int)(((byte)(158)))));
             this.btnClearFilters.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnClearFilters.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -169,6 +171,7 @@
             // 
             // btnSearch
             // 
+            this.btnSearch.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             this.btnSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(150)))), ((int)(((byte)(243)))));
             this.btnSearch.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;

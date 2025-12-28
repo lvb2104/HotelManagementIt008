@@ -47,15 +47,12 @@
             btnExportCSV = new Button();
             btnMarkAsPaid = new Button();
             dgvInvoices = new DataGridView();
-            pnlTop.SuspendLayout();
-            pnlFilters.SuspendLayout();
-            grpFilters.SuspendLayout();
-            pnlTop.SuspendLayout();
-            pnlFilters.SuspendLayout();
-            grpFilters.SuspendLayout();
-            pnlActions.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dgvInvoices).BeginInit();
-            SuspendLayout();
+            this.pnlTop.SuspendLayout();
+            this.pnlFilters.SuspendLayout();
+            this.grpFilters.SuspendLayout();
+            this.pnlActions.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvInvoices)).BeginInit();
+            this.SuspendLayout();
             // 
             // pnlTop
             // 
@@ -110,7 +107,7 @@
             // dtpFilterDate
             // 
             dtpFilterDate.Format = DateTimePickerFormat.Short;
-            dtpFilterDate.Location = new Point(350, 45);
+            dtpFilterDate.Location = new Point(186, 65);
             dtpFilterDate.Name = "dtpFilterDate";
             dtpFilterDate.Size = new Size(150, 25);
             dtpFilterDate.TabIndex = 5;
@@ -118,17 +115,17 @@
             // lblFilterDate
             // 
             lblFilterDate.AutoSize = true;
-            lblFilterDate.Location = new Point(350, 23);
+            lblFilterDate.Location = new Point(186, 35);
             lblFilterDate.Name = "lblFilterDate";
-            lblFilterDate.Size = new Size(41, 19);
+            lblFilterDate.Size = new Size(37, 19);
             lblFilterDate.TabIndex = 4;
-            lblFilterDate.Text = "Date:";
+            lblFilterDate.Text = "Date";
             // 
             // cboFilterStatus
             // 
             cboFilterStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cboFilterStatus.FormattingEnabled = true;
-            cboFilterStatus.Location = new Point(20, 45);
+            cboFilterStatus.Location = new Point(15, 65);
             cboFilterStatus.Name = "cboFilterStatus";
             cboFilterStatus.Size = new Size(150, 25);
             cboFilterStatus.TabIndex = 3;
@@ -136,11 +133,11 @@
             // lblFilterStatus
             // 
             lblFilterStatus.AutoSize = true;
-            lblFilterStatus.Location = new Point(20, 23);
+            lblFilterStatus.Location = new Point(15, 35);
             lblFilterStatus.Name = "lblFilterStatus";
-            lblFilterStatus.Size = new Size(50, 19);
+            lblFilterStatus.Size = new Size(45, 19);
             lblFilterStatus.TabIndex = 2;
-            lblFilterStatus.Text = "Status:";
+            lblFilterStatus.Text = "Status";
             // 
             // btnClearFilters
             // 
@@ -149,7 +146,7 @@
             btnClearFilters.Cursor = Cursors.Hand;
             btnClearFilters.FlatStyle = FlatStyle.Flat;
             btnClearFilters.ForeColor = Color.White;
-            btnClearFilters.Location = new Point(960, 35);
+            btnClearFilters.Location = new Point(947, 35);
             btnClearFilters.Name = "btnClearFilters";
             btnClearFilters.Size = new Size(100, 35);
             btnClearFilters.TabIndex = 1;
@@ -164,7 +161,7 @@
             btnSearch.Cursor = Cursors.Hand;
             btnSearch.FlatStyle = FlatStyle.Flat;
             btnSearch.ForeColor = Color.White;
-            btnSearch.Location = new Point(850, 35);
+            btnSearch.Location = new Point(841, 35);
             btnSearch.Name = "btnSearch";
             btnSearch.Size = new Size(100, 35);
             btnSearch.TabIndex = 0;
@@ -298,15 +295,15 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Invoice Management";
             Load += InvoiceManagementForm_Load;
-            pnlTop.ResumeLayout(false);
-            pnlTop.PerformLayout();
-            pnlFilters.ResumeLayout(false);
-            grpFilters.ResumeLayout(false);
-            grpFilters.PerformLayout();
-            pnlActions.ResumeLayout(false);
-            pnlActions.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)dgvInvoices).EndInit();
-            ResumeLayout(false);
+            this.pnlTop.ResumeLayout(false);
+            this.pnlTop.PerformLayout();
+            this.pnlFilters.ResumeLayout(false);
+            this.grpFilters.ResumeLayout(false);
+            this.grpFilters.PerformLayout();
+            this.pnlActions.ResumeLayout(false);
+            this.pnlActions.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvInvoices)).EndInit();
+            this.ResumeLayout(false);
         }
 
         #endregion

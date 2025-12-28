@@ -12,6 +12,7 @@ namespace HotelManagementIt008.Dtos.Responses
         public DateTime UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
         public BookingInvoiceResponseDto Booking { get; set; } = default!;
+        public PaymentInvoiceResponseDto? Payment { get; set; }
     }
 
     public class BookingInvoiceResponseDto
@@ -28,5 +29,14 @@ namespace HotelManagementIt008.Dtos.Responses
         public Guid Id { get; set; }
         public string Username { get; set; } = default!;
         public string Email { get; set; } = default!;
+    }
+
+    public class PaymentInvoiceResponseDto
+    {
+        public Guid Id { get; set; }
+        public PaymentMethod Method { get; set; }
+        public decimal Amount { get; set; }
+        public PaymentStatus Status { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

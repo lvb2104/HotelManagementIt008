@@ -194,7 +194,8 @@ namespace HotelManagementIt008.Services.Implementations
                     .Include(i => i.Booking)
                         .ThenInclude(b => b.Booker)
                     .Include(i => i.Booking)
-                        .ThenInclude(b => b.Room);
+                        .ThenInclude(b => b.Room)
+                    .Include(i => i.Payment);
 
                 // Apply role-based filtering
                 if (role != "admin")
@@ -290,13 +291,6 @@ namespace HotelManagementIt008.Services.Implementations
                     : InvoiceStatus.Pending; // Or Unpaid
 
                 invoice.Status = status;
-
-                if (status == InvoiceStatus.Paid)
-                {
-                    // TODO: Implement ReportService to handle monthly revenue
-                    // var formattedDate = invoice.UpdatedAt.ToString("yyyy-MM");
-                    // await _reportService.HandleCreateOrUpdateMonthlyRevenue(formattedDate, invoice.TotalPrice, invoice.Booking.Room.RoomType.Id);
-                }
 
                 await _unitOfWork.InvoiceRepository.UpdateAsync(invoice);
                 await _unitOfWork.SaveAsync();

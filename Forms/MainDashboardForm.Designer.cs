@@ -369,6 +369,7 @@
             Controls.Add(pnlSidebar);
             Name = "MainDashboardForm";
             Text = "Hotel Management System";
+            WindowState = FormWindowState.Maximized;
             pnlSidebar.ResumeLayout(false);
             pnlLogo.ResumeLayout(false);
             pnlLogo.PerformLayout();

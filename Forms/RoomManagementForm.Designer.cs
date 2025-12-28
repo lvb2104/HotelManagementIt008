@@ -109,6 +109,7 @@
             grpFilters.Controls.Add(cboFilterStatus);
             grpFilters.Controls.Add(cboFilterRoomType);
             grpFilters.Controls.Add(txtFilterRoomNumber);
+            this.grpFilters.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             grpFilters.Font = new Font("Segoe UI", 10F);
             grpFilters.Location = new Point(10, 10);
             grpFilters.Name = "grpFilters";
@@ -192,6 +193,7 @@
             // 
             // btnClearFilters
             // 
+            this.btnClearFilters.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             btnClearFilters.BackColor = Color.FromArgb(158, 158, 158);
             btnClearFilters.Cursor = Cursors.Hand;
             btnClearFilters.FlatStyle = FlatStyle.Flat;
@@ -206,6 +208,7 @@
             // 
             // btnSearch
             // 
+            this.btnSearch.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             btnSearch.BackColor = Color.FromArgb(33, 150, 243);
             btnSearch.Cursor = Cursors.Hand;
             btnSearch.FlatStyle = FlatStyle.Flat;
