@@ -42,7 +42,7 @@
             this.pnlTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlTop.Location = new System.Drawing.Point(0, 0);
             this.pnlTop.Name = "pnlTop";
-            this.pnlTop.Size = new System.Drawing.Size(384, 60);
+            this.pnlTop.Size = new System.Drawing.Size(420, 60);
             this.pnlTop.TabIndex = 0;
             // 
             // lblTitle
@@ -69,9 +69,10 @@
             this.grpChangePassword.Controls.Add(this.btnShowConfirmPassword);
             this.grpChangePassword.Controls.Add(this.btnSave);
             this.grpChangePassword.Controls.Add(this.btnCancel);
-            this.grpChangePassword.Location = new System.Drawing.Point(12, 70);
+            this.grpChangePassword.Font = new System.Drawing.Font("Segoe UI", 13F, System.Drawing.FontStyle.Bold);
+            this.grpChangePassword.Location = new System.Drawing.Point(20, 75);
             this.grpChangePassword.Name = "grpChangePassword";
-            this.grpChangePassword.Size = new System.Drawing.Size(350, 250);
+            this.grpChangePassword.Size = new System.Drawing.Size(380, 330);
             this.grpChangePassword.TabIndex = 1;
             this.grpChangePassword.TabStop = false;
             this.grpChangePassword.Text = "Change Password";
@@ -79,18 +80,20 @@
             // lblOldPassword
             // 
             this.lblOldPassword.AutoSize = true;
-            this.lblOldPassword.Location = new System.Drawing.Point(20, 30);
+            this.lblOldPassword.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.lblOldPassword.Location = new System.Drawing.Point(20, 45);
             this.lblOldPassword.Name = "lblOldPassword";
-            this.lblOldPassword.Size = new System.Drawing.Size(79, 15);
+            this.lblOldPassword.Size = new System.Drawing.Size(98, 20);
             this.lblOldPassword.TabIndex = 0;
             this.lblOldPassword.Text = "Old Password";
             // 
             // txtOldPassword
             // 
-            this.txtOldPassword.Location = new System.Drawing.Point(20, 50);
+            this.txtOldPassword.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txtOldPassword.Location = new System.Drawing.Point(20, 70);
             this.txtOldPassword.Name = "txtOldPassword";
             this.txtOldPassword.PasswordChar = '*';
-            this.txtOldPassword.Size = new System.Drawing.Size(220, 23);
+            this.txtOldPassword.Size = new System.Drawing.Size(300, 27);
             this.txtOldPassword.TabIndex = 1;
             // 
             // btnShowOldPassword
@@ -101,9 +104,9 @@
             this.btnShowOldPassword.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(145)))), ((int)(((byte)(145)))), ((int)(((byte)(145)))));
             this.btnShowOldPassword.IconFont = FontAwesome.Sharp.IconFont.Solid;
             this.btnShowOldPassword.IconSize = 22;
-            this.btnShowOldPassword.Location = new System.Drawing.Point(250, 48);
+            this.btnShowOldPassword.Location = new System.Drawing.Point(330, 68);
             this.btnShowOldPassword.Name = "btnShowOldPassword";
-            this.btnShowOldPassword.Size = new System.Drawing.Size(30, 25);
+            this.btnShowOldPassword.Size = new System.Drawing.Size(35, 30);
             this.btnShowOldPassword.TabIndex = 2;
             this.btnShowOldPassword.UseVisualStyleBackColor = true;
             this.btnShowOldPassword.Click += new System.EventHandler(this.btnShowOldPassword_Click);
@@ -111,18 +114,20 @@
             // lblNewPassword
             // 
             this.lblNewPassword.AutoSize = true;
-            this.lblNewPassword.Location = new System.Drawing.Point(20, 80);
+            this.lblNewPassword.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.lblNewPassword.Location = new System.Drawing.Point(20, 115);
             this.lblNewPassword.Name = "lblNewPassword";
-            this.lblNewPassword.Size = new System.Drawing.Size(84, 15);
+            this.lblNewPassword.Size = new System.Drawing.Size(104, 20);
             this.lblNewPassword.TabIndex = 3;
             this.lblNewPassword.Text = "New Password";
             // 
             // txtNewPassword
             // 
-            this.txtNewPassword.Location = new System.Drawing.Point(20, 100);
+            this.txtNewPassword.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txtNewPassword.Location = new System.Drawing.Point(20, 140);
             this.txtNewPassword.Name = "txtNewPassword";
             this.txtNewPassword.PasswordChar = '*';
-            this.txtNewPassword.Size = new System.Drawing.Size(220, 23);
+            this.txtNewPassword.Size = new System.Drawing.Size(300, 27);
             this.txtNewPassword.TabIndex = 4;
             // 
             // btnShowNewPassword
@@ -133,9 +138,9 @@
             this.btnShowNewPassword.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(145)))), ((int)(((byte)(145)))), ((int)(((byte)(145)))));
             this.btnShowNewPassword.IconFont = FontAwesome.Sharp.IconFont.Solid;
             this.btnShowNewPassword.IconSize = 22;
-            this.btnShowNewPassword.Location = new System.Drawing.Point(250, 98);
+            this.btnShowNewPassword.Location = new System.Drawing.Point(330, 138);
             this.btnShowNewPassword.Name = "btnShowNewPassword";
-            this.btnShowNewPassword.Size = new System.Drawing.Size(30, 25);
+            this.btnShowNewPassword.Size = new System.Drawing.Size(35, 30);
             this.btnShowNewPassword.TabIndex = 5;
             this.btnShowNewPassword.UseVisualStyleBackColor = true;
             this.btnShowNewPassword.Click += new System.EventHandler(this.btnShowNewPassword_Click);
@@ -143,18 +148,20 @@
             // lblConfirmPassword
             // 
             this.lblConfirmPassword.AutoSize = true;
-            this.lblConfirmPassword.Location = new System.Drawing.Point(20, 130);
+            this.lblConfirmPassword.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.lblConfirmPassword.Location = new System.Drawing.Point(20, 185);
             this.lblConfirmPassword.Name = "lblConfirmPassword";
-            this.lblConfirmPassword.Size = new System.Drawing.Size(104, 15);
+            this.lblConfirmPassword.Size = new System.Drawing.Size(127, 20);
             this.lblConfirmPassword.TabIndex = 6;
             this.lblConfirmPassword.Text = "Confirm Password";
             // 
             // txtConfirmPassword
             // 
-            this.txtConfirmPassword.Location = new System.Drawing.Point(20, 150);
+            this.txtConfirmPassword.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txtConfirmPassword.Location = new System.Drawing.Point(20, 210);
             this.txtConfirmPassword.Name = "txtConfirmPassword";
             this.txtConfirmPassword.PasswordChar = '*';
-            this.txtConfirmPassword.Size = new System.Drawing.Size(220, 23);
+            this.txtConfirmPassword.Size = new System.Drawing.Size(300, 27);
             this.txtConfirmPassword.TabIndex = 7;
             // 
             // btnShowConfirmPassword
@@ -165,9 +172,9 @@
             this.btnShowConfirmPassword.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(145)))), ((int)(((byte)(145)))), ((int)(((byte)(145)))));
             this.btnShowConfirmPassword.IconFont = FontAwesome.Sharp.IconFont.Solid;
             this.btnShowConfirmPassword.IconSize = 22;
-            this.btnShowConfirmPassword.Location = new System.Drawing.Point(250, 148);
+            this.btnShowConfirmPassword.Location = new System.Drawing.Point(330, 208);
             this.btnShowConfirmPassword.Name = "btnShowConfirmPassword";
-            this.btnShowConfirmPassword.Size = new System.Drawing.Size(30, 25);
+            this.btnShowConfirmPassword.Size = new System.Drawing.Size(35, 30);
             this.btnShowConfirmPassword.TabIndex = 8;
             this.btnShowConfirmPassword.UseVisualStyleBackColor = true;
             this.btnShowConfirmPassword.Click += new System.EventHandler(this.btnShowConfirmPassword_Click);
@@ -177,9 +184,10 @@
             this.btnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
             this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSave.ForeColor = System.Drawing.Color.White;
-            this.btnSave.Location = new System.Drawing.Point(20, 205);
+            this.btnSave.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnSave.Location = new System.Drawing.Point(20, 265);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(80, 30);
+            this.btnSave.Size = new System.Drawing.Size(100, 40);
             this.btnSave.TabIndex = 9;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = false;
@@ -190,9 +198,10 @@
             this.btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(158)))), ((int)(((byte)(158)))));
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancel.ForeColor = System.Drawing.Color.White;
-            this.btnCancel.Location = new System.Drawing.Point(110, 205);
+            this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnCancel.Location = new System.Drawing.Point(130, 265);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(80, 30);
+            this.btnCancel.Size = new System.Drawing.Size(100, 40);
             this.btnCancel.TabIndex = 10;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = false;
@@ -203,7 +212,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(384, 340);
+            this.ClientSize = new System.Drawing.Size(420, 430);
             this.Controls.Add(this.grpChangePassword);
             this.Controls.Add(this.pnlTop);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;

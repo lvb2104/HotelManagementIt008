@@ -77,13 +77,13 @@ namespace HotelManagementIt008.Forms
             this.dgvParams.RowHeadersVisible = false;
             this.dgvParams.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvParams.RowTemplate.Height = 29;
-            this.dgvParams.Size = new System.Drawing.Size(860, 160);
+            this.dgvParams.Size = new System.Drawing.Size(860, 300);
             this.dgvParams.TabIndex = 1;
             // 
             // lblKey
             // 
             this.lblKey.AutoSize = true;
-            this.lblKey.Location = new System.Drawing.Point(10, 242);
+            this.lblKey.Location = new System.Drawing.Point(10, 382);
             this.lblKey.Name = "lblKey";
             this.lblKey.Size = new System.Drawing.Size(29, 15);
             this.lblKey.TabIndex = 2;
@@ -92,7 +92,7 @@ namespace HotelManagementIt008.Forms
             // cbKey
             // 
             this.cbKey.FormattingEnabled = true;
-            this.cbKey.Location = new System.Drawing.Point(46, 240);
+            this.cbKey.Location = new System.Drawing.Point(46, 380);
             this.cbKey.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cbKey.Name = "cbKey";
             this.cbKey.Size = new System.Drawing.Size(132, 23);
@@ -102,7 +102,7 @@ namespace HotelManagementIt008.Forms
             // lblValue
             // 
             this.lblValue.AutoSize = true;
-            this.lblValue.Location = new System.Drawing.Point(192, 242);
+            this.lblValue.Location = new System.Drawing.Point(192, 382);
             this.lblValue.Name = "lblValue";
             this.lblValue.Size = new System.Drawing.Size(38, 15);
             this.lblValue.TabIndex = 4;
@@ -110,7 +110,7 @@ namespace HotelManagementIt008.Forms
             // 
             // txtValue
             // 
-            this.txtValue.Location = new System.Drawing.Point(240, 240);
+            this.txtValue.Location = new System.Drawing.Point(240, 380);
             this.txtValue.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtValue.Name = "txtValue";
             this.txtValue.Size = new System.Drawing.Size(132, 23);
@@ -122,7 +122,7 @@ namespace HotelManagementIt008.Forms
             this.btnUpdate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUpdate.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Bold);
             this.btnUpdate.ForeColor = System.Drawing.Color.White;
-            this.btnUpdate.Location = new System.Drawing.Point(385, 234);
+            this.btnUpdate.Location = new System.Drawing.Point(385, 374);
             this.btnUpdate.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnUpdate.Name = "btnUpdate";
             this.btnUpdate.Size = new System.Drawing.Size(88, 30);
@@ -136,7 +136,7 @@ namespace HotelManagementIt008.Forms
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
-            this.ClientSize = new System.Drawing.Size(900, 290);
+            this.ClientSize = new System.Drawing.Size(900, 430);
             this.Controls.Add(this.btnUpdate);
             this.Controls.Add(this.txtValue);
             this.Controls.Add(this.lblValue);
