@@ -49,7 +49,8 @@ namespace HotelManagementIt008.Forms
                 Name = "colId",
                 DataPropertyName = "Id",
                 HeaderText = "ID",
-                Visible = false
+                Visible = true,
+                Width = 250
             });
             dgvBookings.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -129,7 +130,7 @@ namespace HotelManagementIt008.Forms
                     OrderBy = "createdAt desc" // Default sorting
                 };
 
-                var result = await _bookingService.GetBookingSummariesAsync(_currentUserService.UserId.ToString(), gridifyQuery);
+                var result = await _bookingService.GetBookingSummariesAsync(_currentUserService.Role.ToString(), _currentUserService.UserId.ToString(), gridifyQuery);
 
                 if (result.IsSuccess && result.Value != null)
                 {
@@ -185,7 +186,7 @@ namespace HotelManagementIt008.Forms
                     OrderBy = "createdAt desc"
                 };
 
-                var result = await _bookingService.GetBookingSummariesAsync(_currentUserService.UserId.ToString(), gridifyQuery);
+                var result = await _bookingService.GetBookingSummariesAsync(_currentUserService.Role.ToString(), _currentUserService.UserId.ToString(), gridifyQuery);
 
                 if (result.IsSuccess && result.Value != null)
                 {

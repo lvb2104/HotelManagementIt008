@@ -63,7 +63,8 @@ namespace HotelManagementIt008.Forms
                 Name = "colId",
                 DataPropertyName = "Id",
                 HeaderText = "ID",
-                Visible = false
+                Visible = true,
+                Width = 250
             });
             dgvPayments.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -93,6 +94,13 @@ namespace HotelManagementIt008.Forms
                 DataPropertyName = "InvoiceCount",
                 HeaderText = "Invoices",
                 Width = 80
+            });
+            dgvPayments.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "colRoomNumbers",
+                DataPropertyName = "RoomNumbers",
+                HeaderText = "Room Numbers",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
             dgvPayments.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -143,7 +151,38 @@ namespace HotelManagementIt008.Forms
         {
             if (e.RowIndex >= 0)
             {
-                btnEditPayment_Click(sender, e);
+                var row = dgvPayments.Rows[e.RowIndex];
+                if (row.DataBoundItem is PaymentViewModel vm)
+                {
+                    // Show invoice details if any
+                    if (vm.OriginalDto.Invoices != null && vm.OriginalDto.Invoices.Any())
+                    {
+                        var sb = new StringBuilder();
+                        sb.AppendLine($"Payment Details (ID: {vm.Id.ToString().Substring(0, 8)})");
+                        sb.AppendLine($"Amount: {vm.Amount:C2}");
+                        sb.AppendLine($"Method: {vm.Method}");
+                        sb.AppendLine($"Status: {vm.Status}");
+                        sb.AppendLine();
+                        sb.AppendLine($"Linked Invoices ({vm.InvoiceCount}):");
+                        sb.AppendLine(new string('-', 60));
+                        
+                        foreach (var invoice in vm.OriginalDto.Invoices)
+                        {
+                            sb.AppendLine($"• Invoice ID: {invoice.Id.ToString().Substring(0, 8)}");
+                            sb.AppendLine($"  Room: {invoice.RoomNumber}");
+                            sb.AppendLine($"  Total: {invoice.TotalPrice:C2}");
+                            sb.AppendLine($"  Status: {invoice.Status}");
+                            sb.AppendLine($"  Created: {invoice.CreatedAt:yyyy-MM-dd}");
+                            sb.AppendLine();
+                        }
+
+                        MessageBox.Show(sb.ToString(), "Payment & Invoice Details", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("This payment has no linked invoices.", "Payment Details", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
             }
         }
 
@@ -158,7 +197,7 @@ namespace HotelManagementIt008.Forms
                     OrderBy = "createdAt desc"
                 };
 
-                var result = await _paymentService.GetPaymentsAsync(gridifyQuery);
+                var result = await _paymentService.GetPaymentsAsync(_currentUserService.Role.ToString(), _currentUserService.UserId.ToString(), gridifyQuery);
 
                 if (result.IsSuccess && result.Value != null)
                 {
@@ -173,6 +212,9 @@ namespace HotelManagementIt008.Forms
                         Amount = p.Amount,
                         Status = p.Status,
                         InvoiceCount = p.Invoices?.Count ?? 0,
+                        RoomNumbers = p.Invoices != null && p.Invoices.Any()
+                            ? string.Join(", ", p.Invoices.Select(i => $"Room {i.RoomNumber}"))
+                            : "N/A",
                         CreatedAt = p.CreatedAt,
                         UpdatedAt = p.UpdatedAt,
                         OriginalDto = p
@@ -224,7 +266,7 @@ namespace HotelManagementIt008.Forms
                     OrderBy = "createdAt desc"
                 };
 
-                var result = await _paymentService.GetPaymentsAsync(gridifyQuery);
+                var result = await _paymentService.GetPaymentsAsync(_currentUserService.Role.ToString(), _currentUserService.UserId.ToString(), gridifyQuery);
 
                 if (result.IsSuccess && result.Value != null)
                 {
@@ -239,6 +281,9 @@ namespace HotelManagementIt008.Forms
                         Amount = p.Amount,
                         Status = p.Status,
                         InvoiceCount = p.Invoices?.Count ?? 0,
+                        RoomNumbers = p.Invoices != null && p.Invoices.Any()
+                            ? string.Join(", ", p.Invoices.Select(i => $"Room {i.RoomNumber}"))
+                            : "N/A",
                         CreatedAt = p.CreatedAt,
                         UpdatedAt = p.UpdatedAt,
                         OriginalDto = p
@@ -552,6 +597,7 @@ namespace HotelManagementIt008.Forms
             public decimal Amount { get; set; }
             public PaymentStatus Status { get; set; }
             public int InvoiceCount { get; set; }
+            public string RoomNumbers { get; set; } = string.Empty;
             public DateTime CreatedAt { get; set; }
             public DateTime UpdatedAt { get; set; }
             public PaymentResponseDto OriginalDto { get; set; } = default!;

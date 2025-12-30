@@ -117,8 +117,13 @@ namespace HotelManagementIt008.Forms
         {
             try
             {
-                // Load all users (customers). Filter to only customers (non-staff) if needed.
-                var result = await _userService.GetUserSummariesAsync(new Gridify.GridifyQuery { PageSize = 1000 });
+                // Load only customers (exclude admin and staff)
+                var query = new Gridify.GridifyQuery 
+                { 
+                    PageSize = 1000,
+                    Filter = "role=Customer"
+                };
+                var result = await _userService.GetUserSummariesAsync("Admin", query);
                 if (result.IsSuccess && result.Value != null)
                 {
                     cboCustomers.DataSource = result.Value.Data;

@@ -218,8 +218,7 @@
             // btnNext
             // 
             this.btnNext.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            this.btnNext.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            this.btnNext.Location = new System.Drawing.Point(980, 18);
+            this.btnNext.Location = new System.Drawing.Point(970, 15);
             this.btnNext.Name = "btnNext";
             this.btnNext.Size = new System.Drawing.Size(100, 30);
             this.btnNext.TabIndex = 8;
@@ -241,8 +240,7 @@
             // btnPrevious
             // 
             this.btnPrevious.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            this.btnPrevious.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            this.btnPrevious.Location = new System.Drawing.Point(860, 18);
+            this.btnPrevious.Location = new System.Drawing.Point(730, 15);
             this.btnPrevious.Name = "btnPrevious";
             this.btnPrevious.Size = new System.Drawing.Size(100, 30);
             this.btnPrevious.TabIndex = 6;

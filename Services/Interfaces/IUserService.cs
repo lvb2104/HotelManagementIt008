@@ -10,7 +10,7 @@ namespace HotelManagementIt008.Services.Interfaces
         Task<Result<int>> CountByRoleTypeAsync(RoleType? role = null);
         Task<Result<UserResponseDto>> GetUserByIdAsync(Guid id);
         Task<Result<UserResponseDto>> UpdateUserAsync(Guid id, UpdateUserDto dto);
-        Task<Result<Paging<UserSummaryDto>>> GetUserSummariesAsync(GridifyQuery query);
+        Task<Result<Paging<UserSummaryDto>>> GetUserSummariesAsync(string role, GridifyQuery query);
         Task<Result<bool>> DeleteUserAsync(Guid id);
         Task<Result<UserResponseDto>> CreateUserAsync(CreateUserDto dto);
         Task<Result<bool>> ChangePasswordAsync(Guid userId, ChangePasswordRequestDto dto);

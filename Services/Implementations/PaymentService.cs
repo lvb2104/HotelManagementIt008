@@ -103,6 +103,42 @@ namespace HotelManagementIt008.Services.Implementations
             }
         }
 
+        public async Task<Result<Paging<PaymentResponseDto>>> GetPaymentsAsync(string role, string userId, GridifyQuery query)
+        {
+            try
+            {
+                IQueryable<Payment> paymentsQuery = _unitOfWork.PaymentRepository.GetAllQueryable()
+                    .Include(p => p.Invoices)
+                        .ThenInclude(i => i.Booking)
+                            .ThenInclude(b => b.Booker)
+                    .Include(p => p.Invoices)
+                        .ThenInclude(i => i.Booking)
+                            .ThenInclude(b => b.Room);
+
+                // Apply role-based filtering
+                if (!role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+                {
+                    paymentsQuery = paymentsQuery.Where(p => p.Invoices.Any(i => i.Booking.BookerId.ToString() == userId));
+                }
+
+                // Apply Gridify filtering, sorting, and paging
+                var pagedPayments = await paymentsQuery.GridifyAsync(query, _gridifyMapper);
+
+                // Map to DTOs
+                var paymentDtos = _mapper.Map<List<PaymentResponseDto>>(pagedPayments.Data);
+
+                return Result<Paging<PaymentResponseDto>>.Success(new Paging<PaymentResponseDto>
+                {
+                    Data = paymentDtos,
+                    Count = pagedPayments.Count
+                });
+            }
+            catch (Exception ex)
+            {
+                return Result<Paging<PaymentResponseDto>>.Failure($"Error retrieving payments: {ex.Message}");
+            }
+        }
+
         public async Task<Result<PaymentResponseDto>> UpdatePaymentAsync(string id, UpdatePaymentDto dto)
         {
             try

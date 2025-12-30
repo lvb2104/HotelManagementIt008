@@ -33,7 +33,6 @@ namespace HotelManagementIt008.Repositories.Implementations
             if (user != null)
             {
                 Context.Users.Remove(user);
-                await Context.SaveChangesAsync();
             }
         }
     }

@@ -198,7 +198,7 @@ namespace HotelManagementIt008.Services.Implementations
                     .Include(i => i.Payment);
 
                 // Apply role-based filtering
-                if (role != "admin")
+                if (!role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
                 {
                     invoicesQuery = invoicesQuery.Where(i => i.Booking.BookerId.ToString() == userId);
                 }

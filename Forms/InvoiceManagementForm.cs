@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Drawing.Printing;
+using System.Text;
 
 using Gridify;
 
@@ -50,7 +51,8 @@ namespace HotelManagementIt008.Forms
                 Name = "colId",
                 DataPropertyName = "Id",
                 HeaderText = "ID",
-                Visible = false
+                Visible = true,
+                Width = 250
             });
             dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -61,10 +63,10 @@ namespace HotelManagementIt008.Forms
             });
             dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
             {
-                Name = "colBooker",
-                DataPropertyName = "BookerEmail", // Custom property or mapped
-                HeaderText = "Booker Email",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+                Name = "colBookingId",
+                DataPropertyName = "BookingId",
+                HeaderText = "Booking ID",
+                Width = 250
             });
             dgvInvoices.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -122,6 +124,7 @@ namespace HotelManagementIt008.Forms
             });
 
             dgvInvoices.SelectionChanged += DgvInvoices_SelectionChanged;
+            dgvInvoices.CellDoubleClick += DgvInvoices_CellDoubleClick;
         }
 
         private void DgvInvoices_SelectionChanged(object? sender, EventArgs e)
@@ -129,6 +132,7 @@ namespace HotelManagementIt008.Forms
             bool hasSelection = dgvInvoices.SelectedRows.Count > 0;
             btnPrintInvoice.Enabled = hasSelection;
             btnMarkAsPaid.Enabled = hasSelection;
+            btnMarkAsPending.Enabled = hasSelection;
 
             if (hasSelection)
             {
@@ -136,6 +140,47 @@ namespace HotelManagementIt008.Forms
                 if (row.DataBoundItem is InvoiceViewModel vm)
                 {
                     btnMarkAsPaid.Enabled = vm.Status != InvoiceStatus.Paid && vm.Status != InvoiceStatus.Cancelled;
+                    btnMarkAsPending.Enabled = vm.Status != InvoiceStatus.Pending && vm.Status != InvoiceStatus.Cancelled;
+                }
+            }
+        }
+
+        private void DgvInvoices_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                var row = dgvInvoices.Rows[e.RowIndex];
+                if (row.DataBoundItem is InvoiceViewModel vm)
+                {
+                    // Show booking details
+                    if (vm.OriginalDto.Booking != null)
+                    {
+                        var booking = vm.OriginalDto.Booking;
+                        var sb = new StringBuilder();
+                        sb.AppendLine($"Invoice Details (ID: {vm.Id.ToString().Substring(0, 8)})");
+                        sb.AppendLine($"Total Price: {vm.TotalPrice:C2}");
+                        sb.AppendLine($"Status: {vm.Status}");
+                        sb.AppendLine();
+                        sb.AppendLine($"Linked Booking Information:");
+                        sb.AppendLine(new string('-', 60));
+                        sb.AppendLine($"• Booking ID: {booking.Id.ToString().Substring(0, 8)}");
+                        sb.AppendLine($"• Room Number: {booking.Room?.RoomNumber ?? "N/A"}");
+                        sb.AppendLine($"• Room Type: {booking.Room?.RoomType?.Name ?? "N/A"}");
+                        sb.AppendLine($"• Price/Night: {(booking.Room?.RoomType?.PricePerNight ?? 0):C2}");
+                        sb.AppendLine();
+                        sb.AppendLine($"• Check-In: {booking.CheckInDate:yyyy-MM-dd}");
+                        sb.AppendLine($"• Check-Out: {booking.CheckOutDate:yyyy-MM-dd}");
+                        sb.AppendLine($"• Nights: {vm.DaysStayed}");
+                        sb.AppendLine();
+                        sb.AppendLine($"• Customer: {booking.User?.Username ?? "N/A"}");
+                        sb.AppendLine($"• Email: {booking.User?.Email ?? "N/A"}");
+
+                        MessageBox.Show(sb.ToString(), "Invoice & Booking Details", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("This invoice has no linked booking.", "Invoice Details", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
             }
         }
@@ -163,8 +208,8 @@ namespace HotelManagementIt008.Forms
                     var viewModels = result.Value.Data.Select(i => new InvoiceViewModel
                     {
                         Id = i.Id,
+                        BookingId = i.Booking?.Id ?? Guid.Empty,
                         RoomNumber = i.Booking?.Room?.RoomNumber ?? "N/A",
-                        BookerEmail = i.Booking?.User?.Email ?? "Admin",
                         BasePrice = i.BasePrice,
                         TotalPrice = i.TotalPrice,
                         DaysStayed = i.DaysStayed,
@@ -231,8 +276,8 @@ namespace HotelManagementIt008.Forms
                     var viewModels = result.Value.Data.Select(i => new InvoiceViewModel
                     {
                         Id = i.Id,
+                        BookingId = i.Booking?.Id ?? Guid.Empty,
                         RoomNumber = i.Booking?.Room?.RoomNumber ?? "N/A",
-                        BookerEmail = i.Booking?.User?.Email ?? "Admin",
                         BasePrice = i.BasePrice,
                         TotalPrice = i.TotalPrice,
                         DaysStayed = i.DaysStayed,
@@ -307,6 +352,32 @@ namespace HotelManagementIt008.Forms
                         if (result.IsSuccess)
                         {
                             MessageBox.Show("Invoice marked as paid.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            await LoadInvoices();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to update status: " + result.ErrorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+            }
+        }
+
+        private async void btnMarkAsPending_Click(object sender, EventArgs e)
+        {
+            if (dgvInvoices.SelectedRows.Count > 0)
+            {
+                var row = dgvInvoices.SelectedRows[0];
+                if (row.DataBoundItem is InvoiceViewModel vm)
+                {
+                    if (vm.Status == InvoiceStatus.Pending) return;
+
+                    if (MessageBox.Show("Mark this invoice as PENDING?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        var result = await _invoiceService.UpdateInvoiceStatusAsync(vm.Id.ToString(), InvoiceStatus.Pending);
+                        if (result.IsSuccess)
+                        {
+                            MessageBox.Show("Invoice marked as pending.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             await LoadInvoices();
                         }
                         else
@@ -539,8 +610,8 @@ namespace HotelManagementIt008.Forms
         private class InvoiceViewModel
         {
             public Guid Id { get; set; }
+            public Guid BookingId { get; set; }
             public string RoomNumber { get; set; } = string.Empty;
-            public string BookerEmail { get; set; } = string.Empty;
             public decimal BasePrice { get; set; }
             public decimal TotalPrice { get; set; }
             public int DaysStayed { get; set; }

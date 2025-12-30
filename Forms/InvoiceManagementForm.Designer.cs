@@ -46,6 +46,7 @@
             btnPrintInvoice = new Button();
             btnExportCSV = new Button();
             btnMarkAsPaid = new Button();
+            btnMarkAsPending = new Button();
             dgvInvoices = new DataGridView();
             this.pnlTop.SuspendLayout();
             this.pnlFilters.SuspendLayout();
@@ -178,6 +179,7 @@
             pnlActions.Controls.Add(btnPrevious);
             pnlActions.Controls.Add(btnExportCSV);
             pnlActions.Controls.Add(btnPrintInvoice);
+            pnlActions.Controls.Add(btnMarkAsPending);
             pnlActions.Controls.Add(btnMarkAsPaid);
             pnlActions.Dock = DockStyle.Top;
             pnlActions.Location = new Point(0, 180);
@@ -258,6 +260,19 @@
             btnMarkAsPaid.UseVisualStyleBackColor = false;
             btnMarkAsPaid.Click += btnMarkAsPaid_Click;
             // 
+            // btnMarkAsPending
+            // 
+            btnMarkAsPending.BackColor = Color.FromArgb(255, 152, 0);
+            btnMarkAsPending.FlatStyle = FlatStyle.Flat;
+            btnMarkAsPending.ForeColor = Color.White;
+            btnMarkAsPending.Location = new Point(410, 15);
+            btnMarkAsPending.Name = "btnMarkAsPending";
+            btnMarkAsPending.Size = new Size(140, 35);
+            btnMarkAsPending.TabIndex = 7;
+            btnMarkAsPending.Text = "⏳ Mark as Pending";
+            btnMarkAsPending.UseVisualStyleBackColor = false;
+            btnMarkAsPending.Click += btnMarkAsPending_Click;
+            // 
             // 
             // dgvInvoices
             // 
@@ -319,6 +334,7 @@
         private Button btnPrintInvoice;
         private Button btnExportCSV;
         private Button btnMarkAsPaid;
+        private Button btnMarkAsPending;
         private Button btnNext;
         private Button btnPrevious;
         private Label lblPageInfo;
