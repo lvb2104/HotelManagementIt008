@@ -177,13 +177,19 @@ namespace HotelManagementIt008.Services.Implementations
                 _mapper.Map<UserResponseDto>(user)
             );
         }
-        public async Task<Result<Paging<UserSummaryDto>>> GetUserSummariesAsync(GridifyQuery query)
+        public async Task<Result<Paging<UserSummaryDto>>> GetUserSummariesAsync(string role, GridifyQuery query)
         {
             try
             {
                 var usersQuery = _unitOfWork.UserRepository
                     .GetAllQueryable()
                     .AsNoTracking();
+
+                // Apply role-based filtering - Staff can only see customers
+                if (!role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+                {
+                    usersQuery = usersQuery.Where(u => u.Role.Type == RoleType.Customer);
+                }
 
                 // Apply Gridify filtering, sorting, and paging
                 var pagedUsers = await usersQuery.GridifyAsync(query, _gridifyMapper);

@@ -67,7 +67,7 @@
             flpStats.Location = new Point(0, 37);
             flpStats.MaximumSize = new Size(1080, 0);
             flpStats.Name = "flpStats";
-            flpStats.Size = new Size(1094, 280);
+            flpStats.Size = new Size(1080, 280);
             flpStats.TabIndex = 1;
             // 
             // statTotalRoomsCard

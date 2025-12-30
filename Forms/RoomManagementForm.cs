@@ -39,10 +39,11 @@ namespace HotelManagementIt008.Forms
 
             dgvRooms.Columns.Add(new DataGridViewTextBoxColumn
             {
-                Name = "colRoomId",
-                DataPropertyName = nameof(RoomResponseDto.Id),
+                Name = "colId",
+                DataPropertyName = "Id",
                 HeaderText = "ID",
-                Visible = false
+                Visible = true,
+                Width = 250
             });
             dgvRooms.Columns.Add(new DataGridViewTextBoxColumn
             {

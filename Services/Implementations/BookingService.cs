@@ -85,19 +85,12 @@ namespace HotelManagementIt008.Services.Implementations
             }
         }
 
-        public async Task<Result<Paging<BookingSummaryDto>>> GetBookingSummariesAsync(string userId, GridifyQuery query)
+        public async Task<Result<Paging<BookingSummaryDto>>> GetBookingSummariesAsync(string role, string userId, GridifyQuery query)
         {
             try
             {
                 if (!Guid.TryParse(userId, out var guidUserId))
                     return Result<Paging<BookingSummaryDto>>.Failure("Invalid user ID");
-
-                var user = await _unitOfWork.UserRepository.GetByIdAsync(guidUserId);
-                if (user == null) return Result<Paging<BookingSummaryDto>>.Failure("User not found");
-
-                // Check if admin
-                var role = await _unitOfWork.RoleRepository.GetByIdAsync(user.RoleId);
-                bool isAdmin = role?.Type == RoleType.Admin;
 
                 var bookingsQuery = _unitOfWork.BookingRepository.GetAllQueryable()
                     .Include(b => b.Room)
@@ -105,7 +98,7 @@ namespace HotelManagementIt008.Services.Implementations
                     .AsQueryable();
 
                 // Apply role-based filtering
-                if (!isAdmin)
+                if (!role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
                 {
                     bookingsQuery = bookingsQuery.Where(b => b.BookerId == guidUserId);
                 }

@@ -211,6 +211,7 @@
             // 
             // btnNext
             // 
+            this.btnNext.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             this.btnNext.Location = new System.Drawing.Point(957, 17);
             this.btnNext.Name = "btnNext";
             this.btnNext.Size = new System.Drawing.Size(100, 30);
@@ -221,6 +222,7 @@
             // 
             // lblPageInfo
             // 
+            this.lblPageInfo.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             this.lblPageInfo.AutoSize = true;
             this.lblPageInfo.Location = new System.Drawing.Point(851, 25);
             this.lblPageInfo.Name = "lblPageInfo";
@@ -231,6 +233,7 @@
             // 
             // btnPrevious
             // 
+            this.btnPrevious.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             this.btnPrevious.Enabled = false;
             this.btnPrevious.Location = new System.Drawing.Point(717, 17);
             this.btnPrevious.Name = "btnPrevious";

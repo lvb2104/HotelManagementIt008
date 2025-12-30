@@ -58,7 +58,9 @@ namespace HotelManagementIt008.Forms
             {
                 Name = "colId",
                 DataPropertyName = "Id",
-                Visible = false
+                HeaderText = "ID",
+                Visible = true,
+                Width = 250
             });
 
             dgvUsers.Columns.Add(new DataGridViewTextBoxColumn
@@ -156,7 +158,7 @@ namespace HotelManagementIt008.Forms
                 OrderBy = "createdAt desc"
             };
 
-            var result = await _userService.GetUserSummariesAsync(gridifyQuery);
+            var result = await _userService.GetUserSummariesAsync(_currentUserService.Role.ToString(), gridifyQuery);
             if (!result.IsSuccess)
             {
                 MessageBox.Show("Failed to load users: " + result.ErrorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -237,7 +239,7 @@ namespace HotelManagementIt008.Forms
                     OrderBy = "createdAt desc"
                 };
 
-                var result = await _userService.GetUserSummariesAsync(gridifyQuery);
+                var result = await _userService.GetUserSummariesAsync(_currentUserService.Role.ToString(), gridifyQuery);
                 if (!result.IsSuccess)
                 {
                     MessageBox.Show("Failed to filter users: " + result.ErrorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

@@ -267,6 +267,7 @@
             // 
             // btnNext
             // 
+            btnNext.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnNext.Location = new Point(957, 17);
             btnNext.Name = "btnNext";
             btnNext.Size = new Size(100, 30);
@@ -277,6 +278,7 @@
             // 
             // lblPageInfo
             // 
+            lblPageInfo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             lblPageInfo.AutoSize = true;
             lblPageInfo.Location = new Point(851, 25);
             lblPageInfo.Name = "lblPageInfo";
@@ -287,6 +289,7 @@
             // 
             // btnPrevious
             // 
+            btnPrevious.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnPrevious.Enabled = false;
             btnPrevious.Location = new Point(717, 17);
             btnPrevious.Name = "btnPrevious";

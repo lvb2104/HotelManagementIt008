@@ -1,119 +1,35 @@
 ﻿namespace HotelManagementIt008.Repositories.Implementations
 {
-    public class UnitOfWork : IUnitOfWork
+    public class UnitOfWork(HotelManagementDbContext context) : IUnitOfWork
     {
-        private readonly HotelManagementDbContext _context;
-        private UserRepository? _userRepository;
-        private UserTypeRepository? _userTypeRepository;
-        private RoleRepository? _roleRepository;
-        private ProfileRepository? _profileRepository;
-        private RoomRepository? _roomRepository;
-        private RoomTypeRepository? _roomTypeRepository;
-        private BookingRepository? _bookingRepository;
-        private BookingDetailsRepository? _bookingDetailsRepository;
-        private InvoiceRepository? _invoiceRepository;
-        private PaymentRepository? _paymentRepository;
-        private ParamsRepository? _paramsRepository;
+        private readonly HotelManagementDbContext _context = context;
+        private IUserRepository? _userRepository;
+        private IUserTypeRepository? _userTypeRepository;
+        private IRoleRepository? _roleRepository;
+        private IProfileRepository? _profileRepository;
+        private IRoomRepository? _roomRepository;
+        private IRoomTypeRepository? _roomTypeRepository;
+        private IBookingRepository? _bookingRepository;
+        private IBookingDetailsRepository? _bookingDetailsRepository;
+        private IInvoiceRepository? _invoiceRepository;
+        private IPaymentRepository? _paymentRepository;
+        private IParamsRepository? _paramsRepository;
 
-        public UnitOfWork(HotelManagementDbContext context)
-        {
-            _context = context;
-        }
-        public IUserRepository UserRepository
-        {
-            get
-            {
-                // If _userRepository is null, create a new instance, otherwise return the existing one
-                return _userRepository ??= new UserRepository(_context);
-            }
-        }
+        public IUserRepository UserRepository => _userRepository ??= new UserRepository(_context);
+        public IUserTypeRepository UserTypeRepository => _userTypeRepository ??= new UserTypeRepository(_context);
+        public IRoleRepository RoleRepository => _roleRepository ??= new RoleRepository(_context);
+        public IProfileRepository ProfileRepository => _profileRepository ??= new ProfileRepository(_context);
+        public IRoomRepository RoomRepository => _roomRepository ??= new RoomRepository(_context);
+        public IRoomTypeRepository RoomTypeRepository => _roomTypeRepository ??= new RoomTypeRepository(_context);
+        public IBookingRepository BookingRepository => _bookingRepository ??= new BookingRepository(_context);
+        public IBookingDetailsRepository BookingDetailsRepository => _bookingDetailsRepository ??= new BookingDetailsRepository(_context);
+        public IInvoiceRepository InvoiceRepository => _invoiceRepository ??= new InvoiceRepository(_context);
+        public IPaymentRepository PaymentRepository => _paymentRepository ??= new PaymentRepository(_context);
+        public IParamsRepository ParamsRepository => _paramsRepository ??= new ParamsRepository(_context);
 
-        public IUserTypeRepository UserTypeRepository
-        {
-            get
-            {
-                return _userTypeRepository ??= new UserTypeRepository(_context);
-            }
-        }
-
-        public IRoleRepository RoleRepository
-        {
-            get
-            {
-                return _roleRepository ??= new RoleRepository(_context);
-            }
-        }
-
-        public IProfileRepository ProfileRepository
-        {
-            get
-            {
-                return _profileRepository ??= new ProfileRepository(_context);
-            }
-        }
-
-        public IRoomRepository RoomRepository
-        {
-            get
-            {
-                return _roomRepository ??= new RoomRepository(_context);
-            }
-        }
-
-        public IRoomTypeRepository RoomTypeRepository
-        {
-            get
-            {
-                return _roomTypeRepository ??= new RoomTypeRepository(_context);
-            }
-        }
-
-        public IBookingRepository BookingRepository
-        {
-            get
-            {
-                return _bookingRepository ??= new BookingRepository(_context);
-            }
-        }
-
-        public IBookingDetailsRepository BookingDetailsRepository
-        {
-            get
-            {
-                return _bookingDetailsRepository ??= new BookingDetailsRepository(_context);
-            }
-        }
-
-        public IInvoiceRepository InvoiceRepository
-        {
-            get
-            {
-                return _invoiceRepository ??= new InvoiceRepository(_context);
-            }
-        }
-
-        public IPaymentRepository PaymentRepository
-        {
-            get
-            {
-                return _paymentRepository ??= new PaymentRepository(_context);
-            }
-        }
-
-        public IParamsRepository ParamsRepository
-        {
-            get
-            {
-                return _paramsRepository ??= new ParamsRepository(_context);
-            }
-        }
-
-        public Task<int> SaveAsync()
-        {
-            return _context.SaveChangesAsync();
-        }
+        public Task<int> SaveAsync() => _context.SaveChangesAsync();
 
         // Unit of work doesn't create its own context so we don't need to dispose of it, it depends on the DI container, which decides based on the lifetime we registered the UnitOfWork as a service
-
+        // We also don't need to implement IDisposable for IUnitOfWork because GC will take care of it
     }
 }
